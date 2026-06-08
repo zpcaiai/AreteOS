@@ -1,0 +1,333 @@
+// ============================================================================
+// SFM — Business Scaling Engine (Success Factor Modeling)
+// Founder Genius → Success Factors → Shared Identity/Values → Decision Rules →
+// Operating Principles → Repeatable Business System → Scalable Organization.
+// userId/organizationId are indexed scalars (no FK) so the engine is self-contained.
+// ============================================================================
+
+enum SuccessFactorCategory {
+  IDENTITY
+  VALUE
+  MARKET
+  PRODUCT
+  DECISION
+  TEAM
+  CULTURE
+  EXECUTION
+  CUSTOMER
+  RESILIENCE
+}
+
+enum BottleneckType {
+  FOUNDER_DEPENDENCY
+  UNCLEAR_VALUES
+  INCONSISTENT_DECISIONS
+  WEAK_MANAGEMENT
+  POOR_KNOWLEDGE_TRANSFER
+  CULTURE_DILUTION
+  PRODUCT_COMPLEXITY
+  CUSTOMER_ACQUISITION
+  OPERATIONAL_CHAOS
+  CASH_FLOW
+}
+
+model FounderProfile {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  founderIdentity String  @default("")
+  founderValues  String[] @default([])
+  founderBeliefs String[] @default([])
+  decisionStyle  String   @default("")
+  riskStyle      String   @default("")
+  learningStyle  String   @default("")
+  leadershipStyle String  @default("")
+  creativityStyle String  @default("")
+  executionStyle String   @default("")
+  strengths      String[] @default([])
+  shadowRisks    String[] @default([])
+  dependencyMap  Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_founder_profiles")
+}
+
+model BusinessMission {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  statement      String
+  customerPain   String   @default("")
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_business_missions")
+}
+
+model CompanyIdentity {
+  id               String   @id @default(cuid())
+  userId           String
+  organizationId   String?
+  identityStatement String
+  strategicPosition String  @default("")
+  culturalIdentity String   @default("")
+  enemyToAvoid     String   @default("")
+  promiseToCustomer String  @default("")
+  internalSelfImage String  @default("")
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_company_identities")
+}
+
+model CoreBusinessValue {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  value          String
+  rank           Int      @default(0)
+  operatingPrinciple String @default("")
+  dilutionRisk   Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_core_values")
+}
+
+model SuccessFactor {
+  id               String   @id @default(cuid())
+  userId           String
+  organizationId   String?
+  name             String
+  description      String   @default("")
+  category         SuccessFactorCategory
+  evidence         String   @default("")
+  repeatabilityScore Float  @default(0)
+  founderDependencyScore Float @default(0)
+  scalabilityScore Float    @default(0)
+  riskIfLost       String   @default("")
+  replicationMethod String  @default("")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@index([category])
+  @@index([scalabilityScore])
+  @@map("sfm_success_factors")
+}
+
+model FounderPattern {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  pattern        String
+  domain         String   @default("")
+  founderDependency Float  @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_founder_patterns")
+}
+
+model BusinessPattern {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  pattern        String
+  category       String   @default("")
+  repeatability  Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_business_patterns")
+}
+
+model BusinessDecisionRule {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  rule           String
+  context        String   @default("")
+  examples       String[] @default([])
+  antiPatterns   String[] @default([])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_decision_rules")
+}
+
+model OperatingPrinciple {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  principle      String
+  whyItMatters   String   @default("")
+  decisionContext String  @default("")
+  examples       String[] @default([])
+  antiPatterns   String[] @default([])
+  enforcement    String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_operating_principles")
+}
+
+model ScalingBottleneck {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  bottleneckType BottleneckType
+  severity       Float    @default(0)
+  rootCause      String   @default("")
+  affectedSystems String[] @default([])
+  intervention   String   @default("")
+  resolved       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_scaling_bottlenecks")
+}
+
+model TeamAlignment {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  area           String
+  alignmentScore Float    @default(0)
+  notes          String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_team_alignments")
+}
+
+model LeadershipPattern {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  pattern        String
+  maturityScore  Float    @default(0)
+  blindSpots     String[] @default([])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_leadership_patterns")
+}
+
+model CultureRitual {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  name           String
+  purpose        String   @default("")
+  cadence        String   @default("")
+  reinforcesValue String  @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("culture_rituals")
+}
+
+model CollaborationPattern {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  dimension      String
+  score          Float    @default(0)
+  friction       String   @default("")
+  upgrade        String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_collaboration_patterns")
+}
+
+model ResiliencePattern {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  dimension      String
+  score          Float    @default(0)
+  fragility      String   @default("")
+  upgrade        String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_resilience_patterns")
+}
+
+model BusinessSystemBlueprint {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  title          String
+  preserve       String[] @default([])
+  standardize    String[] @default([])
+  delegate       String[] @default([])
+  automate       String[] @default([])
+  teach          String[] @default([])
+  measure        String[] @default([])
+  protect        String[] @default([])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_system_blueprints")
+}
+
+model ReplicationPlaybook {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  title          String
+  transferPlan   String   @default("")
+  hiringPlaybook String   @default("")
+  onboardingPlaybook String @default("")
+  culturePlaybook String  @default("")
+  decisionPlaybook String @default("")
+  scalingPlaybook String  @default("")
+  readinessScore Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("sfm_replication_playbooks")
+}
+
+model OrganizationalHealthSnapshot {
+  id                 String   @id @default(cuid())
+  userId             String
+  organizationId     String?
+  founderDependency  Float    @default(0)
+  repeatability      Float    @default(0)
+  scalability        Float    @default(0)
+  valuesAlignment    Float    @default(0)
+  decisionConsistency Float   @default(0)
+  collaborationQuality Float  @default(0)
+  leadershipMaturity Float    @default(0)
+  resilience         Float    @default(0)
+  replicationReadiness Float  @default(0)
+  organizationalHealth Float  @default(0)
+  createdAt          DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("sfm_org_health_snapshots")
+}

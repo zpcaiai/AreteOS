@@ -1,0 +1,259 @@
+// ============================================================================
+// Leadership Leverage Engine — Dilts logical-levels leadership.
+// Higher logical level = greater leverage. Roles: Caretaker → Guide → Coach →
+// Mentor → Sponsor → Awakener. (CultureRitual is shared with the SFM engine.)
+// ============================================================================
+
+enum LeadershipLevel {
+  ENVIRONMENT
+  BEHAVIOR
+  CAPABILITY
+  BELIEF
+  IDENTITY
+  MISSION
+}
+
+enum LeadershipRole {
+  CARETAKER
+  GUIDE
+  COACH
+  MENTOR
+  SPONSOR
+  AWAKENER
+}
+
+model LeadershipProfile {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  currentRole    LeadershipRole @default(GUIDE)
+  dominantLevel  LeadershipLevel @default(BEHAVIOR)
+  leverageScore  Float    @default(0)
+  globalScore    Float    @default(0)
+  blindSpots     String[] @default([])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_profiles")
+}
+
+model LeadershipAssessment {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  selfAwareness  Float    @default(0)
+  responsibility Float    @default(0)
+  communication  Float    @default(0)
+  emotionalRegulation Float @default(0)
+  decisionMaturity Float  @default(0)
+  integrity      Float    @default(0)
+  peopleDevelopment Float @default(0)
+  maturityScore  Float    @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("leadership_assessments")
+}
+
+model LeadershipLeverageMap {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  environment    Float    @default(0)
+  behavior       Float    @default(0)
+  capability     Float    @default(0)
+  belief         Float    @default(0)
+  identity       Float    @default(0)
+  mission        Float    @default(0)
+  overfocus      String[] @default([])
+  blindSpots     String[] @default([])
+  leverageScore  Float    @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_leverage_maps")
+}
+
+model LeadershipConversation {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  conversationType LeadershipRole @default(COACH)
+  script         String   @default("")
+  questions      String[] @default([])
+  followUps      String[] @default([])
+  effectiveness  Float    @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_conversations")
+}
+
+model IdentitySponsorshipEvent {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  recipient      String   @default("")
+  recognition    String   @default("")
+  identityStatement String @default("")
+  narrative      String   @default("")
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_identity_sponsorships")
+}
+
+model VisionStatement {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  statement      String
+  communication  String   @default("")
+  active         Boolean  @default(true)
+  alignmentScore Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_vision_statements")
+}
+
+model VisionAlignmentSnapshot {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  alignmentScore Float    @default(0)
+  adoptionScore  Float    @default(0)
+  driftDetected  Boolean  @default(false)
+  notes          String   @default("")
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("leadership_vision_alignment")
+}
+
+model BelongingAssessment {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  trust          Float    @default(0)
+  psychologicalSafety Float @default(0)
+  recognition    Float    @default(0)
+  contribution   Float    @default(0)
+  identityFit    Float    @default(0)
+  missionFit     Float    @default(0)
+  belongingScore Float    @default(0)
+  cohesionScore  Float    @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("leadership_belonging_assessments")
+}
+
+model AlignmentAssessment {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  mission        Float    @default(0)
+  identity       Float    @default(0)
+  values         Float    @default(0)
+  decisionRules  Float    @default(0)
+  behaviors      Float    @default(0)
+  teams          Float    @default(0)
+  alignmentScore Float    @default(0)
+  misalignments  String[] @default([])
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_alignment_assessments")
+}
+
+model FutureLeaderProfile {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  candidate      String   @default("")
+  selfAwareness  Float    @default(0)
+  decisionQuality Float   @default(0)
+  influence      Float    @default(0)
+  responsibility Float    @default(0)
+  missionOwnership Float  @default(0)
+  identityStability Float @default(0)
+  visionCapability Float  @default(0)
+  readinessScore Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_future_leaders")
+}
+
+model LeadershipPipeline {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  role           String
+  candidates     String[] @default([])
+  successionMap  Json?
+  readinessScore Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_pipelines")
+}
+
+model CultureBlueprint {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  founderIdentity String  @default("")
+  values         String[] @default([])
+  leadershipBehaviors String[] @default([])
+  operatingPrinciples String[] @default([])
+  rituals        String[] @default([])
+  replicationPlaybook String @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_culture_blueprints")
+}
+
+model AwakeningSession {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  task           String   @default("")
+  why            String   @default("")
+  becoming       String   @default("")
+  futureCreated  String   @default("")
+  largerPurpose  String   @default("")
+  purposeClarity Float    @default(0)
+  missionConnection Float @default(0)
+  awakeningReadiness Float @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_awakening_sessions")
+}
+
+model LeadershipGrowthPlan {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  fromRole       LeadershipRole
+  toRole         LeadershipRole
+  steps          String[] @default([])
+  successMetrics String[] @default([])
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("leadership_growth_plans")
+}

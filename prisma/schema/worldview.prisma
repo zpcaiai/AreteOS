@@ -1,0 +1,128 @@
+// ============================================================================
+// Worldview OS — "The Reality Interpretation Operating System."
+// Worldview → Mission → Identity → Beliefs → Decisions → Outcomes → (reinforce).
+// Extends the existing minimal Worldview engine (reuses Worldview, WorldviewDimension,
+// WorldviewAssessment, Assumption). Avoids political/religious coercion by design.
+// ============================================================================
+
+enum WorldviewStage {
+  INHERITED
+  QUESTIONED
+  CONSCIOUS
+  INTEGRATED
+  GENERATIVE
+  LEGACY
+}
+
+model WorldviewProfile {
+  id          String   @id @default(cuid())
+  userId      String
+  // the 10 dimensions, each 0..1 (clarity/health of stance)
+  reality        Float @default(0)
+  humanNature    Float @default(0)
+  meaning        Float @default(0)
+  success        Float @default(0)
+  failure        Float @default(0)
+  responsibility Float @default(0)
+  time           Float @default(0)
+  change         Float @default(0)
+  risk           Float @default(0)
+  purpose        Float @default(0)
+  clarityScore   Float @default(0)
+  coherenceScore Float @default(0)
+  globalScore    Float @default(0)
+  stage          WorldviewStage @default(QUESTIONED)
+  summary        String @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([userId])
+  @@index([createdAt])
+  @@map("worldview_profiles")
+}
+
+model AssumptionConflict {
+  id          String   @id @default(cuid())
+  userId      String
+  valueOrGoal String
+  assumption  String
+  conflict    String   @default("")
+  severity    Float    @default(0)
+  resolution  String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@map("worldview_assumption_conflicts")
+}
+
+model WorldviewArchetype {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  mission     String   @default("")
+  coreAssumptions String[] @default([])
+  values      String[] @default([])
+  blindSpots  String[] @default([])
+  growthOpportunities String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("worldview_archetypes")
+}
+
+model MeaningProfile {
+  id          String   @id @default(cuid())
+  userId      String
+  work         Float   @default(0)
+  learning     Float   @default(0)
+  relationships Float  @default(0)
+  contribution Float   @default(0)
+  mastery      Float   @default(0)
+  legacy       Float   @default(0)
+  meaningScore Float   @default(0)
+  summary      String  @default("")
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@index([createdAt])
+  @@map("worldview_meaning_profiles")
+}
+
+model PersonalPhilosophy {
+  id          String   @id @default(cuid())
+  userId      String
+  philosophy  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([userId])
+  @@map("worldview_personal_philosophies")
+}
+
+model LifePrinciple {
+  id          String   @id @default(cuid())
+  userId      String
+  principle   String
+  rationale   String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@map("worldview_life_principles")
+}
+
+model WorldviewTwin {
+  id          String   @id @default(cuid())
+  userId      String
+  snapshot    Json?
+  driftDetected Boolean @default(false)
+  evolutionSuggestions String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([userId])
+  @@map("worldview_twins")
+}
+
+model WorldviewEvolution {
+  id          String   @id @default(cuid())
+  userId      String
+  stage       WorldviewStage
+  note        String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@index([createdAt])
+  @@map("worldview_evolutions")
+}

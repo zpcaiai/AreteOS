@@ -1,0 +1,81 @@
+// ============================================================================
+// 听书成长 — Audiobook / Listen-to-Grow module. COPYRIGHT-SAFE BY DESIGN:
+// a catalog of the books the system is *inspired by* (metadata + original summary),
+// not a store of copyrighted book files. Playback uses the browser Web Speech API
+// (TTS) over original summaries, public-domain text, or text the user supplies for
+// their own legally-owned copy. Copyrighted files are referenced (BYO), never bundled.
+// ============================================================================
+
+enum BookSourceType {
+  CATALOG        // metadata + original summary only (copyrighted; no file bundled)
+  PUBLIC_DOMAIN  // text may be stored/played freely
+  USER_UPLOAD    // a pointer to a file the user owns (not redistributed)
+}
+
+enum BookFormat {
+  PDF
+  EPUB
+  TEXT
+  AUDIO
+}
+
+model AudioBook {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  author         String   @default("")
+  relatedModule  String   @default("")  // which OS/engine it informs
+  inspiredByNote String   @default("")
+  summary        String   @default("")  // ORIGINAL summary, safe for TTS
+  textContent    String   @default("")  // public-domain text or user-supplied; "" for catalog-only
+  sourceType     BookSourceType @default(CATALOG)
+  format         BookFormat @default(TEXT)
+  isPublicDomain Boolean  @default(false)
+  // For USER_UPLOAD: a reference to the user's own file (path/URL). Optional, nullable.
+  ownerUserId    String?
+  assetRef       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([relatedModule])
+  @@index([sourceType])
+  @@index([ownerUserId])
+  @@map("audiobooks")
+}
+
+model ListeningProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  bookId      String
+  positionChar Int     @default(0)   // resume position into the spoken text
+  percent     Float    @default(0)
+  totalSeconds Int     @default(0)
+  completed   Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@map("listening_progress")
+}
+
+model ListeningSession {
+  id          String   @id @default(cuid())
+  userId      String
+  bookId      String
+  seconds     Int      @default(0)
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@index([bookId])
+  @@map("listening_sessions")
+}
+
+model BookNote {
+  id          String   @id @default(cuid())
+  userId      String
+  bookId      String
+  note        String
+  positionChar Int     @default(0)
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@index([bookId])
+  @@map("book_notes")
+}

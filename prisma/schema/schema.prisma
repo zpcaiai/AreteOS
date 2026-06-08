@@ -1,0 +1,23 @@
+// MISSION OS — a Human Development Operating System.
+//
+// Core development model (top-down):
+//   Worldview → Mission → Identity → Values → Mental Models → First Principles
+//   → Decisions → Behavior → Habits → Mastery → Leadership → Legacy
+// Growth loop: Mission → Identity → Values → Decisions → Habits → Character →
+//   Outcomes → Identity Reinforcement.
+//
+// Architecture: DDD aggregates + append-only domain_events store (event sourcing)
+// + agent-based services. A parallel Neo4j graph (see prisma/neo4j.cypher) holds
+// the personal knowledge graph (mental-model latticework, identity graph).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ───────────────────────────── enums ─────────────────────────────

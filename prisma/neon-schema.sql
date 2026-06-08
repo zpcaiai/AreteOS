@@ -1,0 +1,2673 @@
+-- Arete (mission-os) — full PostgreSQL schema from prisma/schema/ (192 tables).
+-- Paste into Neon SQL Editor on an EMPTY database.
+-- Optional reset first if not empty:  DROP SCHEMA public CASCADE; CREATE SCHEMA public;
+
+BEGIN;
+
+-- ===== Enums =====
+CREATE TYPE "BookSourceType" AS ENUM ('CATALOG', 'PUBLIC_DOMAIN', 'USER_UPLOAD');
+CREATE TYPE "BookFormat" AS ENUM ('PDF', 'EPUB', 'TEXT', 'AUDIO');
+CREATE TYPE "ChildIdentityKind" AS ENUM ('EXPLORER', 'RESEARCHER', 'CREATOR', 'BUILDER', 'INVENTOR', 'PROBLEM_SOLVER', 'COLLABORATOR', 'STORYTELLER', 'LEADER', 'MENTOR');
+CREATE TYPE "MindsetKind" AS ENUM ('FIXED', 'GROWTH');
+CREATE TYPE "CreativityMode" AS ENUM ('DREAMER', 'BUILDER', 'CRITIC');
+CREATE TYPE "CogCategory" AS ENUM ('ECONOMICS', 'PSYCHOLOGY', 'SYSTEMS_THINKING', 'PROBABILITY', 'BIOLOGY', 'PHYSICS', 'STRATEGY', 'INNOVATION', 'DECISION_SCIENCE', 'GENERAL');
+CREATE TYPE "EvolutionStage" AS ENUM ('UNAWARE', 'EXPLORER', 'BUILDER', 'OPERATOR', 'STRATEGIST', 'CREATOR', 'LEADER', 'LEGACY_BUILDER');
+CREATE TYPE "DevLayer" AS ENUM ('WORLDVIEW', 'MISSION', 'IDENTITY', 'VALUES', 'MENTAL_MODELS', 'FIRST_PRINCIPLES', 'DECISIONS', 'BEHAVIOR', 'HABITS', 'MASTERY', 'LEADERSHIP', 'LEGACY');
+CREATE TYPE "MasteryStage" AS ENUM ('NOVICE', 'BEGINNER', 'PRACTITIONER', 'PROFESSIONAL', 'EXPERT', 'MASTER');
+CREATE TYPE "ShadowType" AS ENUM ('PROCRASTINATION', 'COMFORT_ADDICTION', 'STATUS_ADDICTION', 'CONFIRMATION_BIAS', 'SUNK_COST_BIAS', 'EGO', 'FEAR', 'AVOIDANCE', 'DISTRACTION');
+CREATE TYPE "ModelArchetype" AS ENUM ('EINSTEIN', 'BUFFETT', 'DISNEY', 'JOBS', 'MUNGER', 'MUSK', 'DALIO', 'CUSTOM');
+CREATE TYPE "ModelCategory" AS ENUM ('ECONOMICS', 'PSYCHOLOGY', 'SYSTEMS', 'PROBABILITY', 'PHYSICS', 'BIOLOGY', 'STRATEGY', 'GENERAL');
+CREATE TYPE "DecisionStatus" AS ENUM ('DRAFT', 'REVIEWED', 'DECIDED');
+CREATE TYPE "ReviewPeriod" AS ENUM ('DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY');
+CREATE TYPE "ScoreKind" AS ENUM ('MISSION_ALIGNMENT', 'IDENTITY_ALIGNMENT', 'VALUE_INTEGRITY', 'MENTAL_MODEL_USAGE', 'FIRST_PRINCIPLE', 'DECISION_QUALITY', 'HABIT_CONSISTENCY', 'MASTERY', 'LEADERSHIP', 'LEGACY', 'REFLECTION', 'GROWTH');
+CREATE TYPE "MemberTier" AS ENUM ('FREE', 'PLUS', 'PRO');
+CREATE TYPE "BillingPeriod" AS ENUM ('MONTHLY', 'QUARTERLY', 'ANNUAL');
+CREATE TYPE "MemberOrderStatus" AS ENUM ('CREATED', 'PAID', 'CANCELLED');
+CREATE TYPE "BeliefType" AS ENUM ('LIMITING', 'EMPOWERING', 'NEUTRAL');
+CREATE TYPE "ProductKind" AS ENUM ('MEMBERSHIP_DAYS', 'CREDITS', 'CONTENT');
+CREATE TYPE "StoreOrderStatus" AS ENUM ('CREATED', 'PAID', 'COMPLETED', 'CANCELLED');
+CREATE TYPE "IdentityStackRole" AS ENUM ('PRIMARY', 'SECONDARY', 'EMERGING', 'LEGACY');
+CREATE TYPE "IdentityStage" AS ENUM ('DISCOVER', 'CHOOSE', 'PRACTICE', 'INTERNALIZE', 'INTEGRATE', 'MASTER', 'TEACH', 'LEGACY');
+CREATE TYPE "LeadershipLevel" AS ENUM ('ENVIRONMENT', 'BEHAVIOR', 'CAPABILITY', 'BELIEF', 'IDENTITY', 'MISSION');
+CREATE TYPE "LeadershipRole" AS ENUM ('CARETAKER', 'GUIDE', 'COACH', 'MENTOR', 'SPONSOR', 'AWAKENER');
+CREATE TYPE "ManagementLevel" AS ENUM ('SUPERVISOR', 'MANAGER', 'DIRECTOR', 'LEADER', 'VISIONARY', 'SYSTEM_ARCHITECT', 'ORG_DESIGNER');
+CREATE TYPE "LeverageTier" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+CREATE TYPE "KnowledgeAssetKind" AS ENUM ('PLAYBOOK', 'PROMPT_LIBRARY', 'EXPERT_PATTERN', 'DECISION_PATTERN', 'TROUBLESHOOTING', 'CUSTOMER', 'TECHNICAL');
+CREATE TYPE "SuccessFactorCategory" AS ENUM ('IDENTITY', 'VALUE', 'MARKET', 'PRODUCT', 'DECISION', 'TEAM', 'CULTURE', 'EXECUTION', 'CUSTOMER', 'RESILIENCE');
+CREATE TYPE "BottleneckType" AS ENUM ('FOUNDER_DEPENDENCY', 'UNCLEAR_VALUES', 'INCONSISTENT_DECISIONS', 'WEAK_MANAGEMENT', 'POOR_KNOWLEDGE_TRANSFER', 'CULTURE_DILUTION', 'PRODUCT_COMPLEXITY', 'CUSTOMER_ACQUISITION', 'OPERATIONAL_CHAOS', 'CASH_FLOW');
+CREATE TYPE "WorldviewStage" AS ENUM ('INHERITED', 'QUESTIONED', 'CONSCIOUS', 'INTEGRATED', 'GENERATIVE', 'LEGACY');
+
+-- ===== Tables =====
+CREATE TABLE "audiobooks" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "author" TEXT NOT NULL DEFAULT '',
+  "relatedModule" TEXT NOT NULL DEFAULT '',
+  "inspiredByNote" TEXT NOT NULL DEFAULT '',
+  "summary" TEXT NOT NULL DEFAULT '',
+  "textContent" TEXT NOT NULL DEFAULT '',
+  "sourceType" "BookSourceType" NOT NULL DEFAULT 'CATALOG'::"BookSourceType",
+  "format" "BookFormat" NOT NULL DEFAULT 'TEXT'::"BookFormat",
+  "isPublicDomain" BOOLEAN NOT NULL DEFAULT false,
+  "ownerUserId" TEXT,
+  "assetRef" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "listening_progress" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "bookId" TEXT NOT NULL,
+  "positionChar" INTEGER NOT NULL DEFAULT 0,
+  "percent" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "totalSeconds" INTEGER NOT NULL DEFAULT 0,
+  "completed" BOOLEAN NOT NULL DEFAULT false,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "listening_sessions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "bookId" TEXT NOT NULL,
+  "seconds" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "book_notes" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "bookId" TEXT NOT NULL,
+  "note" TEXT NOT NULL,
+  "positionChar" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "age" INTEGER NOT NULL DEFAULT 0,
+  "interests" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "primaryIdentity" "ChildIdentityKind",
+  "emergingIdentity" "ChildIdentityKind",
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_identities" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "kind" "ChildIdentityKind" NOT NULL,
+  "strengths" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "opportunities" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "sponsorship" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_assessments" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "curiosity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "creativity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "resilience" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "autonomy" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "collaboration" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "problemSolving" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "identityClarity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "learningMotivation" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_growth_mindset_logs" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "fixedStatement" TEXT NOT NULL,
+  "growthReframe" TEXT NOT NULL DEFAULT '',
+  "mindset" "MindsetKind" NOT NULL DEFAULT 'FIXED'::"MindsetKind",
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_curiosity_logs" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "question" TEXT NOT NULL DEFAULT '',
+  "experiment" TEXT NOT NULL DEFAULT '',
+  "topic" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_creativity_projects" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "mode" "CreativityMode" NOT NULL DEFAULT 'DREAMER'::"CreativityMode",
+  "idea" TEXT NOT NULL DEFAULT '',
+  "prototype" TEXT NOT NULL DEFAULT '',
+  "reflection" TEXT NOT NULL DEFAULT '',
+  "confidence" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_learning_environments" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "noise" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "distraction" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "autonomy" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "exploration" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "accessibility" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "qualityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "upgradePlan" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_learning_autonomy_logs" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "initiative" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "ownership" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "persistence" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "focus" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "independentLearning" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "autonomyScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_problem_solving_logs" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "problem" TEXT NOT NULL,
+  "observation" TEXT NOT NULL DEFAULT '',
+  "hypothesis" TEXT NOT NULL DEFAULT '',
+  "experiment" TEXT NOT NULL DEFAULT '',
+  "reflection" TEXT NOT NULL DEFAULT '',
+  "score" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_projects" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "interest" TEXT NOT NULL DEFAULT '',
+  "status" TEXT NOT NULL DEFAULT 'in_progress',
+  "capabilities" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_resilience_logs" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "failureRecovery" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "persistence" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "riskTaking" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "emotionalRegulation" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "resilienceScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_parent_coaching_sessions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "role" TEXT NOT NULL DEFAULT 'Identity Sponsor',
+  "guidance" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "conversationScripts" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "supportScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_identity_snapshots" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "kind" "ChildIdentityKind" NOT NULL,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "child_development_snapshots" (
+  "id" TEXT NOT NULL,
+  "childId" TEXT NOT NULL,
+  "explorer" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "creator" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "builder" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "researcher" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "problemSolver" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "resilience" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "autonomy" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "growthMindset" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "parentSupport" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_models" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "category" "CogCategory" NOT NULL DEFAULT 'GENERAL'::"CogCategory",
+  "summary" TEXT NOT NULL DEFAULT '',
+  "whenToUse" TEXT NOT NULL DEFAULT '',
+  "examples" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_model_relationships" (
+  "id" TEXT NOT NULL,
+  "fromSlug" TEXT NOT NULL,
+  "toSlug" TEXT NOT NULL,
+  "relation" TEXT NOT NULL DEFAULT 'relates-to',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_model_clusters" (
+  "id" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "purpose" TEXT NOT NULL DEFAULT '',
+  "modelSlugs" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_model_examples" (
+  "id" TEXT NOT NULL,
+  "modelSlug" TEXT NOT NULL,
+  "example" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_decision_lenses" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "question" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_decision_lens_results" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "decision" TEXT NOT NULL,
+  "lenses" JSONB,
+  "confidence" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_biases" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "correction" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_bias_events" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "biasSlug" TEXT NOT NULL,
+  "biasName" TEXT NOT NULL,
+  "context" TEXT NOT NULL DEFAULT '',
+  "severity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_judgment_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "judgmentScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "blindSpots" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_judgment_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "problemFraming" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "evidenceQuality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "modelDiversity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "biasResistance" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "longTermThinking" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "secondOrderThinking" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "riskAwareness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "decisionClarity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "judgmentScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_decision_journals" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "decision" TEXT NOT NULL,
+  "context" TEXT NOT NULL DEFAULT '',
+  "expectedOutcome" TEXT NOT NULL DEFAULT '',
+  "actualOutcome" TEXT NOT NULL DEFAULT '',
+  "modelsUsed" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "resolved" BOOLEAN NOT NULL DEFAULT false,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_decision_assumptions" (
+  "id" TEXT NOT NULL,
+  "journalId" TEXT NOT NULL,
+  "assumption" TEXT NOT NULL,
+  "heldTrue" BOOLEAN,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_decision_outcomes" (
+  "id" TEXT NOT NULL,
+  "journalId" TEXT NOT NULL,
+  "outcome" TEXT NOT NULL,
+  "surprise" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_decision_reviews" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "journalId" TEXT NOT NULL,
+  "lessons" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "failedModel" TEXT NOT NULL DEFAULT '',
+  "wrongAssumptions" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_latticeworks" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "goal" TEXT NOT NULL,
+  "blindSpots" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "synergyNote" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_latticework_nodes" (
+  "id" TEXT NOT NULL,
+  "latticeworkId" TEXT NOT NULL,
+  "modelSlug" TEXT NOT NULL,
+  "modelName" TEXT NOT NULL,
+  "category" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_latticework_edges" (
+  "id" TEXT NOT NULL,
+  "latticeworkId" TEXT NOT NULL,
+  "fromModel" TEXT NOT NULL,
+  "toModel" TEXT NOT NULL,
+  "relation" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_cognitive_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "thinkingStyle" TEXT NOT NULL DEFAULT '',
+  "decisionStyle" TEXT NOT NULL DEFAULT '',
+  "learningStyle" TEXT NOT NULL DEFAULT '',
+  "reasoningStyle" TEXT NOT NULL DEFAULT '',
+  "riskStyle" TEXT NOT NULL DEFAULT '',
+  "strengths" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "weaknesses" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_thinking_patterns" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "pattern" TEXT NOT NULL,
+  "helpful" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_reasoning_styles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "style" TEXT NOT NULL,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_uncertainty_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "robustness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "fragility" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "optionality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "tailRiskAwareness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "uncertaintyScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "profile" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_optionalities" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "option" TEXT NOT NULL,
+  "upside" TEXT NOT NULL DEFAULT '',
+  "cappedDownside" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_tail_risks" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "risk" TEXT NOT NULL,
+  "exposure" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "mitigation" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_diagnoses" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "problem" TEXT NOT NULL,
+  "diagnosis" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_root_causes" (
+  "id" TEXT NOT NULL,
+  "diagnosisId" TEXT NOT NULL,
+  "rootCause" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_leverage_points" (
+  "id" TEXT NOT NULL,
+  "diagnosisId" TEXT NOT NULL,
+  "leverage" TEXT NOT NULL,
+  "impact" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_wisdom_insights" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "insight" TEXT NOT NULL,
+  "basis" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cog_personal_principles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "principle" TEXT NOT NULL,
+  "rationale" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "users" (
+  "id" TEXT NOT NULL,
+  "email" TEXT NOT NULL,
+  "name" TEXT,
+  "passwordHash" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "personality_states" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "stage" "EvolutionStage" NOT NULL DEFAULT 'UNAWARE'::"EvolutionStage",
+  "progress" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "enteredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "personality_transitions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "fromStage" "EvolutionStage" NOT NULL,
+  "toStage" "EvolutionStage" NOT NULL,
+  "reason" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldviews" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "summary" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_dimensions" (
+  "id" TEXT NOT NULL,
+  "worldviewId" TEXT NOT NULL,
+  "dimension" TEXT NOT NULL,
+  "stance" TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "question" TEXT NOT NULL,
+  "answer" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "missions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "statement" TEXT NOT NULL,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "visions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "statement" TEXT NOT NULL,
+  "horizon" TEXT NOT NULL DEFAULT '10Y',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "life_themes" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "constitutions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "article" TEXT NOT NULL,
+  "rank" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identities" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "statement" TEXT NOT NULL DEFAULT '',
+  "clarity" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "roles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "identityId" TEXT,
+  "name" TEXT NOT NULL,
+  "intention" TEXT NOT NULL DEFAULT '',
+  "weight" DOUBLE PRECISION NOT NULL DEFAULT 1,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_scores" (
+  "id" TEXT NOT NULL,
+  "identityId" TEXT NOT NULL,
+  "alignment" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_history" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "snapshot" JSONB NOT NULL,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "values" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "value_rankings" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "valueId" TEXT NOT NULL,
+  "rank" INTEGER NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "value_conflicts" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "valueAId" TEXT NOT NULL,
+  "valueBId" TEXT NOT NULL,
+  "context" TEXT NOT NULL DEFAULT '',
+  "resolution" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "mental_models" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "category" "ModelCategory" NOT NULL DEFAULT 'GENERAL'::"ModelCategory",
+  "description" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "model_connections" (
+  "id" TEXT NOT NULL,
+  "fromModelId" TEXT NOT NULL,
+  "toModelId" TEXT NOT NULL,
+  "relation" TEXT NOT NULL DEFAULT 'relates_to',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "model_usage_logs" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "modelId" TEXT NOT NULL,
+  "context" TEXT NOT NULL DEFAULT '',
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "first_principle_maps" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "problem" TEXT NOT NULL,
+  "tree" JSONB,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "assumptions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "mapId" TEXT,
+  "statement" TEXT NOT NULL,
+  "valid" BOOLEAN,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "root_causes" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "mapId" TEXT,
+  "cause" TEXT NOT NULL,
+  "depth" INTEGER NOT NULL DEFAULT 1,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "constraints" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "mapId" TEXT,
+  "statement" TEXT NOT NULL,
+  "kind" TEXT NOT NULL DEFAULT 'PHYSICAL',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "decisions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "context" TEXT NOT NULL DEFAULT '',
+  "status" "DecisionStatus" NOT NULL DEFAULT 'DRAFT'::"DecisionStatus",
+  "quality" DOUBLE PRECISION,
+  "reversible" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "decision_options" (
+  "id" TEXT NOT NULL,
+  "decisionId" TEXT NOT NULL,
+  "label" TEXT NOT NULL,
+  "chosen" BOOLEAN NOT NULL DEFAULT false,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "decision_reviews" (
+  "id" TEXT NOT NULL,
+  "decisionId" TEXT NOT NULL,
+  "optionId" TEXT,
+  "missionFit" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "identityFit" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "valueFit" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "expectedValue" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "opportunityCost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "secondOrder" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "risk" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "reversibility" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+  "shadowMotive" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "quality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "role_models" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "person" TEXT NOT NULL,
+  "archetype" "ModelArchetype" NOT NULL DEFAULT 'CUSTOM'::"ModelArchetype",
+  "values" TEXT NOT NULL DEFAULT '',
+  "beliefs" TEXT NOT NULL DEFAULT '',
+  "environment" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_patterns" (
+  "id" TEXT NOT NULL,
+  "roleModelId" TEXT NOT NULL,
+  "pattern" TEXT NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "decision_patterns" (
+  "id" TEXT NOT NULL,
+  "roleModelId" TEXT NOT NULL,
+  "rule" TEXT NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "habit_patterns" (
+  "id" TEXT NOT NULL,
+  "roleModelId" TEXT NOT NULL,
+  "habit" TEXT NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "habits" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "identityProof" TEXT NOT NULL DEFAULT '',
+  "targetPerWeek" INTEGER NOT NULL DEFAULT 7,
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "habit_logs" (
+  "id" TEXT NOT NULL,
+  "habitId" TEXT NOT NULL,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "done" BOOLEAN NOT NULL DEFAULT true,
+  "identityNote" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "habit_identity_links" (
+  "id" TEXT NOT NULL,
+  "habitId" TEXT NOT NULL,
+  "identityId" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "shadow_patterns" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "type" "ShadowType" NOT NULL,
+  "rootCause" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "shadow_events" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "patternId" TEXT,
+  "type" "ShadowType" NOT NULL,
+  "trigger" TEXT NOT NULL DEFAULT '',
+  "severity" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "interventions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "patternId" TEXT,
+  "action" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "reflections" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "worked" TEXT NOT NULL DEFAULT '',
+  "failed" TEXT NOT NULL DEFAULT '',
+  "learned" TEXT NOT NULL DEFAULT '',
+  "wrongAssumptions" TEXT NOT NULL DEFAULT '',
+  "identityReinforced" TEXT NOT NULL DEFAULT '',
+  "depth" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "lessons" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "reflectionId" TEXT,
+  "text" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "reviews" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "period" "ReviewPeriod" NOT NULL,
+  "periodKey" TEXT NOT NULL,
+  "summary" TEXT NOT NULL DEFAULT '',
+  "metrics" JSONB,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "skills" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "domain" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "mastery_levels" (
+  "id" TEXT NOT NULL,
+  "skillId" TEXT NOT NULL,
+  "stage" "MasteryStage" NOT NULL DEFAULT 'NOVICE'::"MasteryStage",
+  "knowledge" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "execution" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "problemSolving" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "teaching" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "skill_progress" (
+  "id" TEXT NOT NULL,
+  "skillId" TEXT NOT NULL,
+  "note" TEXT NOT NULL DEFAULT '',
+  "delta" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_metrics" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "communication" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "influence" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "delegation" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "teamBuilding" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "decisionQuality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "influence_logs" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "who" TEXT NOT NULL DEFAULT '',
+  "outcome" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "legacy_projects" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "kind" TEXT NOT NULL DEFAULT 'INSTITUTION',
+  "impact" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "mentees" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "focus" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "knowledge_assets" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "type" TEXT NOT NULL DEFAULT 'ARTICLE',
+  "url" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "score_snapshots" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "kind" "ScoreKind" NOT NULL,
+  "value" DOUBLE PRECISION NOT NULL,
+  "detail" JSONB,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "domain_events" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "aggregateType" TEXT NOT NULL,
+  "aggregateId" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "payload" JSONB NOT NULL,
+  "version" INTEGER NOT NULL DEFAULT 1,
+  "occurredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "beliefs" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "statement" TEXT NOT NULL,
+  "type" "BeliefType" NOT NULL DEFAULT 'NEUTRAL'::"BeliefType",
+  "strength" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "limiting_beliefs" (
+  "id" TEXT NOT NULL,
+  "beliefId" TEXT NOT NULL,
+  "trigger" TEXT NOT NULL DEFAULT '',
+  "cost" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "empowering_beliefs" (
+  "id" TEXT NOT NULL,
+  "beliefId" TEXT NOT NULL,
+  "evidence" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "belief_reframes" (
+  "id" TEXT NOT NULL,
+  "beliefId" TEXT NOT NULL,
+  "reframedText" TEXT NOT NULL,
+  "empoweringText" TEXT NOT NULL DEFAULT '',
+  "action" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "belief_change_logs" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "beliefId" TEXT,
+  "fromType" "BeliefType" NOT NULL,
+  "toType" "BeliefType" NOT NULL,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "digital_twin_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "snapshot" JSONB,
+  "summary" TEXT NOT NULL DEFAULT '',
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "twin_memories" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "kind" TEXT NOT NULL DEFAULT 'EVENT',
+  "content" TEXT NOT NULL,
+  "weight" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "twin_insights" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "insight" TEXT NOT NULL,
+  "basis" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "drift_predictions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "risk" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "fromIdentity" TEXT NOT NULL DEFAULT '',
+  "towardIdentity" TEXT NOT NULL DEFAULT '',
+  "rationale" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "geniuses" (
+  "id" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "era" TEXT NOT NULL DEFAULT '',
+  "domain" TEXT NOT NULL DEFAULT '',
+  "summary" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "genius_strategies" (
+  "id" TEXT NOT NULL,
+  "geniusId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "repSequence" JSONB,
+  "tote" JSONB,
+  "identity" TEXT NOT NULL DEFAULT '',
+  "beliefs" TEXT NOT NULL DEFAULT '',
+  "values" TEXT NOT NULL DEFAULT '',
+  "capabilities" TEXT NOT NULL DEFAULT '',
+  "highLeverage" TEXT NOT NULL DEFAULT '',
+  "creativeProcess" TEXT NOT NULL DEFAULT '',
+  "learningProcess" TEXT NOT NULL DEFAULT '',
+  "feedbackProcess" TEXT NOT NULL DEFAULT '',
+  "shadowPatterns" TEXT NOT NULL DEFAULT '',
+  "failureModes" TEXT NOT NULL DEFAULT '',
+  "installProtocol" JSONB,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "strategy_adoptions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "strategyId" TEXT NOT NULL,
+  "status" TEXT NOT NULL DEFAULT 'ADOPTED',
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "genius_practice_logs" (
+  "id" TEXT NOT NULL,
+  "adoptionId" TEXT NOT NULL,
+  "reflection" TEXT NOT NULL DEFAULT '',
+  "fidelity" DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+  "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "blueprint_adaptations" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "strategyId" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "identity" TEXT NOT NULL DEFAULT '',
+  "beliefs" TEXT NOT NULL DEFAULT '',
+  "values" TEXT NOT NULL DEFAULT '',
+  "decisionRules" JSONB,
+  "habits" JSONB,
+  "creativeProcess" TEXT NOT NULL DEFAULT '',
+  "summary" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "learning_paths" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "adaptationId" TEXT,
+  "strategyId" TEXT,
+  "title" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "learning_steps" (
+  "id" TEXT NOT NULL,
+  "pathId" TEXT NOT NULL,
+  "stage" TEXT NOT NULL,
+  "order" INTEGER NOT NULL DEFAULT 0,
+  "action" TEXT NOT NULL DEFAULT '',
+  "done" BOOLEAN NOT NULL DEFAULT false,
+  "doneAt" TIMESTAMP(3),
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "community_posts" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "status" TEXT NOT NULL DEFAULT '',
+  "message" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "post_comments" (
+  "id" TEXT NOT NULL,
+  "postId" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "content" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "memberships" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "tier" "MemberTier" NOT NULL DEFAULT 'FREE'::"MemberTier",
+  "period" "BillingPeriod",
+  "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+  "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "expiresAt" TIMESTAMP(3),
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "membership_orders" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "tier" "MemberTier" NOT NULL,
+  "period" "BillingPeriod" NOT NULL,
+  "amount" DECIMAL(10,2) NOT NULL,
+  "currency" TEXT NOT NULL DEFAULT 'CNY',
+  "status" "MemberOrderStatus" NOT NULL DEFAULT 'CREATED'::"MemberOrderStatus",
+  "provider" TEXT NOT NULL DEFAULT 'mock',
+  "outTradeNo" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "paidAt" TIMESTAMP(3),
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "store_products" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "kind" "ProductKind" NOT NULL,
+  "price" DECIMAL(10,2) NOT NULL,
+  "currency" TEXT NOT NULL DEFAULT 'CNY',
+  "grantTier" "MemberTier",
+  "grantDays" INTEGER NOT NULL DEFAULT 0,
+  "grantCredits" INTEGER NOT NULL DEFAULT 0,
+  "grantContentKey" TEXT NOT NULL DEFAULT '',
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "sortOrder" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "store_orders" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "productId" TEXT NOT NULL,
+  "productName" TEXT NOT NULL,
+  "quantity" INTEGER NOT NULL DEFAULT 1,
+  "amount" DECIMAL(10,2) NOT NULL,
+  "currency" TEXT NOT NULL DEFAULT 'CNY',
+  "status" "StoreOrderStatus" NOT NULL DEFAULT 'CREATED'::"StoreOrderStatus",
+  "provider" TEXT NOT NULL DEFAULT 'mock',
+  "outTradeNo" TEXT NOT NULL,
+  "paidAt" TIMESTAMP(3),
+  "deliveredAt" TIMESTAMP(3),
+  "deliveryNote" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "user_credits" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "balance" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "credit_ledgers" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "delta" INTEGER NOT NULL,
+  "reason" TEXT NOT NULL DEFAULT '',
+  "orderId" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "content_unlocks" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "contentKey" TEXT NOT NULL,
+  "orderId" TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_families" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "purpose" TEXT NOT NULL DEFAULT '',
+  "sortOrder" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_archetypes" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "familyId" TEXT NOT NULL,
+  "mission" TEXT NOT NULL DEFAULT '',
+  "identityStatement" TEXT NOT NULL DEFAULT '',
+  "values" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "beliefs" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "mentalModels" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "decisionRules" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "habits" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "capabilities" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "shadowPatterns" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "failureModes" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "growthPath" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "legacyExpression" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_values" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "value" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_beliefs" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "belief" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_habits" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "habit" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_capabilities" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "capability" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_mental_models" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "model" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_shadow_patterns" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "pattern" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_failure_modes" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "failureMode" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_evolution_paths" (
+  "id" TEXT NOT NULL,
+  "archetypeId" TEXT NOT NULL,
+  "stage" "IdentityStage" NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "user_identity_stacks" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "role" "IdentityStackRole" NOT NULL,
+  "archetypeSlug" TEXT NOT NULL,
+  "archetypeName" TEXT NOT NULL,
+  "stage" "IdentityStage" NOT NULL DEFAULT 'CHOOSE'::"IdentityStage",
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_recommendations" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "archetypeSlug" TEXT NOT NULL,
+  "archetypeName" TEXT NOT NULL,
+  "role" "IdentityStackRole" NOT NULL DEFAULT 'EMERGING'::"IdentityStackRole",
+  "rationale" TEXT NOT NULL DEFAULT '',
+  "fitScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_conflicts" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "identityA" TEXT NOT NULL,
+  "identityB" TEXT NOT NULL,
+  "tension" TEXT NOT NULL DEFAULT '',
+  "tradeoffs" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "integration" TEXT NOT NULL DEFAULT '',
+  "severity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "clarity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "alignment" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "stability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "conflict" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "evolution" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "integration" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "summary" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "identity_evolution_snapshots" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "archetypeSlug" TEXT NOT NULL,
+  "stage" "IdentityStage" NOT NULL,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "currentRole" "LeadershipRole" NOT NULL DEFAULT 'GUIDE'::"LeadershipRole",
+  "dominantLevel" "LeadershipLevel" NOT NULL DEFAULT 'BEHAVIOR'::"LeadershipLevel",
+  "leverageScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "blindSpots" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "selfAwareness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "responsibility" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "communication" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "emotionalRegulation" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "decisionMaturity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "integrity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "peopleDevelopment" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "maturityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_leverage_maps" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "environment" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "behavior" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "capability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "belief" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "identity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "mission" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "overfocus" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "blindSpots" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "leverageScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_conversations" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "conversationType" "LeadershipRole" NOT NULL DEFAULT 'COACH'::"LeadershipRole",
+  "script" TEXT NOT NULL DEFAULT '',
+  "questions" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "followUps" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "effectiveness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_identity_sponsorships" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "recipient" TEXT NOT NULL DEFAULT '',
+  "recognition" TEXT NOT NULL DEFAULT '',
+  "identityStatement" TEXT NOT NULL DEFAULT '',
+  "narrative" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_vision_statements" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "statement" TEXT NOT NULL,
+  "communication" TEXT NOT NULL DEFAULT '',
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "alignmentScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_vision_alignment" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "alignmentScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "adoptionScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "driftDetected" BOOLEAN NOT NULL DEFAULT false,
+  "notes" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_belonging_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "trust" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "psychologicalSafety" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "recognition" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "contribution" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "identityFit" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "missionFit" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "belongingScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "cohesionScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_alignment_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "mission" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "identity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "values" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "decisionRules" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "behaviors" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "teams" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "alignmentScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "misalignments" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_future_leaders" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "candidate" TEXT NOT NULL DEFAULT '',
+  "selfAwareness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "decisionQuality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "influence" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "responsibility" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "missionOwnership" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "identityStability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "visionCapability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "readinessScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_pipelines" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "role" TEXT NOT NULL,
+  "candidates" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "successionMap" JSONB,
+  "readinessScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_culture_blueprints" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "founderIdentity" TEXT NOT NULL DEFAULT '',
+  "values" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "leadershipBehaviors" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "operatingPrinciples" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "rituals" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "replicationPlaybook" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_awakening_sessions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "task" TEXT NOT NULL DEFAULT '',
+  "why" TEXT NOT NULL DEFAULT '',
+  "becoming" TEXT NOT NULL DEFAULT '',
+  "futureCreated" TEXT NOT NULL DEFAULT '',
+  "largerPurpose" TEXT NOT NULL DEFAULT '',
+  "purposeClarity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "missionConnection" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "awakeningReadiness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leadership_growth_plans" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "fromRole" "LeadershipRole" NOT NULL,
+  "toRole" "LeadershipRole" NOT NULL,
+  "steps" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "successMetrics" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "level" "ManagementLevel" NOT NULL DEFAULT 'MANAGER'::"ManagementLevel",
+  "maturityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "dependencyRisk" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "mission" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "leadership" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "knowledge" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "decisionQuality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "delegation" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "alignment" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "resilience" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "maturityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_activities" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "activity" TEXT NOT NULL,
+  "tier" "LeverageTier" NOT NULL DEFAULT 'LOW'::"LeverageTier",
+  "hoursPerWeek" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "leverage_logs" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "lowShare" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "mediumShare" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "highShare" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "leverageScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "improvementPlan" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "knowledge_worker_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "subject" TEXT NOT NULL DEFAULT '',
+  "clarity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "autonomy" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "capability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "tooling" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "focus" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "effectivenessScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "constraints" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "mgmt_knowledge_assets" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "kind" "KnowledgeAssetKind" NOT NULL DEFAULT 'PLAYBOOK'::"KnowledgeAssetKind",
+  "title" TEXT NOT NULL,
+  "content" TEXT NOT NULL DEFAULT '',
+  "tacitSource" TEXT NOT NULL DEFAULT '',
+  "reuseCount" INTEGER NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_playbooks" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "title" TEXT NOT NULL,
+  "steps" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "whenToUse" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_prompt_libraries" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "title" TEXT NOT NULL,
+  "prompts" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "domain" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "organizational_memories" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "kind" TEXT NOT NULL DEFAULT 'lesson',
+  "title" TEXT NOT NULL,
+  "detail" TEXT NOT NULL DEFAULT '',
+  "outcome" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_decision_governance" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "quality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "consistency" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "speed" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "ownership" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "learning" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "governanceScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "notes" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "organizational_health" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "trust" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "communication" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "execution" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "ownership" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "learning" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "collaboration" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "healthScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "fragility_assessments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "founderDependency" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "keyPersonDependency" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "customerConcentration" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "knowledgeConcentration" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "productConcentration" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "resilienceScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "fragilityMap" JSONB,
+  "stressTest" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "organization_designs" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "title" TEXT NOT NULL,
+  "structure" TEXT NOT NULL DEFAULT '',
+  "decisionRights" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "informationFlow" TEXT NOT NULL DEFAULT '',
+  "coordinationCost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "scalingRecommendations" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "designScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_twin_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "snapshot" JSONB,
+  "accuracyScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "organization_twin_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "snapshot" JSONB,
+  "simulationResults" JSONB,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "management_coaching_sessions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "blindSpots" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "growthAreas" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "coachingPlan" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "developmentPlan" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_founder_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "founderIdentity" TEXT NOT NULL DEFAULT '',
+  "founderValues" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "founderBeliefs" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "decisionStyle" TEXT NOT NULL DEFAULT '',
+  "riskStyle" TEXT NOT NULL DEFAULT '',
+  "learningStyle" TEXT NOT NULL DEFAULT '',
+  "leadershipStyle" TEXT NOT NULL DEFAULT '',
+  "creativityStyle" TEXT NOT NULL DEFAULT '',
+  "executionStyle" TEXT NOT NULL DEFAULT '',
+  "strengths" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "shadowRisks" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "dependencyMap" JSONB,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_business_missions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "statement" TEXT NOT NULL,
+  "customerPain" TEXT NOT NULL DEFAULT '',
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_company_identities" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "identityStatement" TEXT NOT NULL,
+  "strategicPosition" TEXT NOT NULL DEFAULT '',
+  "culturalIdentity" TEXT NOT NULL DEFAULT '',
+  "enemyToAvoid" TEXT NOT NULL DEFAULT '',
+  "promiseToCustomer" TEXT NOT NULL DEFAULT '',
+  "internalSelfImage" TEXT NOT NULL DEFAULT '',
+  "active" BOOLEAN NOT NULL DEFAULT true,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_core_values" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "value" TEXT NOT NULL,
+  "rank" INTEGER NOT NULL DEFAULT 0,
+  "operatingPrinciple" TEXT NOT NULL DEFAULT '',
+  "dilutionRisk" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_success_factors" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "name" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "category" "SuccessFactorCategory" NOT NULL,
+  "evidence" TEXT NOT NULL DEFAULT '',
+  "repeatabilityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "founderDependencyScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "scalabilityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "riskIfLost" TEXT NOT NULL DEFAULT '',
+  "replicationMethod" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_founder_patterns" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "pattern" TEXT NOT NULL,
+  "domain" TEXT NOT NULL DEFAULT '',
+  "founderDependency" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_business_patterns" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "pattern" TEXT NOT NULL,
+  "category" TEXT NOT NULL DEFAULT '',
+  "repeatability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_decision_rules" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "rule" TEXT NOT NULL,
+  "context" TEXT NOT NULL DEFAULT '',
+  "examples" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "antiPatterns" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_operating_principles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "principle" TEXT NOT NULL,
+  "whyItMatters" TEXT NOT NULL DEFAULT '',
+  "decisionContext" TEXT NOT NULL DEFAULT '',
+  "examples" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "antiPatterns" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "enforcement" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_scaling_bottlenecks" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "bottleneckType" "BottleneckType" NOT NULL,
+  "severity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "rootCause" TEXT NOT NULL DEFAULT '',
+  "affectedSystems" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "intervention" TEXT NOT NULL DEFAULT '',
+  "resolved" BOOLEAN NOT NULL DEFAULT false,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_team_alignments" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "area" TEXT NOT NULL,
+  "alignmentScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "notes" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_leadership_patterns" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "pattern" TEXT NOT NULL,
+  "maturityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "blindSpots" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "culture_rituals" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "name" TEXT NOT NULL,
+  "purpose" TEXT NOT NULL DEFAULT '',
+  "cadence" TEXT NOT NULL DEFAULT '',
+  "reinforcesValue" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_collaboration_patterns" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "dimension" TEXT NOT NULL,
+  "score" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "friction" TEXT NOT NULL DEFAULT '',
+  "upgrade" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_resilience_patterns" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "dimension" TEXT NOT NULL,
+  "score" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "fragility" TEXT NOT NULL DEFAULT '',
+  "upgrade" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_system_blueprints" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "title" TEXT NOT NULL,
+  "preserve" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "standardize" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "delegate" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "automate" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "teach" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "measure" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "protect" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_replication_playbooks" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "title" TEXT NOT NULL,
+  "transferPlan" TEXT NOT NULL DEFAULT '',
+  "hiringPlaybook" TEXT NOT NULL DEFAULT '',
+  "onboardingPlaybook" TEXT NOT NULL DEFAULT '',
+  "culturePlaybook" TEXT NOT NULL DEFAULT '',
+  "decisionPlaybook" TEXT NOT NULL DEFAULT '',
+  "scalingPlaybook" TEXT NOT NULL DEFAULT '',
+  "readinessScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "sfm_org_health_snapshots" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "organizationId" TEXT,
+  "founderDependency" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "repeatability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "scalability" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "valuesAlignment" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "decisionConsistency" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "collaborationQuality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "leadershipMaturity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "resilience" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "replicationReadiness" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "organizationalHealth" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "reality" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "humanNature" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "meaning" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "success" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "failure" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "responsibility" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "time" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "change" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "risk" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "purpose" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "clarityScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "coherenceScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "globalScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "stage" "WorldviewStage" NOT NULL DEFAULT 'QUESTIONED'::"WorldviewStage",
+  "summary" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_assumption_conflicts" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "valueOrGoal" TEXT NOT NULL,
+  "assumption" TEXT NOT NULL,
+  "conflict" TEXT NOT NULL DEFAULT '',
+  "severity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "resolution" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_archetypes" (
+  "id" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "mission" TEXT NOT NULL DEFAULT '',
+  "coreAssumptions" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "values" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "blindSpots" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "growthOpportunities" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_meaning_profiles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "work" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "learning" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "relationships" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "contribution" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "mastery" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "legacy" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "meaningScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "summary" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_personal_philosophies" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "philosophy" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_life_principles" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "principle" TEXT NOT NULL,
+  "rationale" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_twins" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "snapshot" JSONB,
+  "driftDetected" BOOLEAN NOT NULL DEFAULT false,
+  "evolutionSuggestions" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE "worldview_evolutions" (
+  "id" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "stage" "WorldviewStage" NOT NULL,
+  "note" TEXT NOT NULL DEFAULT '',
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
+
+-- ===== Foreign keys =====
+ALTER TABLE "personality_states" ADD CONSTRAINT "fk_personality_states_0" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "personality_transitions" ADD CONSTRAINT "fk_personality_transitions_1" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "worldviews" ADD CONSTRAINT "fk_worldviews_2" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "worldview_dimensions" ADD CONSTRAINT "fk_worldview_dimensions_3" FOREIGN KEY ("worldviewId") REFERENCES "worldviews" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "worldview_assessments" ADD CONSTRAINT "fk_worldview_assessments_4" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "missions" ADD CONSTRAINT "fk_missions_5" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "visions" ADD CONSTRAINT "fk_visions_6" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "life_themes" ADD CONSTRAINT "fk_life_themes_7" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "constitutions" ADD CONSTRAINT "fk_constitutions_8" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "identities" ADD CONSTRAINT "fk_identities_9" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "roles" ADD CONSTRAINT "fk_roles_10" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "roles" ADD CONSTRAINT "fk_roles_11" FOREIGN KEY ("identityId") REFERENCES "identities" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "identity_scores" ADD CONSTRAINT "fk_identity_scores_12" FOREIGN KEY ("identityId") REFERENCES "identities" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "identity_history" ADD CONSTRAINT "fk_identity_history_13" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "values" ADD CONSTRAINT "fk_values_14" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "value_rankings" ADD CONSTRAINT "fk_value_rankings_15" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "value_rankings" ADD CONSTRAINT "fk_value_rankings_16" FOREIGN KEY ("valueId") REFERENCES "values" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "value_conflicts" ADD CONSTRAINT "fk_value_conflicts_17" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "mental_models" ADD CONSTRAINT "fk_mental_models_18" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "model_connections" ADD CONSTRAINT "fk_model_connections_19" FOREIGN KEY ("fromModelId") REFERENCES "mental_models" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "model_connections" ADD CONSTRAINT "fk_model_connections_20" FOREIGN KEY ("toModelId") REFERENCES "mental_models" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "model_usage_logs" ADD CONSTRAINT "fk_model_usage_logs_21" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "model_usage_logs" ADD CONSTRAINT "fk_model_usage_logs_22" FOREIGN KEY ("modelId") REFERENCES "mental_models" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "first_principle_maps" ADD CONSTRAINT "fk_first_principle_maps_23" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "assumptions" ADD CONSTRAINT "fk_assumptions_24" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "assumptions" ADD CONSTRAINT "fk_assumptions_25" FOREIGN KEY ("mapId") REFERENCES "first_principle_maps" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "root_causes" ADD CONSTRAINT "fk_root_causes_26" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "root_causes" ADD CONSTRAINT "fk_root_causes_27" FOREIGN KEY ("mapId") REFERENCES "first_principle_maps" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "constraints" ADD CONSTRAINT "fk_constraints_28" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "constraints" ADD CONSTRAINT "fk_constraints_29" FOREIGN KEY ("mapId") REFERENCES "first_principle_maps" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "decisions" ADD CONSTRAINT "fk_decisions_30" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "decision_options" ADD CONSTRAINT "fk_decision_options_31" FOREIGN KEY ("decisionId") REFERENCES "decisions" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "decision_reviews" ADD CONSTRAINT "fk_decision_reviews_32" FOREIGN KEY ("decisionId") REFERENCES "decisions" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "decision_reviews" ADD CONSTRAINT "fk_decision_reviews_33" FOREIGN KEY ("optionId") REFERENCES "decision_options" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "role_models" ADD CONSTRAINT "fk_role_models_34" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "identity_patterns" ADD CONSTRAINT "fk_identity_patterns_35" FOREIGN KEY ("roleModelId") REFERENCES "role_models" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "decision_patterns" ADD CONSTRAINT "fk_decision_patterns_36" FOREIGN KEY ("roleModelId") REFERENCES "role_models" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "habit_patterns" ADD CONSTRAINT "fk_habit_patterns_37" FOREIGN KEY ("roleModelId") REFERENCES "role_models" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "habits" ADD CONSTRAINT "fk_habits_38" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "habit_logs" ADD CONSTRAINT "fk_habit_logs_39" FOREIGN KEY ("habitId") REFERENCES "habits" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "habit_identity_links" ADD CONSTRAINT "fk_habit_identity_links_40" FOREIGN KEY ("habitId") REFERENCES "habits" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "habit_identity_links" ADD CONSTRAINT "fk_habit_identity_links_41" FOREIGN KEY ("identityId") REFERENCES "identities" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "shadow_patterns" ADD CONSTRAINT "fk_shadow_patterns_42" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "shadow_events" ADD CONSTRAINT "fk_shadow_events_43" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "shadow_events" ADD CONSTRAINT "fk_shadow_events_44" FOREIGN KEY ("patternId") REFERENCES "shadow_patterns" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "interventions" ADD CONSTRAINT "fk_interventions_45" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "interventions" ADD CONSTRAINT "fk_interventions_46" FOREIGN KEY ("patternId") REFERENCES "shadow_patterns" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "reflections" ADD CONSTRAINT "fk_reflections_47" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "lessons" ADD CONSTRAINT "fk_lessons_48" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "lessons" ADD CONSTRAINT "fk_lessons_49" FOREIGN KEY ("reflectionId") REFERENCES "reflections" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "reviews" ADD CONSTRAINT "fk_reviews_50" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "skills" ADD CONSTRAINT "fk_skills_51" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "mastery_levels" ADD CONSTRAINT "fk_mastery_levels_52" FOREIGN KEY ("skillId") REFERENCES "skills" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "skill_progress" ADD CONSTRAINT "fk_skill_progress_53" FOREIGN KEY ("skillId") REFERENCES "skills" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "leadership_metrics" ADD CONSTRAINT "fk_leadership_metrics_54" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "influence_logs" ADD CONSTRAINT "fk_influence_logs_55" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "legacy_projects" ADD CONSTRAINT "fk_legacy_projects_56" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "mentees" ADD CONSTRAINT "fk_mentees_57" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "knowledge_assets" ADD CONSTRAINT "fk_knowledge_assets_58" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "score_snapshots" ADD CONSTRAINT "fk_score_snapshots_59" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "domain_events" ADD CONSTRAINT "fk_domain_events_60" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "beliefs" ADD CONSTRAINT "fk_beliefs_61" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "limiting_beliefs" ADD CONSTRAINT "fk_limiting_beliefs_62" FOREIGN KEY ("beliefId") REFERENCES "beliefs" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "empowering_beliefs" ADD CONSTRAINT "fk_empowering_beliefs_63" FOREIGN KEY ("beliefId") REFERENCES "beliefs" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "belief_reframes" ADD CONSTRAINT "fk_belief_reframes_64" FOREIGN KEY ("beliefId") REFERENCES "beliefs" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "belief_change_logs" ADD CONSTRAINT "fk_belief_change_logs_65" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "digital_twin_profiles" ADD CONSTRAINT "fk_digital_twin_profiles_66" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "twin_memories" ADD CONSTRAINT "fk_twin_memories_67" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "twin_insights" ADD CONSTRAINT "fk_twin_insights_68" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "drift_predictions" ADD CONSTRAINT "fk_drift_predictions_69" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "genius_strategies" ADD CONSTRAINT "fk_genius_strategies_70" FOREIGN KEY ("geniusId") REFERENCES "geniuses" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "strategy_adoptions" ADD CONSTRAINT "fk_strategy_adoptions_71" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "strategy_adoptions" ADD CONSTRAINT "fk_strategy_adoptions_72" FOREIGN KEY ("strategyId") REFERENCES "genius_strategies" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "genius_practice_logs" ADD CONSTRAINT "fk_genius_practice_logs_73" FOREIGN KEY ("adoptionId") REFERENCES "strategy_adoptions" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "blueprint_adaptations" ADD CONSTRAINT "fk_blueprint_adaptations_74" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "blueprint_adaptations" ADD CONSTRAINT "fk_blueprint_adaptations_75" FOREIGN KEY ("strategyId") REFERENCES "genius_strategies" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "learning_paths" ADD CONSTRAINT "fk_learning_paths_76" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "learning_paths" ADD CONSTRAINT "fk_learning_paths_77" FOREIGN KEY ("adaptationId") REFERENCES "blueprint_adaptations" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "learning_steps" ADD CONSTRAINT "fk_learning_steps_78" FOREIGN KEY ("pathId") REFERENCES "learning_paths" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "community_posts" ADD CONSTRAINT "fk_community_posts_79" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "post_comments" ADD CONSTRAINT "fk_post_comments_80" FOREIGN KEY ("postId") REFERENCES "community_posts" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "post_comments" ADD CONSTRAINT "fk_post_comments_81" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "memberships" ADD CONSTRAINT "fk_memberships_82" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "membership_orders" ADD CONSTRAINT "fk_membership_orders_83" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "store_orders" ADD CONSTRAINT "fk_store_orders_84" FOREIGN KEY ("productId") REFERENCES "store_products" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "identity_archetypes" ADD CONSTRAINT "fk_identity_archetypes_85" FOREIGN KEY ("familyId") REFERENCES "identity_families" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ===== Indexes =====
+CREATE UNIQUE INDEX "uq_audiobooks_0" ON "audiobooks" ("slug");
+CREATE INDEX "ix_audiobooks_1" ON "audiobooks" ("relatedModule");
+CREATE INDEX "ix_audiobooks_2" ON "audiobooks" ("sourceType");
+CREATE INDEX "ix_audiobooks_3" ON "audiobooks" ("ownerUserId");
+CREATE UNIQUE INDEX "uq_listening_progress_4" ON "listening_progress" ("userId", "bookId");
+CREATE INDEX "ix_listening_progress_5" ON "listening_progress" ("userId");
+CREATE INDEX "ix_listening_sessions_6" ON "listening_sessions" ("userId");
+CREATE INDEX "ix_listening_sessions_7" ON "listening_sessions" ("bookId");
+CREATE INDEX "ix_book_notes_8" ON "book_notes" ("userId");
+CREATE INDEX "ix_book_notes_9" ON "book_notes" ("bookId");
+CREATE INDEX "ix_child_profiles_10" ON "child_profiles" ("userId");
+CREATE INDEX "ix_child_identities_11" ON "child_identities" ("childId");
+CREATE INDEX "ix_child_assessments_12" ON "child_assessments" ("childId");
+CREATE INDEX "ix_child_assessments_13" ON "child_assessments" ("createdAt");
+CREATE INDEX "ix_child_growth_mindset_logs_14" ON "child_growth_mindset_logs" ("childId");
+CREATE INDEX "ix_child_curiosity_logs_15" ON "child_curiosity_logs" ("childId");
+CREATE INDEX "ix_child_creativity_projects_16" ON "child_creativity_projects" ("childId");
+CREATE INDEX "ix_child_learning_environments_17" ON "child_learning_environments" ("childId");
+CREATE INDEX "ix_child_learning_environments_18" ON "child_learning_environments" ("createdAt");
+CREATE INDEX "ix_child_learning_autonomy_logs_19" ON "child_learning_autonomy_logs" ("childId");
+CREATE INDEX "ix_child_learning_autonomy_logs_20" ON "child_learning_autonomy_logs" ("createdAt");
+CREATE INDEX "ix_child_problem_solving_logs_21" ON "child_problem_solving_logs" ("childId");
+CREATE INDEX "ix_child_projects_22" ON "child_projects" ("childId");
+CREATE INDEX "ix_child_resilience_logs_23" ON "child_resilience_logs" ("childId");
+CREATE INDEX "ix_child_resilience_logs_24" ON "child_resilience_logs" ("createdAt");
+CREATE INDEX "ix_child_parent_coaching_sessions_25" ON "child_parent_coaching_sessions" ("userId");
+CREATE INDEX "ix_child_parent_coaching_sessions_26" ON "child_parent_coaching_sessions" ("childId");
+CREATE INDEX "ix_child_identity_snapshots_27" ON "child_identity_snapshots" ("childId");
+CREATE INDEX "ix_child_identity_snapshots_28" ON "child_identity_snapshots" ("createdAt");
+CREATE INDEX "ix_child_development_snapshots_29" ON "child_development_snapshots" ("childId");
+CREATE INDEX "ix_child_development_snapshots_30" ON "child_development_snapshots" ("createdAt");
+CREATE UNIQUE INDEX "uq_cog_models_31" ON "cog_models" ("slug");
+CREATE INDEX "ix_cog_models_32" ON "cog_models" ("category");
+CREATE INDEX "ix_cog_model_relationships_33" ON "cog_model_relationships" ("fromSlug");
+CREATE INDEX "ix_cog_model_examples_34" ON "cog_model_examples" ("modelSlug");
+CREATE UNIQUE INDEX "uq_cog_decision_lenses_35" ON "cog_decision_lenses" ("slug");
+CREATE INDEX "ix_cog_decision_lens_results_36" ON "cog_decision_lens_results" ("userId");
+CREATE UNIQUE INDEX "uq_cog_biases_37" ON "cog_biases" ("slug");
+CREATE INDEX "ix_cog_bias_events_38" ON "cog_bias_events" ("userId");
+CREATE INDEX "ix_cog_judgment_profiles_39" ON "cog_judgment_profiles" ("userId");
+CREATE INDEX "ix_cog_judgment_assessments_40" ON "cog_judgment_assessments" ("userId");
+CREATE INDEX "ix_cog_judgment_assessments_41" ON "cog_judgment_assessments" ("createdAt");
+CREATE INDEX "ix_cog_decision_journals_42" ON "cog_decision_journals" ("userId");
+CREATE INDEX "ix_cog_decision_assumptions_43" ON "cog_decision_assumptions" ("journalId");
+CREATE INDEX "ix_cog_decision_outcomes_44" ON "cog_decision_outcomes" ("journalId");
+CREATE INDEX "ix_cog_decision_reviews_45" ON "cog_decision_reviews" ("userId");
+CREATE INDEX "ix_cog_decision_reviews_46" ON "cog_decision_reviews" ("journalId");
+CREATE INDEX "ix_cog_latticeworks_47" ON "cog_latticeworks" ("userId");
+CREATE INDEX "ix_cog_latticework_nodes_48" ON "cog_latticework_nodes" ("latticeworkId");
+CREATE INDEX "ix_cog_latticework_edges_49" ON "cog_latticework_edges" ("latticeworkId");
+CREATE INDEX "ix_cog_cognitive_profiles_50" ON "cog_cognitive_profiles" ("userId");
+CREATE INDEX "ix_cog_thinking_patterns_51" ON "cog_thinking_patterns" ("userId");
+CREATE INDEX "ix_cog_reasoning_styles_52" ON "cog_reasoning_styles" ("userId");
+CREATE INDEX "ix_cog_uncertainty_assessments_53" ON "cog_uncertainty_assessments" ("userId");
+CREATE INDEX "ix_cog_uncertainty_assessments_54" ON "cog_uncertainty_assessments" ("createdAt");
+CREATE INDEX "ix_cog_optionalities_55" ON "cog_optionalities" ("userId");
+CREATE INDEX "ix_cog_tail_risks_56" ON "cog_tail_risks" ("userId");
+CREATE INDEX "ix_cog_diagnoses_57" ON "cog_diagnoses" ("userId");
+CREATE INDEX "ix_cog_root_causes_58" ON "cog_root_causes" ("diagnosisId");
+CREATE INDEX "ix_cog_leverage_points_59" ON "cog_leverage_points" ("diagnosisId");
+CREATE INDEX "ix_cog_wisdom_insights_60" ON "cog_wisdom_insights" ("userId");
+CREATE INDEX "ix_cog_wisdom_insights_61" ON "cog_wisdom_insights" ("createdAt");
+CREATE INDEX "ix_cog_personal_principles_62" ON "cog_personal_principles" ("userId");
+CREATE UNIQUE INDEX "uq_users_63" ON "users" ("email");
+CREATE UNIQUE INDEX "uq_personality_states_64" ON "personality_states" ("userId");
+CREATE INDEX "ix_personality_transitions_65" ON "personality_transitions" ("userId", "createdAt");
+CREATE INDEX "ix_worldviews_66" ON "worldviews" ("userId");
+CREATE INDEX "ix_worldview_dimensions_67" ON "worldview_dimensions" ("worldviewId");
+CREATE INDEX "ix_worldview_assessments_68" ON "worldview_assessments" ("userId");
+CREATE INDEX "ix_missions_69" ON "missions" ("userId");
+CREATE INDEX "ix_visions_70" ON "visions" ("userId");
+CREATE INDEX "ix_life_themes_71" ON "life_themes" ("userId");
+CREATE INDEX "ix_constitutions_72" ON "constitutions" ("userId");
+CREATE INDEX "ix_identities_73" ON "identities" ("userId");
+CREATE INDEX "ix_roles_74" ON "roles" ("userId");
+CREATE INDEX "ix_identity_scores_75" ON "identity_scores" ("identityId", "date");
+CREATE INDEX "ix_identity_history_76" ON "identity_history" ("userId", "date");
+CREATE INDEX "ix_values_77" ON "values" ("userId");
+CREATE UNIQUE INDEX "uq_value_rankings_78" ON "value_rankings" ("userId", "valueId");
+CREATE INDEX "ix_value_rankings_79" ON "value_rankings" ("userId", "rank");
+CREATE INDEX "ix_value_conflicts_80" ON "value_conflicts" ("userId");
+CREATE UNIQUE INDEX "uq_mental_models_81" ON "mental_models" ("userId", "name");
+CREATE INDEX "ix_mental_models_82" ON "mental_models" ("userId", "category");
+CREATE UNIQUE INDEX "uq_model_connections_83" ON "model_connections" ("fromModelId", "toModelId", "relation");
+CREATE INDEX "ix_model_usage_logs_84" ON "model_usage_logs" ("userId", "date");
+CREATE INDEX "ix_model_usage_logs_85" ON "model_usage_logs" ("modelId");
+CREATE INDEX "ix_first_principle_maps_86" ON "first_principle_maps" ("userId");
+CREATE INDEX "ix_assumptions_87" ON "assumptions" ("userId");
+CREATE INDEX "ix_root_causes_88" ON "root_causes" ("userId");
+CREATE INDEX "ix_constraints_89" ON "constraints" ("userId");
+CREATE INDEX "ix_decisions_90" ON "decisions" ("userId");
+CREATE INDEX "ix_decision_options_91" ON "decision_options" ("decisionId");
+CREATE INDEX "ix_decision_reviews_92" ON "decision_reviews" ("decisionId");
+CREATE INDEX "ix_role_models_93" ON "role_models" ("userId");
+CREATE INDEX "ix_identity_patterns_94" ON "identity_patterns" ("roleModelId");
+CREATE INDEX "ix_decision_patterns_95" ON "decision_patterns" ("roleModelId");
+CREATE INDEX "ix_habit_patterns_96" ON "habit_patterns" ("roleModelId");
+CREATE INDEX "ix_habits_97" ON "habits" ("userId");
+CREATE INDEX "ix_habit_logs_98" ON "habit_logs" ("habitId", "date");
+CREATE UNIQUE INDEX "uq_habit_identity_links_99" ON "habit_identity_links" ("habitId", "identityId");
+CREATE INDEX "ix_habit_identity_links_100" ON "habit_identity_links" ("habitId");
+CREATE INDEX "ix_shadow_patterns_101" ON "shadow_patterns" ("userId", "type");
+CREATE INDEX "ix_shadow_events_102" ON "shadow_events" ("userId", "date");
+CREATE INDEX "ix_interventions_103" ON "interventions" ("userId");
+CREATE INDEX "ix_reflections_104" ON "reflections" ("userId", "date");
+CREATE INDEX "ix_lessons_105" ON "lessons" ("userId");
+CREATE UNIQUE INDEX "uq_reviews_106" ON "reviews" ("userId", "period", "periodKey");
+CREATE INDEX "ix_reviews_107" ON "reviews" ("userId", "period");
+CREATE INDEX "ix_skills_108" ON "skills" ("userId");
+CREATE UNIQUE INDEX "uq_mastery_levels_109" ON "mastery_levels" ("skillId");
+CREATE INDEX "ix_skill_progress_110" ON "skill_progress" ("skillId", "date");
+CREATE INDEX "ix_leadership_metrics_111" ON "leadership_metrics" ("userId", "date");
+CREATE INDEX "ix_influence_logs_112" ON "influence_logs" ("userId");
+CREATE INDEX "ix_legacy_projects_113" ON "legacy_projects" ("userId");
+CREATE INDEX "ix_mentees_114" ON "mentees" ("userId");
+CREATE INDEX "ix_knowledge_assets_115" ON "knowledge_assets" ("userId");
+CREATE INDEX "ix_score_snapshots_116" ON "score_snapshots" ("userId", "kind", "date");
+CREATE INDEX "ix_domain_events_117" ON "domain_events" ("userId", "occurredAt");
+CREATE INDEX "ix_domain_events_118" ON "domain_events" ("aggregateType", "aggregateId");
+CREATE INDEX "ix_beliefs_119" ON "beliefs" ("userId", "type");
+CREATE UNIQUE INDEX "uq_limiting_beliefs_120" ON "limiting_beliefs" ("beliefId");
+CREATE UNIQUE INDEX "uq_empowering_beliefs_121" ON "empowering_beliefs" ("beliefId");
+CREATE INDEX "ix_belief_reframes_122" ON "belief_reframes" ("beliefId");
+CREATE INDEX "ix_belief_change_logs_123" ON "belief_change_logs" ("userId");
+CREATE UNIQUE INDEX "uq_digital_twin_profiles_124" ON "digital_twin_profiles" ("userId");
+CREATE INDEX "ix_twin_memories_125" ON "twin_memories" ("userId", "createdAt");
+CREATE INDEX "ix_twin_insights_126" ON "twin_insights" ("userId", "createdAt");
+CREATE INDEX "ix_drift_predictions_127" ON "drift_predictions" ("userId", "createdAt");
+CREATE UNIQUE INDEX "uq_geniuses_128" ON "geniuses" ("name");
+CREATE INDEX "ix_genius_strategies_129" ON "genius_strategies" ("geniusId");
+CREATE UNIQUE INDEX "uq_strategy_adoptions_130" ON "strategy_adoptions" ("userId", "strategyId");
+CREATE INDEX "ix_strategy_adoptions_131" ON "strategy_adoptions" ("userId");
+CREATE INDEX "ix_genius_practice_logs_132" ON "genius_practice_logs" ("adoptionId", "date");
+CREATE INDEX "ix_blueprint_adaptations_133" ON "blueprint_adaptations" ("userId");
+CREATE INDEX "ix_learning_paths_134" ON "learning_paths" ("userId");
+CREATE INDEX "ix_learning_steps_135" ON "learning_steps" ("pathId", "order");
+CREATE INDEX "ix_community_posts_136" ON "community_posts" ("userId");
+CREATE INDEX "ix_community_posts_137" ON "community_posts" ("createdAt");
+CREATE INDEX "ix_post_comments_138" ON "post_comments" ("postId", "createdAt");
+CREATE UNIQUE INDEX "uq_memberships_139" ON "memberships" ("userId");
+CREATE UNIQUE INDEX "uq_membership_orders_140" ON "membership_orders" ("outTradeNo");
+CREATE INDEX "ix_membership_orders_141" ON "membership_orders" ("userId");
+CREATE UNIQUE INDEX "uq_store_products_142" ON "store_products" ("slug");
+CREATE INDEX "ix_store_products_143" ON "store_products" ("kind");
+CREATE INDEX "ix_store_products_144" ON "store_products" ("active", "sortOrder");
+CREATE UNIQUE INDEX "uq_store_orders_145" ON "store_orders" ("outTradeNo");
+CREATE INDEX "ix_store_orders_146" ON "store_orders" ("userId");
+CREATE INDEX "ix_store_orders_147" ON "store_orders" ("status");
+CREATE INDEX "ix_store_orders_148" ON "store_orders" ("createdAt");
+CREATE UNIQUE INDEX "uq_user_credits_149" ON "user_credits" ("userId");
+CREATE INDEX "ix_credit_ledgers_150" ON "credit_ledgers" ("userId");
+CREATE INDEX "ix_credit_ledgers_151" ON "credit_ledgers" ("orderId");
+CREATE UNIQUE INDEX "uq_content_unlocks_152" ON "content_unlocks" ("userId", "contentKey");
+CREATE INDEX "ix_content_unlocks_153" ON "content_unlocks" ("userId");
+CREATE UNIQUE INDEX "uq_identity_families_154" ON "identity_families" ("slug");
+CREATE UNIQUE INDEX "uq_identity_archetypes_155" ON "identity_archetypes" ("slug");
+CREATE INDEX "ix_identity_archetypes_156" ON "identity_archetypes" ("familyId");
+CREATE INDEX "ix_identity_values_157" ON "identity_values" ("archetypeId");
+CREATE INDEX "ix_identity_beliefs_158" ON "identity_beliefs" ("archetypeId");
+CREATE INDEX "ix_identity_habits_159" ON "identity_habits" ("archetypeId");
+CREATE INDEX "ix_identity_capabilities_160" ON "identity_capabilities" ("archetypeId");
+CREATE INDEX "ix_identity_mental_models_161" ON "identity_mental_models" ("archetypeId");
+CREATE INDEX "ix_identity_shadow_patterns_162" ON "identity_shadow_patterns" ("archetypeId");
+CREATE INDEX "ix_identity_failure_modes_163" ON "identity_failure_modes" ("archetypeId");
+CREATE INDEX "ix_identity_evolution_paths_164" ON "identity_evolution_paths" ("archetypeId");
+CREATE INDEX "ix_user_identity_stacks_165" ON "user_identity_stacks" ("userId");
+CREATE INDEX "ix_identity_recommendations_166" ON "identity_recommendations" ("userId");
+CREATE INDEX "ix_identity_conflicts_167" ON "identity_conflicts" ("userId");
+CREATE INDEX "ix_identity_assessments_168" ON "identity_assessments" ("userId");
+CREATE INDEX "ix_identity_assessments_169" ON "identity_assessments" ("createdAt");
+CREATE INDEX "ix_identity_evolution_snapshots_170" ON "identity_evolution_snapshots" ("userId");
+CREATE INDEX "ix_identity_evolution_snapshots_171" ON "identity_evolution_snapshots" ("createdAt");
+CREATE INDEX "ix_leadership_profiles_172" ON "leadership_profiles" ("userId");
+CREATE INDEX "ix_leadership_profiles_173" ON "leadership_profiles" ("organizationId");
+CREATE INDEX "ix_leadership_assessments_174" ON "leadership_assessments" ("userId");
+CREATE INDEX "ix_leadership_assessments_175" ON "leadership_assessments" ("organizationId");
+CREATE INDEX "ix_leadership_assessments_176" ON "leadership_assessments" ("createdAt");
+CREATE INDEX "ix_leadership_leverage_maps_177" ON "leadership_leverage_maps" ("userId");
+CREATE INDEX "ix_leadership_leverage_maps_178" ON "leadership_leverage_maps" ("organizationId");
+CREATE INDEX "ix_leadership_conversations_179" ON "leadership_conversations" ("userId");
+CREATE INDEX "ix_leadership_conversations_180" ON "leadership_conversations" ("organizationId");
+CREATE INDEX "ix_leadership_identity_sponsorships_181" ON "leadership_identity_sponsorships" ("userId");
+CREATE INDEX "ix_leadership_identity_sponsorships_182" ON "leadership_identity_sponsorships" ("organizationId");
+CREATE INDEX "ix_leadership_vision_statements_183" ON "leadership_vision_statements" ("userId");
+CREATE INDEX "ix_leadership_vision_statements_184" ON "leadership_vision_statements" ("organizationId");
+CREATE INDEX "ix_leadership_vision_alignment_185" ON "leadership_vision_alignment" ("userId");
+CREATE INDEX "ix_leadership_vision_alignment_186" ON "leadership_vision_alignment" ("organizationId");
+CREATE INDEX "ix_leadership_vision_alignment_187" ON "leadership_vision_alignment" ("createdAt");
+CREATE INDEX "ix_leadership_belonging_assessments_188" ON "leadership_belonging_assessments" ("userId");
+CREATE INDEX "ix_leadership_belonging_assessments_189" ON "leadership_belonging_assessments" ("organizationId");
+CREATE INDEX "ix_leadership_belonging_assessments_190" ON "leadership_belonging_assessments" ("createdAt");
+CREATE INDEX "ix_leadership_alignment_assessments_191" ON "leadership_alignment_assessments" ("userId");
+CREATE INDEX "ix_leadership_alignment_assessments_192" ON "leadership_alignment_assessments" ("organizationId");
+CREATE INDEX "ix_leadership_future_leaders_193" ON "leadership_future_leaders" ("userId");
+CREATE INDEX "ix_leadership_future_leaders_194" ON "leadership_future_leaders" ("organizationId");
+CREATE INDEX "ix_leadership_pipelines_195" ON "leadership_pipelines" ("userId");
+CREATE INDEX "ix_leadership_pipelines_196" ON "leadership_pipelines" ("organizationId");
+CREATE INDEX "ix_leadership_culture_blueprints_197" ON "leadership_culture_blueprints" ("userId");
+CREATE INDEX "ix_leadership_culture_blueprints_198" ON "leadership_culture_blueprints" ("organizationId");
+CREATE INDEX "ix_leadership_awakening_sessions_199" ON "leadership_awakening_sessions" ("userId");
+CREATE INDEX "ix_leadership_awakening_sessions_200" ON "leadership_awakening_sessions" ("organizationId");
+CREATE INDEX "ix_leadership_growth_plans_201" ON "leadership_growth_plans" ("userId");
+CREATE INDEX "ix_leadership_growth_plans_202" ON "leadership_growth_plans" ("organizationId");
+CREATE INDEX "ix_management_profiles_203" ON "management_profiles" ("userId");
+CREATE INDEX "ix_management_profiles_204" ON "management_profiles" ("organizationId");
+CREATE INDEX "ix_management_assessments_205" ON "management_assessments" ("userId");
+CREATE INDEX "ix_management_assessments_206" ON "management_assessments" ("organizationId");
+CREATE INDEX "ix_management_assessments_207" ON "management_assessments" ("createdAt");
+CREATE INDEX "ix_management_activities_208" ON "management_activities" ("userId");
+CREATE INDEX "ix_management_activities_209" ON "management_activities" ("organizationId");
+CREATE INDEX "ix_management_activities_210" ON "management_activities" ("tier");
+CREATE INDEX "ix_leverage_logs_211" ON "leverage_logs" ("userId");
+CREATE INDEX "ix_leverage_logs_212" ON "leverage_logs" ("organizationId");
+CREATE INDEX "ix_leverage_logs_213" ON "leverage_logs" ("createdAt");
+CREATE INDEX "ix_knowledge_worker_profiles_214" ON "knowledge_worker_profiles" ("userId");
+CREATE INDEX "ix_knowledge_worker_profiles_215" ON "knowledge_worker_profiles" ("organizationId");
+CREATE INDEX "ix_mgmt_knowledge_assets_216" ON "mgmt_knowledge_assets" ("userId");
+CREATE INDEX "ix_mgmt_knowledge_assets_217" ON "mgmt_knowledge_assets" ("organizationId");
+CREATE INDEX "ix_mgmt_knowledge_assets_218" ON "mgmt_knowledge_assets" ("kind");
+CREATE INDEX "ix_management_playbooks_219" ON "management_playbooks" ("userId");
+CREATE INDEX "ix_management_playbooks_220" ON "management_playbooks" ("organizationId");
+CREATE INDEX "ix_management_prompt_libraries_221" ON "management_prompt_libraries" ("userId");
+CREATE INDEX "ix_management_prompt_libraries_222" ON "management_prompt_libraries" ("organizationId");
+CREATE INDEX "ix_organizational_memories_223" ON "organizational_memories" ("userId");
+CREATE INDEX "ix_organizational_memories_224" ON "organizational_memories" ("organizationId");
+CREATE INDEX "ix_organizational_memories_225" ON "organizational_memories" ("kind");
+CREATE INDEX "ix_management_decision_governance_226" ON "management_decision_governance" ("userId");
+CREATE INDEX "ix_management_decision_governance_227" ON "management_decision_governance" ("organizationId");
+CREATE INDEX "ix_management_decision_governance_228" ON "management_decision_governance" ("createdAt");
+CREATE INDEX "ix_organizational_health_229" ON "organizational_health" ("userId");
+CREATE INDEX "ix_organizational_health_230" ON "organizational_health" ("organizationId");
+CREATE INDEX "ix_organizational_health_231" ON "organizational_health" ("createdAt");
+CREATE INDEX "ix_fragility_assessments_232" ON "fragility_assessments" ("userId");
+CREATE INDEX "ix_fragility_assessments_233" ON "fragility_assessments" ("organizationId");
+CREATE INDEX "ix_fragility_assessments_234" ON "fragility_assessments" ("createdAt");
+CREATE INDEX "ix_organization_designs_235" ON "organization_designs" ("userId");
+CREATE INDEX "ix_organization_designs_236" ON "organization_designs" ("organizationId");
+CREATE INDEX "ix_management_twin_profiles_237" ON "management_twin_profiles" ("userId");
+CREATE INDEX "ix_management_twin_profiles_238" ON "management_twin_profiles" ("organizationId");
+CREATE INDEX "ix_organization_twin_profiles_239" ON "organization_twin_profiles" ("userId");
+CREATE INDEX "ix_organization_twin_profiles_240" ON "organization_twin_profiles" ("organizationId");
+CREATE INDEX "ix_management_coaching_sessions_241" ON "management_coaching_sessions" ("userId");
+CREATE INDEX "ix_management_coaching_sessions_242" ON "management_coaching_sessions" ("organizationId");
+CREATE INDEX "ix_sfm_founder_profiles_243" ON "sfm_founder_profiles" ("userId");
+CREATE INDEX "ix_sfm_founder_profiles_244" ON "sfm_founder_profiles" ("organizationId");
+CREATE INDEX "ix_sfm_business_missions_245" ON "sfm_business_missions" ("userId");
+CREATE INDEX "ix_sfm_business_missions_246" ON "sfm_business_missions" ("organizationId");
+CREATE INDEX "ix_sfm_company_identities_247" ON "sfm_company_identities" ("userId");
+CREATE INDEX "ix_sfm_company_identities_248" ON "sfm_company_identities" ("organizationId");
+CREATE INDEX "ix_sfm_core_values_249" ON "sfm_core_values" ("userId");
+CREATE INDEX "ix_sfm_core_values_250" ON "sfm_core_values" ("organizationId");
+CREATE INDEX "ix_sfm_success_factors_251" ON "sfm_success_factors" ("userId");
+CREATE INDEX "ix_sfm_success_factors_252" ON "sfm_success_factors" ("organizationId");
+CREATE INDEX "ix_sfm_success_factors_253" ON "sfm_success_factors" ("category");
+CREATE INDEX "ix_sfm_success_factors_254" ON "sfm_success_factors" ("scalabilityScore");
+CREATE INDEX "ix_sfm_founder_patterns_255" ON "sfm_founder_patterns" ("userId");
+CREATE INDEX "ix_sfm_founder_patterns_256" ON "sfm_founder_patterns" ("organizationId");
+CREATE INDEX "ix_sfm_business_patterns_257" ON "sfm_business_patterns" ("userId");
+CREATE INDEX "ix_sfm_business_patterns_258" ON "sfm_business_patterns" ("organizationId");
+CREATE INDEX "ix_sfm_decision_rules_259" ON "sfm_decision_rules" ("userId");
+CREATE INDEX "ix_sfm_decision_rules_260" ON "sfm_decision_rules" ("organizationId");
+CREATE INDEX "ix_sfm_operating_principles_261" ON "sfm_operating_principles" ("userId");
+CREATE INDEX "ix_sfm_operating_principles_262" ON "sfm_operating_principles" ("organizationId");
+CREATE INDEX "ix_sfm_scaling_bottlenecks_263" ON "sfm_scaling_bottlenecks" ("userId");
+CREATE INDEX "ix_sfm_scaling_bottlenecks_264" ON "sfm_scaling_bottlenecks" ("organizationId");
+CREATE INDEX "ix_sfm_team_alignments_265" ON "sfm_team_alignments" ("userId");
+CREATE INDEX "ix_sfm_team_alignments_266" ON "sfm_team_alignments" ("organizationId");
+CREATE INDEX "ix_sfm_leadership_patterns_267" ON "sfm_leadership_patterns" ("userId");
+CREATE INDEX "ix_sfm_leadership_patterns_268" ON "sfm_leadership_patterns" ("organizationId");
+CREATE INDEX "ix_culture_rituals_269" ON "culture_rituals" ("userId");
+CREATE INDEX "ix_culture_rituals_270" ON "culture_rituals" ("organizationId");
+CREATE INDEX "ix_sfm_collaboration_patterns_271" ON "sfm_collaboration_patterns" ("userId");
+CREATE INDEX "ix_sfm_collaboration_patterns_272" ON "sfm_collaboration_patterns" ("organizationId");
+CREATE INDEX "ix_sfm_resilience_patterns_273" ON "sfm_resilience_patterns" ("userId");
+CREATE INDEX "ix_sfm_resilience_patterns_274" ON "sfm_resilience_patterns" ("organizationId");
+CREATE INDEX "ix_sfm_system_blueprints_275" ON "sfm_system_blueprints" ("userId");
+CREATE INDEX "ix_sfm_system_blueprints_276" ON "sfm_system_blueprints" ("organizationId");
+CREATE INDEX "ix_sfm_replication_playbooks_277" ON "sfm_replication_playbooks" ("userId");
+CREATE INDEX "ix_sfm_replication_playbooks_278" ON "sfm_replication_playbooks" ("organizationId");
+CREATE INDEX "ix_sfm_org_health_snapshots_279" ON "sfm_org_health_snapshots" ("userId");
+CREATE INDEX "ix_sfm_org_health_snapshots_280" ON "sfm_org_health_snapshots" ("organizationId");
+CREATE INDEX "ix_sfm_org_health_snapshots_281" ON "sfm_org_health_snapshots" ("createdAt");
+CREATE INDEX "ix_worldview_profiles_282" ON "worldview_profiles" ("userId");
+CREATE INDEX "ix_worldview_profiles_283" ON "worldview_profiles" ("createdAt");
+CREATE INDEX "ix_worldview_assumption_conflicts_284" ON "worldview_assumption_conflicts" ("userId");
+CREATE UNIQUE INDEX "uq_worldview_archetypes_285" ON "worldview_archetypes" ("slug");
+CREATE INDEX "ix_worldview_meaning_profiles_286" ON "worldview_meaning_profiles" ("userId");
+CREATE INDEX "ix_worldview_meaning_profiles_287" ON "worldview_meaning_profiles" ("createdAt");
+CREATE INDEX "ix_worldview_personal_philosophies_288" ON "worldview_personal_philosophies" ("userId");
+CREATE INDEX "ix_worldview_life_principles_289" ON "worldview_life_principles" ("userId");
+CREATE INDEX "ix_worldview_twins_290" ON "worldview_twins" ("userId");
+CREATE INDEX "ix_worldview_evolutions_291" ON "worldview_evolutions" ("userId");
+CREATE INDEX "ix_worldview_evolutions_292" ON "worldview_evolutions" ("createdAt");
+
+COMMIT;

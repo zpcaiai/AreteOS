@@ -1,0 +1,47 @@
+{
+  "name": "mission-os",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts && tsx prisma/seed-genius.ts && tsx prisma/seed-identity.ts && tsx prisma/seed-cognitive.ts && tsx prisma/seed-worldview.ts && tsx prisma/seed-audiobooks.ts && tsx prisma/seed-emporion.ts",
+    "test": "vitest run",
+    "nightly": "tsx scripts/nightly.ts",
+    "db:seed:genius": "tsx prisma/seed-genius.ts",
+    "db:seed:identity": "tsx prisma/seed-identity.ts",
+    "db:seed:cognitive": "tsx prisma/seed-cognitive.ts",
+    "db:seed:worldview": "tsx prisma/seed-worldview.ts",
+    "db:seed:audiobooks": "tsx prisma/seed-audiobooks.ts",
+    "db:seed:emporion": "tsx prisma/seed-emporion.ts",
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && next build",
+    "analyze": "ANALYZE=true next build"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "next": "^15.1.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prisma": "^6.2.1",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@next/bundle-analyzer": "^15.1.4"
+  }
+}

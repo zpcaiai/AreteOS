@@ -1,0 +1,104 @@
+// ============================================================================
+// Emporion (ἐμπόριον) — the virtual-goods store. Order → pay → INSTANT
+// fulfillment: 虚拟商品支付成功后立即发货并完成订单 (no shipping state).
+// Mock payment for now; a real Alipay/WeChat notify callback can replace
+// /api/emporion/pay without touching fulfillment. Grants are auditable:
+// membership days, credits (with ledger), or content unlocks.
+// ============================================================================
+
+enum ProductKind {
+  MEMBERSHIP_DAYS
+  CREDITS
+  CONTENT
+}
+
+enum StoreOrderStatus {
+  CREATED
+  PAID
+  COMPLETED // virtual goods: delivered + completed at the moment of payment
+  CANCELLED
+}
+
+model VirtualProduct {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  name        String
+  description String      @default("")
+  kind        ProductKind
+  price       Decimal     @db.Decimal(10, 2)
+  currency    String      @default("CNY")
+  // Fulfillment payload (exactly one group applies, by kind):
+  grantTier       MemberTier? // MEMBERSHIP_DAYS: which tier the days extend
+  grantDays       Int     @default(0)
+  grantCredits    Int     @default(0) // CREDITS
+  grantContentKey String  @default("") // CONTENT
+  active      Boolean     @default(true)
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  orders StoreOrder[]
+
+  @@index([kind])
+  @@index([active, sortOrder])
+  @@map("store_products")
+}
+
+model StoreOrder {
+  id          String           @id @default(cuid())
+  userId      String
+  productId   String
+  product     VirtualProduct   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productName String // snapshot at purchase time
+  quantity    Int              @default(1)
+  amount      Decimal          @db.Decimal(10, 2)
+  currency    String           @default("CNY")
+  status      StoreOrderStatus @default(CREATED)
+  provider    String           @default("mock")
+  outTradeNo  String           @unique
+  paidAt      DateTime?
+  deliveredAt DateTime? // 虚拟商品: 与 paidAt 同刻 (instant delivery)
+  deliveryNote String          @default("")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("store_orders")
+}
+
+model UserCredit {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_credits")
+}
+
+model CreditLedger {
+  id        String   @id @default(cuid())
+  userId    String
+  delta     Int // +grant / -spend
+  reason    String   @default("")
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([orderId])
+  @@map("credit_ledgers")
+}
+
+model ContentUnlock {
+  id         String   @id @default(cuid())
+  userId     String
+  contentKey String
+  orderId    String?
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, contentKey])
+  @@index([userId])
+  @@map("content_unlocks")
+}

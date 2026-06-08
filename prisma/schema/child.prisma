@@ -1,0 +1,232 @@
+// ============================================================================
+// Child Development OS — "Genius Kids OS" (ages 6-18). Develop identity, curiosity,
+// agency, creativity, resilience and learning capability — NOT grades or compliance.
+// Environment → Experience → Beliefs → Identity → Capability → Creativity → Character.
+// Inspired by widely-taught ideas (growth mindset, Montessori, Reggio Emilia, the
+// three-role creative method). A parent account (userId) manages one or more children.
+// ============================================================================
+
+enum ChildIdentityKind {
+  EXPLORER
+  RESEARCHER
+  CREATOR
+  BUILDER
+  INVENTOR
+  PROBLEM_SOLVER
+  COLLABORATOR
+  STORYTELLER
+  LEADER
+  MENTOR
+}
+
+enum MindsetKind {
+  FIXED
+  GROWTH
+}
+
+enum CreativityMode {
+  DREAMER
+  BUILDER
+  CRITIC
+}
+
+model ChildProfile {
+  id          String   @id @default(cuid())
+  userId      String   // parent/guardian account
+  name        String
+  age         Int      @default(0)
+  interests   String[] @default([])
+  primaryIdentity ChildIdentityKind?
+  emergingIdentity ChildIdentityKind?
+  globalScore Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([userId])
+  @@map("child_profiles")
+}
+
+model ChildIdentity {
+  id          String   @id @default(cuid())
+  childId     String
+  kind        ChildIdentityKind
+  strengths   String[] @default([])
+  opportunities String[] @default([])
+  sponsorship String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@map("child_identities")
+}
+
+model ChildAssessment {
+  id            String   @id @default(cuid())
+  childId       String
+  curiosity     Float    @default(0)
+  creativity    Float    @default(0)
+  resilience    Float    @default(0)
+  autonomy      Float    @default(0)
+  collaboration Float    @default(0)
+  problemSolving Float   @default(0)
+  identityClarity Float  @default(0)
+  learningMotivation Float @default(0)
+  globalScore   Float    @default(0)
+  createdAt     DateTime @default(now())
+  @@index([childId])
+  @@index([createdAt])
+  @@map("child_assessments")
+}
+
+model GrowthMindsetLog {
+  id          String   @id @default(cuid())
+  childId     String
+  fixedStatement String
+  growthReframe String  @default("")
+  mindset     MindsetKind @default(FIXED)
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@map("child_growth_mindset_logs")
+}
+
+model CuriosityLog {
+  id          String   @id @default(cuid())
+  childId     String
+  question    String   @default("")
+  experiment  String   @default("")
+  topic       String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@map("child_curiosity_logs")
+}
+
+model CreativityProject {
+  id          String   @id @default(cuid())
+  childId     String
+  title       String
+  mode        CreativityMode @default(DREAMER)
+  idea        String   @default("")
+  prototype   String   @default("")
+  reflection  String   @default("")
+  confidence  Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([childId])
+  @@map("child_creativity_projects")
+}
+
+model LearningEnvironment {
+  id          String   @id @default(cuid())
+  childId     String
+  noise       Float    @default(0)
+  distraction Float    @default(0)
+  autonomy    Float    @default(0)
+  exploration Float    @default(0)
+  accessibility Float  @default(0)
+  qualityScore Float   @default(0)
+  upgradePlan String[] @default([])
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@index([createdAt])
+  @@map("child_learning_environments")
+}
+
+model LearningAutonomyLog {
+  id          String   @id @default(cuid())
+  childId     String
+  initiative  Float    @default(0)
+  ownership   Float    @default(0)
+  persistence Float    @default(0)
+  focus       Float    @default(0)
+  independentLearning Float @default(0)
+  autonomyScore Float  @default(0)
+  note        String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@index([createdAt])
+  @@map("child_learning_autonomy_logs")
+}
+
+model ProblemSolvingLog {
+  id          String   @id @default(cuid())
+  childId     String
+  problem     String
+  observation String   @default("")
+  hypothesis  String   @default("")
+  experiment  String   @default("")
+  reflection  String   @default("")
+  score       Float    @default(0)
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@map("child_problem_solving_logs")
+}
+
+model ChildProject {
+  id          String   @id @default(cuid())
+  childId     String
+  title       String
+  description String   @default("")
+  interest    String   @default("")
+  status      String   @default("in_progress")
+  capabilities String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([childId])
+  @@map("child_projects")
+}
+
+model ResilienceLog {
+  id          String   @id @default(cuid())
+  childId     String
+  failureRecovery Float @default(0)
+  persistence Float    @default(0)
+  riskTaking  Float    @default(0)
+  emotionalRegulation Float @default(0)
+  resilienceScore Float @default(0)
+  note        String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@index([createdAt])
+  @@map("child_resilience_logs")
+}
+
+model ParentCoachingSession {
+  id          String   @id @default(cuid())
+  userId      String
+  childId     String
+  role        String   @default("Identity Sponsor")
+  guidance    String[] @default([])
+  conversationScripts String[] @default([])
+  supportScore Float   @default(0)
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@index([childId])
+  @@map("child_parent_coaching_sessions")
+}
+
+model ChildIdentitySnapshot {
+  id          String   @id @default(cuid())
+  childId     String
+  kind        ChildIdentityKind
+  note        String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@index([createdAt])
+  @@map("child_identity_snapshots")
+}
+
+model ChildDevelopmentSnapshot {
+  id          String   @id @default(cuid())
+  childId     String
+  explorer    Float    @default(0)
+  creator     Float    @default(0)
+  builder     Float    @default(0)
+  researcher  Float    @default(0)
+  problemSolver Float  @default(0)
+  resilience  Float    @default(0)
+  autonomy    Float    @default(0)
+  growthMindset Float  @default(0)
+  parentSupport Float  @default(0)
+  globalScore Float    @default(0)
+  createdAt   DateTime @default(now())
+  @@index([childId])
+  @@index([createdAt])
+  @@map("child_development_snapshots")
+}

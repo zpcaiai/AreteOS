@@ -1,0 +1,203 @@
+// ============================================================================
+// Identity Library Engine — a structured library of high-leverage human identities.
+// Goals fail; identity persists. Behavior follows identity. NOT personality typing.
+// IdentityArchetype holds the denormalized blueprint (arrays) used by seed + UI;
+// the child tables exist for normalized per-attribute records.
+// ============================================================================
+
+enum IdentityStackRole {
+  PRIMARY
+  SECONDARY
+  EMERGING
+  LEGACY
+}
+
+enum IdentityStage {
+  DISCOVER
+  CHOOSE
+  PRACTICE
+  INTERNALIZE
+  INTEGRATE
+  MASTER
+  TEACH
+  LEGACY
+}
+
+model IdentityFamily {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  purpose     String   @default("")
+  sortOrder   Int      @default(0)
+  archetypes  IdentityArchetype[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("identity_families")
+}
+
+model IdentityArchetype {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  familyId        String
+  family          IdentityFamily @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  mission         String   @default("")
+  identityStatement String @default("")
+  values          String[] @default([])
+  beliefs         String[] @default([])
+  mentalModels    String[] @default([])
+  decisionRules   String[] @default([])
+  habits          String[] @default([])
+  capabilities    String[] @default([])
+  shadowPatterns  String[] @default([])
+  failureModes    String[] @default([])
+  growthPath      String[] @default([])
+  legacyExpression String  @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@index([familyId])
+  @@map("identity_archetypes")
+}
+
+model IdentityValue {
+  id          String   @id @default(cuid())
+  archetypeId String
+  value       String
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_values")
+}
+
+model IdentityBelief {
+  id          String   @id @default(cuid())
+  archetypeId String
+  belief      String
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_beliefs")
+}
+
+model IdentityHabit {
+  id          String   @id @default(cuid())
+  archetypeId String
+  habit       String
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_habits")
+}
+
+model IdentityCapability {
+  id          String   @id @default(cuid())
+  archetypeId String
+  capability  String
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_capabilities")
+}
+
+model IdentityMentalModel {
+  id          String   @id @default(cuid())
+  archetypeId String
+  model       String
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_mental_models")
+}
+
+model IdentityShadowPattern {
+  id          String   @id @default(cuid())
+  archetypeId String
+  pattern     String
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_shadow_patterns")
+}
+
+model IdentityFailureMode {
+  id          String   @id @default(cuid())
+  archetypeId String
+  failureMode String
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_failure_modes")
+}
+
+model IdentityEvolutionPath {
+  id          String   @id @default(cuid())
+  archetypeId String
+  stage       IdentityStage
+  description String   @default("")
+  createdAt   DateTime @default(now())
+  @@index([archetypeId])
+  @@map("identity_evolution_paths")
+}
+
+model UserIdentityStack {
+  id            String   @id @default(cuid())
+  userId        String
+  role          IdentityStackRole
+  archetypeSlug String
+  archetypeName String
+  stage         IdentityStage @default(CHOOSE)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@index([userId])
+  @@map("user_identity_stacks")
+}
+
+model IdentityRecommendation {
+  id          String   @id @default(cuid())
+  userId      String
+  archetypeSlug String
+  archetypeName String
+  role        IdentityStackRole @default(EMERGING)
+  rationale   String   @default("")
+  fitScore    Float    @default(0)
+  createdAt   DateTime @default(now())
+  @@index([userId])
+  @@map("identity_recommendations")
+}
+
+model IdentityConflict {
+  id           String   @id @default(cuid())
+  userId       String
+  identityA    String
+  identityB    String
+  tension      String   @default("")
+  tradeoffs    String[] @default([])
+  integration  String   @default("")
+  severity     Float    @default(0)
+  createdAt    DateTime @default(now())
+  @@index([userId])
+  @@map("identity_conflicts")
+}
+
+model IdentityAssessment {
+  id            String   @id @default(cuid())
+  userId        String
+  clarity       Float    @default(0)
+  alignment     Float    @default(0)
+  stability     Float    @default(0)
+  conflict      Float    @default(0)
+  evolution     Float    @default(0)
+  integration   Float    @default(0)
+  globalScore   Float    @default(0)
+  summary       String   @default("")
+  createdAt     DateTime @default(now())
+  @@index([userId])
+  @@index([createdAt])
+  @@map("identity_assessments")
+}
+
+model IdentityEvolutionSnapshot {
+  id           String   @id @default(cuid())
+  userId       String
+  archetypeSlug String
+  stage        IdentityStage
+  note         String   @default("")
+  createdAt    DateTime @default(now())
+  @@index([userId])
+  @@index([createdAt])
+  @@map("identity_evolution_snapshots")
+}

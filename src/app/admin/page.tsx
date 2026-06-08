@@ -1,0 +1,60 @@
+import Link from "next/link";
+import { overview } from "@/lib/admin/service";
+import { Card, PageHeader, StatGrid, Empty } from "@/components/ui";
+
+export const metadata = { title: "总览" };
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminHome() {
+  const o = await overview();
+  return (
+    <div>
+      <PageHeader title="总览" subtitle="平台关键指标与最近动态。" />
+      <Card title="关键指标">
+        <StatGrid items={[
+          { value: o.users, label: "用户" },
+          { value: o.ordersDone, label: "完成订单" },
+          { value: `¥${o.revenue}`, label: "累计收入" },
+          { value: o.productsActive, label: "在售商品" },
+          { value: o.posts, label: "社区帖子" },
+        ]} />
+      </Card>
+      <Card title="会员分布">
+        <div className="flex gap-6 text-sm">
+          {["FREE", "PLUS", "PRO"].map((t) => (
+            <div key={t}><span className="text-slate-400">{t}</span> <span className="font-bold tabular-nums">{o.tiers[t] ?? 0}</span></div>
+          ))}
+        </div>
+      </Card>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <Card title="最近订单">
+          {o.recentOrders.length ? (
+            <ul className="space-y-1 text-sm">
+              {o.recentOrders.map((r) => (
+                <li key={r.id} className="flex justify-between border-t border-slate-800 pt-1">
+                  <span className="text-slate-300">{r.productName}</span>
+                  <span className={r.status === "COMPLETED" ? "text-emerald-400" : "text-amber-400"}>¥{Number(r.amount)} · {r.status}</span>
+                </li>
+              ))}
+            </ul>
+          ) : <Empty>暂无订单</Empty>}
+          <Link href="/admin/orders" className="mt-2 inline-block text-xs text-indigo-400">全部订单 →</Link>
+        </Card>
+        <Card title="最近注册">
+          {o.recentUsers.length ? (
+            <ul className="space-y-1 text-sm">
+              {o.recentUsers.map((u) => (
+                <li key={u.id} className="flex justify-between border-t border-slate-800 pt-1">
+                  <span className="text-slate-300">{u.name || u.email}</span>
+                  <span className="text-xs text-slate-500">{new Date(u.createdAt).toLocaleDateString()}</span>
+                </li>
+              ))}
+            </ul>
+          ) : <Empty>暂无用户</Empty>}
+          <Link href="/admin/users" className="mt-2 inline-block text-xs text-indigo-400">全部用户 →</Link>
+        </Card>
+      </div>
+    </div>
+  );
+}

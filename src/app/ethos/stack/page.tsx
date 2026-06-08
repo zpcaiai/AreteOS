@@ -1,0 +1,47 @@
+import { getUserId } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { Card, PageHeader, Empty } from "@/components/ui";
+import { StackTool } from "../IdentityClient";
+
+export const metadata = { title: "Identity Stack" };
+
+export const dynamic = "force-dynamic";
+
+export default async function StackPage() {
+  const userId = await getUserId();
+  const [stack, recs] = await Promise.all([
+    prisma.userIdentityStack.findMany({ where: { userId, active: true }, orderBy: { createdAt: "asc" } }),
+    prisma.identityRecommendation.findMany({ where: { userId }, orderBy: { fitScore: "desc" }, take: 8 }),
+  ]);
+  return (
+    <div>
+      <PageHeader title="Identity Stack" subtitle="You don't have one identity — you have a stack. Primary, secondary, emerging, legacy." />
+      <StackTool />
+      <Card title="Current Stack">
+        {stack.length ? (
+          <div className="space-y-2 text-sm">
+            {stack.map((s) => (
+              <div key={s.id} className="flex items-center justify-between border-t border-slate-800 pt-2">
+                <span><span className="font-semibold text-slate-100">{s.archetypeName}</span> <span className="ml-2 text-xs text-indigo-300">{s.role}</span></span>
+                <span className="text-xs text-slate-400">{s.stage}</span>
+              </div>
+            ))}
+          </div>
+        ) : <Empty>No stack yet — build one above.</Empty>}
+      </Card>
+      {recs.length > 0 && (
+        <Card title="Recommended Identities">
+          <ul className="space-y-2 text-sm">
+            {recs.map((r) => (
+              <li key={r.id} className="border-t border-slate-800 pt-2">
+                <span className="font-medium text-slate-100">{r.archetypeName}</span>
+                <span className="ml-2 text-xs text-emerald-400">fit {Math.round(r.fitScore * 100)}</span>
+                <div className="text-xs text-slate-400">{r.rationale}</div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+    </div>
+  );
+}

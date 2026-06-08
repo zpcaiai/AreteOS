@@ -1,0 +1,288 @@
+// ============================================================================
+// Management OS — "The Leverage Operating System for Knowledge Organizations."
+// Grove (leverage), Drucker (knowledge workers), Nonaka/SECI (knowledge capture),
+// Taleb (anti-fragility). Management is system design, not people control.
+// Reuses AlignmentAssessment (above) for the Alignment Engine.
+// ============================================================================
+
+enum ManagementLevel {
+  SUPERVISOR
+  MANAGER
+  DIRECTOR
+  LEADER
+  VISIONARY
+  SYSTEM_ARCHITECT
+  ORG_DESIGNER
+}
+
+enum LeverageTier {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum KnowledgeAssetKind {
+  PLAYBOOK
+  PROMPT_LIBRARY
+  EXPERT_PATTERN
+  DECISION_PATTERN
+  TROUBLESHOOTING
+  CUSTOMER
+  TECHNICAL
+}
+
+model ManagementProfile {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  level          ManagementLevel @default(MANAGER)
+  maturityScore  Float    @default(0)
+  globalScore    Float    @default(0)
+  dependencyRisk Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("management_profiles")
+}
+
+model ManagementAssessment {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  mission        Float    @default(0)
+  leadership     Float    @default(0)
+  knowledge      Float    @default(0)
+  decisionQuality Float   @default(0)
+  delegation     Float    @default(0)
+  alignment      Float    @default(0)
+  resilience     Float    @default(0)
+  maturityScore  Float    @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("management_assessments")
+}
+
+model ManagementActivity {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  activity       String
+  tier           LeverageTier @default(LOW)
+  hoursPerWeek   Float    @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([tier])
+  @@map("management_activities")
+}
+
+model LeverageLog {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  lowShare       Float    @default(0)
+  mediumShare    Float    @default(0)
+  highShare      Float    @default(0)
+  leverageScore  Float    @default(0)
+  improvementPlan String[] @default([])
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("leverage_logs")
+}
+
+model KnowledgeWorkerProfile {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  subject        String   @default("")
+  clarity        Float    @default(0)
+  autonomy       Float    @default(0)
+  capability     Float    @default(0)
+  tooling        Float    @default(0)
+  focus          Float    @default(0)
+  effectivenessScore Float @default(0)
+  constraints    String[] @default([])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("knowledge_worker_profiles")
+}
+
+model MgmtKnowledgeAsset {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  kind           KnowledgeAssetKind @default(PLAYBOOK)
+  title          String
+  content        String   @default("")
+  tacitSource    String   @default("")
+  reuseCount     Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@index([kind])
+  @@map("mgmt_knowledge_assets")
+}
+
+model Playbook {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  title          String
+  steps          String[] @default([])
+  whenToUse      String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("management_playbooks")
+}
+
+model PromptLibrary {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  title          String
+  prompts        String[] @default([])
+  domain         String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("management_prompt_libraries")
+}
+
+model OrganizationalMemory {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  kind           String   @default("lesson")
+  title          String
+  detail         String   @default("")
+  outcome        String   @default("")
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([kind])
+  @@map("organizational_memories")
+}
+
+model DecisionGovernance {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  quality        Float    @default(0)
+  consistency    Float    @default(0)
+  speed          Float    @default(0)
+  ownership      Float    @default(0)
+  learning       Float    @default(0)
+  governanceScore Float   @default(0)
+  notes          String   @default("")
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("management_decision_governance")
+}
+
+model OrganizationalHealth {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  trust          Float    @default(0)
+  communication  Float    @default(0)
+  execution      Float    @default(0)
+  ownership      Float    @default(0)
+  learning       Float    @default(0)
+  collaboration  Float    @default(0)
+  healthScore    Float    @default(0)
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("organizational_health")
+}
+
+model FragilityAssessment {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  founderDependency Float @default(0)
+  keyPersonDependency Float @default(0)
+  customerConcentration Float @default(0)
+  knowledgeConcentration Float @default(0)
+  productConcentration Float @default(0)
+  resilienceScore Float   @default(0)
+  fragilityMap   Json?
+  stressTest     String   @default("")
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("fragility_assessments")
+}
+
+model OrganizationDesign {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  title          String
+  structure      String   @default("")
+  decisionRights String[] @default([])
+  informationFlow String  @default("")
+  coordinationCost Float  @default(0)
+  scalingRecommendations String[] @default([])
+  designScore    Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("organization_designs")
+}
+
+model ManagementTwin {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  snapshot       Json?
+  accuracyScore  Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("management_twin_profiles")
+}
+
+model OrganizationTwin {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  snapshot       Json?
+  simulationResults Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([userId])
+  @@index([organizationId])
+  @@map("organization_twin_profiles")
+}
+
+model CoachingSession {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String?
+  blindSpots     String[] @default([])
+  growthAreas    String[] @default([])
+  coachingPlan   String[] @default([])
+  developmentPlan String[] @default([])
+  createdAt      DateTime @default(now())
+  @@index([userId])
+  @@index([organizationId])
+  @@map("management_coaching_sessions")
+}
