@@ -15,6 +15,7 @@ export default async function HabitsPage() {
   return (
     <div>
       <PageHeader title="Habits" subtitle="Habits are identity proofs, not tasks." />
+      <a href="/psychology" className="mb-4 block rounded-xl border border-emerald-900/60 bg-emerald-950/30 px-4 py-2 text-sm text-emerald-200 hover:bg-emerald-950/50">New · Behavioral activation: adapt a stuck habit to your current energy (Green/Yellow/Red) → Psychology Studio</a>
       <div className="grid gap-5 lg:grid-cols-2">
         {habits.length ? habits.map((h) => {
           const target = (h.targetPerWeek * 30) / 7;

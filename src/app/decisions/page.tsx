@@ -14,6 +14,7 @@ export default async function DecisionsPage() {
   return (
     <div>
       <PageHeader title="Decisions" subtitle="Every decision scored on mission/identity/value fit, EV, 2nd-order, risk, reversibility, shadow motive." />
+      <a href="/psychology" className="mb-4 block rounded-xl border border-indigo-900/60 bg-indigo-950/30 px-4 py-2 text-sm text-indigo-200 hover:bg-indigo-950/50">New · Decision-motive analysis: surface the motive (fear/pride/values) behind a pending call → Psychology Studio</a>
       <div className="space-y-4">
         {decisions.length ? decisions.map((d) => (
           <Card key={d.id} title={d.title}>

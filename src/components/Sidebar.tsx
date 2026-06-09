@@ -12,6 +12,7 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
   ]},
   { title: "Foundation", items: [
     { href: "/cosmos", label: "Cosmos · Worldview" },
+    { href: "/cosmos/constellation", label: "Constellation" },
   ]},
   { title: "Direction", items: [
     { href: "/telos", label: "Telos · Mission" },
