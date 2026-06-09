@@ -11,7 +11,7 @@
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts && tsx prisma/seed-genius.ts && tsx prisma/seed-identity.ts && tsx prisma/seed-cognitive.ts && tsx prisma/seed-worldview.ts && tsx prisma/seed-audiobooks.ts && tsx prisma/seed-emporion.ts",
+    "db:seed": "tsx prisma/seed.ts && tsx prisma/seed-genius.ts && tsx prisma/seed-identity.ts && tsx prisma/seed-cognitive.ts && tsx prisma/seed-worldview.ts && tsx prisma/seed-audiobooks.ts && tsx prisma/seed-emporion.ts && tsx prisma/seed-naval.ts",
     "test": "vitest run",
     "nightly": "tsx scripts/nightly.ts",
     "db:seed:genius": "tsx prisma/seed-genius.ts",
@@ -22,7 +22,8 @@
     "db:seed:emporion": "tsx prisma/seed-emporion.ts",
     "postinstall": "prisma generate",
     "vercel-build": "prisma generate && next build",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "db:seed:naval": "tsx prisma/seed-naval.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",

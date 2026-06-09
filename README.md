@@ -257,3 +257,59 @@ membership-mix/recent activity), users (search + inline membership grant), order
 (view + refund/cancel), products (Emporion CRUD: create / re-price / toggle active),
 memberships (manual grant/extend), and community moderation (delete posts/comments).
 Routes under `/api/admin/*`. Set `ADMIN_EMAILS="you@example.com"` in Vercel env.
+
+## Naval Life OS
+
+A life-strategy subsystem inside Mission OS, inspired by the public ideas around
+specific knowledge, judgment, leverage, wealth creation, long-term games, freedom
+and happiness. It helps a user move from time-for-money work toward owned,
+compounding assets and a balanced life. All content is original and educational —
+it is **not** financial, legal, or medical advice.
+
+### Core loop
+
+> Specific knowledge → judgment → leverage → asset creation → wealth → freedom →
+> happiness → better judgment → more specific knowledge.
+
+### Thirteen engines
+
+Specific Knowledge · Talent Stack · Leverage · Judgment · Decision Journal ·
+Wealth Creation · Asset Builder · Permissionless Opportunities · Long-Term Games ·
+Freedom · Happiness · Life Portfolio · Naval Digital Twin.
+
+### Architecture
+
+- **Schema** — `prisma/schema/naval.prisma` (28 models + 6 enums).
+- **Scoring** — `src/lib/naval/scoring.ts`. Each score is the geometric mean of its
+  0..1 factors × 100 (a near-zero factor still tanks the score). `GlobalNavalScore`
+  is the geometric mean of the seven life drivers.
+- **Agents** — `src/lib/agents/naval.ts` (13 agents, registered and exposed at
+  `POST /api/agents/:name`). Tone: concise, strategic, non-motivational,
+  non-therapeutic. Wealth and happiness agents carry explicit safety constraints.
+- **Engine operations** — `src/lib/naval/engines.ts` runs each agent and persists
+  the result via Prisma. **Read/compute** — `src/lib/naval/service.ts` assembles
+  the dashboard, writes `NavalScoreSnapshot` trend rows, and generates the 90-day
+  plan.
+- **API** — `src/app/api/naval/*` (route groups per engine, plus `/dashboard` and
+  `/plan/90-day`). Routes validate input, gate writes behind the `naval` Plus-tier
+  feature, and delegate to the service layer.
+- **UI** — pages under `src/app/naval/*` (overview, dashboard, and the 13 engines)
+  with `src/components/naval/*` (interactive `EngineStudio`, `Radar`, `PlanButton`,
+  config). Linked from the sidebar under "Naval Life OS".
+
+### Membership
+
+Naval engines require the **Plus** tier (`FEATURES.naval = 2`). Read endpoints are
+open to any signed-in user; assessment/write endpoints call `requireFeature(userId, "naval")`.
+
+### Seeding
+
+`npm run db:seed:naval` (also part of `npm run db:seed`) creates a coherent
+life-strategy slice for the demo user so `/naval` and the dashboard render
+immediately.
+
+### Safety
+
+Wealth: educational framing only — no specific securities, no promised returns, no
+regulated advice. Happiness: not therapy; the agent defers to professional support
+on crisis/self-harm language. Business: long-term, ethical value creation only.

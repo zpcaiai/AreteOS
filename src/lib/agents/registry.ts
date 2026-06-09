@@ -8,6 +8,7 @@ import * as cognitive from "./cognitive";
 import * as worldview from "./worldview";
 import * as child from "./child";
 import * as psychology from "./psychology";
+import * as naval from "./naval";
 
 // Re-export every agent so `import {{ X }} from "@/lib/agents/registry"` keeps working.
 export * from "./core";
@@ -19,6 +20,7 @@ export * from "./cognitive";
 export * from "./worldview";
 export * from "./child";
 export * from "./psychology";
+export * from "./naval";
 
 export const AGENTS = {
   ...core,
@@ -30,6 +32,7 @@ export const AGENTS = {
   ...worldview,
   ...child,
   ...psychology,
+  ...naval,
 };
 
 export type AgentName = keyof typeof AGENTS;

@@ -15,7 +15,7 @@ export const TIERS: TierInfo[] = [
   },
   {
     tier: "PLUS", label: "Plus", tagline: "Think and decide better.",
-    features: ["Everything in Free", "All 19 AI coaches", "Decisions · Mental Models · First Principles", "Genius modeling & Learning Paths", "Post in the community", "Weekly reviews"],
+    features: ["Everything in Free", "All 19 AI coaches", "Decisions · Mental Models · First Principles", "Genius modeling & Learning Paths", "Naval Life OS — leverage, judgment, wealth & freedom", "Post in the community", "Weekly reviews"],
   },
   {
     tier: "PRO", label: "Pro", tagline: "Compound into excellence.",
@@ -29,6 +29,7 @@ export const FEATURES: Record<string, number> = {
   genius: 1, learning_path: 1, community_post: 1, weekly_review: 1,
   digital_twin: 2, excellence_adapt: 2, knowledge_graph: 2, nightly_reports: 2, quarterly_review: 2,
   sfm: 2, leadership: 2, management: 2, cognitive: 2, child: 2,
+  naval: 2,
 };
 
 export function hasFeature(tier: Tier, featureKey: string): boolean {
