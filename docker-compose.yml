@@ -1,0 +1,29 @@
+# Local Postgres for Mission OS dev. Credentials/port are read from .env
+# (POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB / POSTGRES_PORT), which is
+# gitignored — no secrets live in this committed file. Defaults match a fresh setup.
+#
+#   docker compose up -d        # start the DB
+#   npm run db:push             # create tables
+#   npm run db:seed:naval       # demo data
+#   docker compose down         # stop (data persists in the named volume)
+services:
+  db:
+    image: postgres:16
+    container_name: mission-os-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-mission_os}
+    ports:
+      - "${POSTGRES_PORT:-5431}:5432"
+    volumes:
+      - mission_os_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-mission_os}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mission_os_pgdata:
