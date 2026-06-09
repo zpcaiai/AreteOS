@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/ui";
-import Constellation, { type ConsNode } from "@/components/Constellation";
+import ConstellationCanvas from "@/components/ConstellationCanvas";
+import type { ConsNode } from "@/components/Constellation";
 
 export const metadata = { title: "Constellation" };
 
@@ -26,8 +27,8 @@ const NODES: ConsNode[] = [
 export default function ConstellationPage() {
   return (
     <div>
-      <PageHeader title="Constellation" subtitle="Your development system as a navigable sphere — drag to spin, click a node to open it. Migrated from the emotion-sphere 3D visual." />
-      <div className="mt-6"><Constellation nodes={NODES} title="Arete · Identity & Engine Map" /></div>
+      <PageHeader title="Constellation" subtitle="Your development system as a navigable WebGL sphere — drag to orbit, scroll to zoom, click a node to open it. Ported from emotion-sphere (react-three-fiber)." />
+      <div className="mt-6"><ConstellationCanvas nodes={NODES} title="Arete · Identity & Engine Map" /></div>
     </div>
   );
 }
