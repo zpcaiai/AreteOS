@@ -1,0 +1,111 @@
+// ───────────────────────── Psychology OS ─────────────────────────
+// Ported from the emotion-sphere engines (secularized). Records produced by the
+// psychology agents (CbtReframe, PersonalityDriver, NarrativeIdentity, …) and
+// the deterministic Formation trajectory engine. Nested analysis is stored as
+// Json to stay faithful to the source shapes without over-normalizing.
+
+model CbtEntry {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activatingEvent String
+  automaticThought String  @default("")
+  distortionType  String   @default("")
+  beliefHierarchy Json     // { automaticThought, intermediate{…}, core{…} }
+  consequences    Json     // { emotional, behavioral, physiological }
+  reframing       Json     // { automatic, intermediate, core, synthesis }
+  evidenceAgainst String[] @default([])
+  severityScore   Int      @default(5)   // 1..10
+  beliefStrength  Int      @default(5)   // 1..10
+  createdAt       DateTime @default(now())
+  @@index([userId, createdAt])
+  @@map("cbt_entries")
+}
+
+model DriverEntry {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  driverCategory  String
+  surfaceProblem  String
+  deepEmotion     String   @default("")
+  hiddenDynamics  String   @default("")
+  behavioralCycle Json     // { trigger, response, relief, cost }
+  coreBelief      String   @default("")
+  longTermRisk    String   @default("")
+  interventionPriority Int @default(3)   // 1..5
+  createdAt       DateTime @default(now())
+  @@index([userId, createdAt])
+  @@map("driver_entries")
+}
+
+enum NarrativeType {
+  REDEMPTION
+  CONTAMINATION
+  TURNING_POINT
+  STABILITY
+}
+
+model NarrativeEntry {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  narrativeType   NarrativeType
+  narrativeTitle  String
+  identityThemes  String[]      @default([])
+  coreValues      String[]      @default([])
+  coherenceScore  Int           @default(5)  // 1..10
+  agencyScore     Int           @default(5)
+  redemptionScore Int           @default(5)
+  createdAt       DateTime      @default(now())
+  @@index([userId, createdAt])
+  @@map("narrative_entries")
+}
+
+model FormationSnapshot {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stateVector   Json     // 8-dim tendency vector
+  dimensions    Json     // per-dimension { score, delta, trend, confidence }
+  dominantLoop  String   @default("unknown")
+  trajectory    String   @default("unknown")
+  formationArc  String   @default("unknown")
+  driftDetected Boolean  @default(false)
+  alignmentTrend String  @default("stable")
+  narrative     String   @default("")
+  createdAt     DateTime @default(now())
+  @@index([userId, createdAt])
+  @@map("formation_snapshots")
+}
+
+model DecisionDiscernment {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decision        String
+  motiveProfile   Json     // { fear, pride, desire, duty, care }
+  dominantSource  String   // values | fear | pride | impulse | social_pressure | mixed | uncertain
+  guidancePriority String  // proceed | pause | reframe | seek_input
+  reasoning       String   @default("")
+  alternatives    String[] @default([])
+  confidence      Float    @default(0.5)
+  reviewedOutcome String   @default("")   // filled in later — the review-log loop
+  reviewedAt      DateTime?
+  createdAt       DateTime @default(now())
+  @@index([userId, createdAt])
+  @@map("decision_discernments")
+}
+
+model PersonaTagRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String
+  category  String   // driver | belief | narrative | state | distortion | value | general
+  weight    Float    @default(0.6)
+  source    String   @default("")  // which agent produced it
+  createdAt DateTime @default(now())
+  @@index([userId, category])
+  @@map("persona_tags")
+}

@@ -153,6 +153,13 @@ model User {
   reviews           Review[]
   skills            Skill[]
   leadershipMetrics LeadershipMetric[]
+  // Psychology OS (migrated from emotion-sphere)
+  cbtEntries        CbtEntry[]
+  driverEntries     DriverEntry[]
+  narrativeEntries  NarrativeEntry[]
+  formationSnapshots FormationSnapshot[]
+  decisionDiscernments DecisionDiscernment[]
+  personaTags       PersonaTagRecord[]
   influenceLogs     InfluenceLog[]
   legacyProjects    LegacyProject[]
   mentees           Mentee[]

@@ -22,6 +22,7 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
   ]},
   { title: "Thinking", items: [
     { href: "/phronesis", label: "Phronesis · Cognitive" },
+    { href: "/psychology", label: "Psychology · CBT" },
     { href: "/decisions", label: "Decisions" },
     { href: "/role-models", label: "Role Models" },
     { href: "/genius-strategies", label: "Genius Strategies" },
