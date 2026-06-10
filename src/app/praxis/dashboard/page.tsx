@@ -2,12 +2,14 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeOrgHealth } from "@/lib/praxis/service";
 import { Card, ScoreBar, PageHeader, Line, Empty, Scoreboard } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Organizational Health Dashboard" };
 
 export const dynamic = "force-dynamic";
 
 export default async function SfmDashboard() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [health, bottlenecks, playbooks, history] = await Promise.all([
     computeOrgHealth(userId),
@@ -29,7 +31,7 @@ export default async function SfmDashboard() {
 
   return (
     <div>
-      <PageHeader title="Organizational Health Dashboard" subtitle="The full SFM scoreboard — replication readiness and the binding constraints to scaling." />
+      <PageHeader title={t("page.praxis.dashboard.title")} subtitle={t("page.praxis.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title="Replication Readiness">

@@ -4,12 +4,14 @@ import { prisma } from "@/lib/db";
 import { computeOrgHealth } from "@/lib/praxis/service";
 import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import SfmStudio from "./SfmStudio";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Business Scaling Engine (SFM)" };
 
 export const dynamic = "force-dynamic";
 
 export default async function SfmPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [health, founder, identity, factors, values, principles] = await Promise.all([
     computeOrgHealth(userId),
@@ -22,7 +24,7 @@ export default async function SfmPage() {
 
   return (
     <div>
-      <PageHeader title="Business Scaling Engine (SFM)" subtitle="Founder Genius → Success Factors → Shared Identity → Decision Rules → Operating Principles → Repeatable System → Scalable Organization." />
+      <PageHeader title={t("page.praxis.title")} subtitle={t("page.praxis.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Replication Readiness">

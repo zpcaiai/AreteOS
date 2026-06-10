@@ -1,11 +1,13 @@
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Role Models" };
 export const dynamic = "force-dynamic";
 
 export default async function RoleModelsPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const models = await prisma.roleModel.findMany({
     where: { userId }, orderBy: { createdAt: "desc" },
@@ -13,7 +15,7 @@ export default async function RoleModelsPage() {
   });
   return (
     <div>
-      <PageHeader title="Role Models" subtitle="Excellence Blueprints (Dilts): identity, values, mental models, decision rules, habits." />
+      <PageHeader title={t("page.role_models.title")} subtitle={t("page.role_models.subtitle")} />
       <div className="space-y-4">
         {models.length ? models.map((m) => (
           <Card key={m.id} title={`${m.person} · ${m.archetype}`}>

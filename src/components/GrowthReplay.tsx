@@ -5,6 +5,7 @@
 // append-only domain-event log.
 
 import { useCallback, useEffect, useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
 
 interface Aggregate { aggregateType: string; aggregateId: string; eventCount: number; lastEventAt: string | null; types: Record<string, number> }
 interface Replay { eventCount: number; aggregates: Aggregate[]; events: { type: string; aggregateType: string; occurredAt: string }[] }
@@ -12,6 +13,7 @@ interface Replay { eventCount: number; aggregates: Aggregate[]; events: { type: 
 const DAY = 86_400_000;
 
 export default function GrowthReplay({ firstEventAt }: { firstEventAt: string | null }) {
+  const { t } = useI18n();
   const start = firstEventAt ? new Date(firstEventAt).getTime() : Date.now() - 90 * DAY;
   const totalDays = Math.max(1, Math.ceil((Date.now() - start) / DAY));
   const [offset, setOffset] = useState(totalDays);
@@ -47,7 +49,7 @@ export default function GrowthReplay({ firstEventAt }: { firstEventAt: string | 
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <label htmlFor="replay-slider" className="text-sm text-slate-400">Rewind to</label>
+        <label htmlFor="replay-slider" className="text-sm text-slate-400">{t("ui.replay.rewind")}</label>
         <input
           id="replay-slider"
           type="range"
@@ -62,8 +64,8 @@ export default function GrowthReplay({ firstEventAt }: { firstEventAt: string | 
           aria-valuetext={until.toISOString().slice(0, 10)}
         />
         <span className="text-sm tabular-nums text-slate-200">{until.toISOString().slice(0, 10)}</span>
-        {busy && <span className="text-xs text-slate-500" aria-live="polite">replaying…</span>}
-        {replay && <span className="text-xs text-slate-500">{replay.eventCount} events</span>}
+        {busy && <span className="text-xs text-slate-500" aria-live="polite">{t("ui.replay.replaying")}</span>}
+        {replay && <span className="text-xs text-slate-500">{replay.eventCount} {t("ui.replay.events")}</span>}
       </div>
 
       {replay && rows.length > 0 ? (
@@ -80,7 +82,7 @@ export default function GrowthReplay({ firstEventAt }: { firstEventAt: string | 
             ))}
           </div>
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">Last events before this point</p>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">{t("ui.replay.lastEvents")}</p>
             <ul className="space-y-1 text-sm text-slate-400">
               {recent.map((e, i) => (
                 <li key={i}>
@@ -92,7 +94,7 @@ export default function GrowthReplay({ firstEventAt }: { firstEventAt: string | 
           </div>
         </div>
       ) : (
-        <p className="text-sm text-slate-500">No domain events before this point yet — your history rebuilds here as you use the system.</p>
+        <p className="text-sm text-slate-500">{t("ui.replay.empty")}</p>
       )}
     </div>
   );

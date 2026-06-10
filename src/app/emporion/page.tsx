@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getEntitlements } from "@/lib/emporion/service";
 import { Card, PageHeader, Empty, StatGrid } from "@/components/ui";
 import EmporionClient from "./EmporionClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Emporion · 商店" };
 
@@ -13,6 +14,7 @@ const KIND_LABEL: Record<string, string> = {
 };
 
 export default async function EmporionPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [products, orders, ent] = await Promise.all([
     prisma.virtualProduct.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { price: "asc" }] }),
@@ -22,7 +24,7 @@ export default async function EmporionPage() {
 
   return (
     <div>
-      <PageHeader title="Emporion · 商店" subtitle="虚拟商品 — 支付成功即时发货、立即完成。会员时长、点数与内容解锁。" />
+      <PageHeader title={t("page.emporion.title")} subtitle={t("page.emporion.subtitle")} />
 
       <Card title="我的资产">
         <StatGrid items={[

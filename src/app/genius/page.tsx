@@ -4,17 +4,19 @@ import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { SIX_CAPABILITIES } from "@/lib/genius/constants";
 import { ChildCreateForm } from "./ChildClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Genius Kids OS" };
 
 export const dynamic = "force-dynamic";
 
 export default async function ChildHub() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const children = await prisma.childProfile.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
   return (
     <div>
-      <PageHeader title="Genius Kids OS" subtitle="Raise curious, capable, creative, resilient lifelong learners — not grades. Ages 6–18." />
+      <PageHeader title={t("page.genius.title")} subtitle={t("page.genius.subtitle")} />
       <Card title="Why this exists">
         <p className="text-sm text-slate-300">We optimize for the six capabilities that predict long-term flourishing far better than test scores:</p>
         <div className="mt-2 flex flex-wrap gap-2">

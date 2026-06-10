@@ -2,16 +2,18 @@ import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Genius Library" };
 export const dynamic = "force-dynamic";
 
 export default async function ModelsPage() {
+  const { t } = await getDict();
   await getUserId();
   const geniuses = await prisma.genius.findMany({ orderBy: { name: "asc" }, include: { strategies: { take: 1 } } });
   return (
     <div>
-      <PageHeader title="Genius Library" subtitle="Excellence reverse-engineered into reusable blueprints — modeling how, not biography." />
+      <PageHeader title={t("page.models.title")} subtitle={t("page.models.subtitle")} />
       {geniuses.length ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {geniuses.map((g) => (

@@ -2,12 +2,14 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeManagement } from "@/lib/oikos/service";
 import { Card, ScoreBar, PageHeader, Line, Empty, Scoreboard } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Management Dashboard" };
 
 export const dynamic = "force-dynamic";
 
 export default async function ManagementDashboard() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [health, assets, governance, fragility, designs, healthHistory] = await Promise.all([
     computeManagement(userId),
@@ -30,7 +32,7 @@ export default async function ManagementDashboard() {
 
   return (
     <div>
-      <PageHeader title="Management Dashboard" subtitle="Leverage, knowledge assets, decision governance, health, and anti-fragility in one view." />
+      <PageHeader title={t("page.oikos.dashboard.title")} subtitle={t("page.oikos.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title="Global Management Score">

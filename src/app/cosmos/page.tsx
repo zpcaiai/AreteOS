@@ -5,12 +5,14 @@ import { computeWorldview } from "@/lib/cosmos/service";
 import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import AnalyzeBox from "@/components/AnalyzeBox";
 import WorldviewStudio from "./WorldviewStudio";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Worldview OS" };
 
 export const dynamic = "force-dynamic";
 
 export default async function WorldviewPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [worldview, health, profile] = await Promise.all([
     prisma.worldview.findFirst({ where: { userId }, orderBy: { createdAt: "desc" }, include: { dimensions: true } }),
@@ -20,7 +22,7 @@ export default async function WorldviewPage() {
 
   return (
     <div>
-      <PageHeader title="Worldview OS" subtitle="The reality-interpretation operating system. Worldview → Mission → Identity → Beliefs → Decisions → Outcomes." />
+      <PageHeader title={t("page.cosmos.title")} subtitle={t("page.cosmos.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Global Worldview Score">

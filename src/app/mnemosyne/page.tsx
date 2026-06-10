@@ -3,12 +3,14 @@ import { prisma } from "@/lib/db";
 import { PageHeader, Card } from "@/components/ui";
 import Disclaimer from "@/components/Disclaimer";
 import AudiobookShelf from "./AudiobookShelf";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "听书成长 · Listen to Grow" };
 
 export const dynamic = "force-dynamic";
 
 export default async function AudiobooksPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [books, progress, sessions] = await Promise.all([
     prisma.audioBook.findMany({
@@ -22,7 +24,7 @@ export default async function AudiobooksPage() {
 
   return (
     <div>
-      <PageHeader title="听书成长 · Listen to Grow" subtitle="Listen to the ideas behind every module. Read-aloud summaries and public-domain texts — grow while you commute." />
+      <PageHeader title={t("page.mnemosyne.title")} subtitle={t("page.mnemosyne.subtitle")} />
       <Card title="Your listening">
         <div className="flex gap-8 text-sm">
           <div><div className="text-2xl font-bold tabular-nums">{totalMin}</div><div className="text-xs text-slate-500">minutes listened</div></div>

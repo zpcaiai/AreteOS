@@ -2,12 +2,14 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { StackTool } from "../IdentityClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Identity Stack" };
 
 export const dynamic = "force-dynamic";
 
 export default async function StackPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [stack, recs] = await Promise.all([
     prisma.userIdentityStack.findMany({ where: { userId, active: true }, orderBy: { createdAt: "asc" } }),
@@ -15,7 +17,7 @@ export default async function StackPage() {
   ]);
   return (
     <div>
-      <PageHeader title="Identity Stack" subtitle="You don't have one identity — you have a stack. Primary, secondary, emerging, legacy." />
+      <PageHeader title={t("page.ethos.stack.title")} subtitle={t("page.ethos.stack.subtitle")} />
       <StackTool />
       <Card title="Current Stack">
         {stack.length ? (

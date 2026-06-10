@@ -2,12 +2,14 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeCognitive } from "@/lib/phronesis/service";
 import { Card, ScoreBar, PageHeader, Empty, Scoreboard } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Cognitive Dashboard" };
 
 export const dynamic = "force-dynamic";
 
 export default async function CognitiveDashboard() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [h, journals, biasEvents, insights, principles, diagnoses] = await Promise.all([
     computeCognitive(userId),
@@ -26,7 +28,7 @@ export default async function CognitiveDashboard() {
 
   return (
     <div>
-      <PageHeader title="Cognitive Dashboard" subtitle="Judgment, decision quality, biases, and accumulated wisdom." />
+      <PageHeader title={t("page.phronesis.dashboard.title")} subtitle={t("page.phronesis.dashboard.subtitle")} />
       <Card title="Scoreboard"><Scoreboard rows={board} /></Card>
 
       <Card title="Decision Journal">

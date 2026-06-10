@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { DeleteButton } from "../AdminClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "社区审核" };
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCommunity() {
+  const { t } = await getDict();
   const posts = await prisma.communityPost.findMany({
     orderBy: { createdAt: "desc" }, take: 100,
     include: {
@@ -17,7 +19,7 @@ export default async function AdminCommunity() {
   });
   return (
     <div>
-      <PageHeader title="社区审核" subtitle="浏览帖子与评论,删除违规内容(删帖会一并删除其评论)。" />
+      <PageHeader title={t("page.admin.community.title")} subtitle={t("page.admin.community.subtitle")} />
       {posts.length ? posts.map((p) => (
         <Card key={p.id}>
           <div className="flex items-start justify-between gap-3">

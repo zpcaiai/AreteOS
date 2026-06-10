@@ -1,16 +1,18 @@
 import { PageHeader } from "@/components/ui";
 import EngineStudio from "@/components/naval/EngineStudio";
 import { ENGINES } from "@/components/naval/config";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Judgment" };
 export const dynamic = "force-dynamic";
 
 const config = ENGINES["judgment"];
 
-export default function Page() {
+export default async function Page() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title={config.title} subtitle={config.subtitle} />
+      <PageHeader title={t("page.naval.judgment.title")} subtitle={t("page.naval.judgment.subtitle")} />
       <EngineStudio config={config} />
     </div>
   );

@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/ui";
 import ConstellationCanvas from "@/components/ConstellationCanvas";
 import type { ConsNode } from "@/components/Constellation";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Constellation" };
 
@@ -24,10 +25,11 @@ const NODES: ConsNode[] = [
   { id: "v-stability", label: "Emotional stability", group: "Value" },
 ];
 
-export default function ConstellationPage() {
+export default async function ConstellationPage() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title="Constellation" subtitle="Your development system as a navigable WebGL sphere — drag to orbit, scroll to zoom, click a node to open it. Ported from emotion-sphere (react-three-fiber)." />
+      <PageHeader title={t("page.cosmos.constellation.title")} subtitle={t("page.cosmos.constellation.subtitle")} />
       <div className="mt-6"><ConstellationCanvas nodes={NODES} title="Arete · Identity & Engine Map" /></div>
     </div>
   );

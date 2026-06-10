@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { PageHeader, Empty } from "@/components/ui";
 import { Composer, CommentForm } from "@/components/CommunityClient";
 import { statusLabel } from "@/lib/community/statuses";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Community" };
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ function ago(d: Date) {
 }
 
 export default async function CommunityPage() {
+  const { t } = await getDict();
   await getUserId();
   const posts = await prisma.communityPost.findMany({
     orderBy: { createdAt: "desc" }, take: 50,
@@ -29,7 +31,7 @@ export default async function CommunityPage() {
   });
   return (
     <div className="mx-auto max-w-2xl">
-      <PageHeader title="Community" subtitle="Share what kind of work you're in, and a message. Browse and comment on others'." />
+      <PageHeader title={t("page.community.title")} subtitle={t("page.community.subtitle")} />
       <div className="mb-6"><Composer /></div>
       {posts.length ? (
         <div className="space-y-4">

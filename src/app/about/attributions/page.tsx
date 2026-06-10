@@ -1,12 +1,14 @@
 import { PageHeader, Card } from "@/components/ui";
 import { DISCLAIMER_LONG, INSPIRATIONS } from "@/lib/legal/attributions";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Attributions & Legal" };
 
-export default function AttributionsPage() {
+export default async function AttributionsPage() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title="Attributions & Legal" subtitle="What inspired this work, and what this product is not." />
+      <PageHeader title={t("page.about.attributions.title")} subtitle={t("page.about.attributions.subtitle")} />
       <Card title="Disclaimer">
         <p className="text-sm leading-relaxed text-slate-300">{DISCLAIMER_LONG}</p>
       </Card>

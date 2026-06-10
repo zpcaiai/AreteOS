@@ -4,11 +4,13 @@ import { computeScoresCached } from "@/lib/analytics";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
 import AnalyzeBox from "@/components/AnalyzeBox";
 import WhatIfSimulator from "@/components/WhatIfSimulator";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Digital Twin" };
 export const dynamic = "force-dynamic";
 
 export default async function TwinPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [{ scores, stage }, insights, drifts] = await Promise.all([
     computeScoresCached(userId),
@@ -17,7 +19,7 @@ export default async function TwinPage() {
   ]);
   return (
     <div>
-      <PageHeader title="Digital Twin" subtitle="A live model of who you are becoming — drift risk, trajectory, simulation." />
+      <PageHeader title={t("page.twin.title")} subtitle={t("page.twin.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
         <Card title="Current twin">
           <p className="text-sm text-slate-300">Stage: <span className="font-medium">{stage.current}</span></p>

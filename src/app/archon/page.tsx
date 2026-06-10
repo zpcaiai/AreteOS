@@ -5,12 +5,14 @@ import { computeLeadership } from "@/lib/archon/service";
 import { LEVELS } from "@/lib/archon/levels";
 import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import LeadershipStudio from "./LeadershipStudio";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Leadership Leverage Engine" };
 
 export const dynamic = "force-dynamic";
 
 export default async function LeadershipPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [health, leverage, vision] = await Promise.all([
     computeLeadership(userId),
@@ -24,7 +26,7 @@ export default async function LeadershipPage() {
 
   return (
     <div>
-      <PageHeader title="Leadership Leverage Engine" subtitle="The higher the logical level, the greater the leverage. Environment → Behavior → Capability → Belief → Identity → Mission." />
+      <PageHeader title={t("page.archon.title")} subtitle={t("page.archon.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Global Leadership Score">

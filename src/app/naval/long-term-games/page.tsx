@@ -1,16 +1,18 @@
 import { PageHeader } from "@/components/ui";
 import EngineStudio from "@/components/naval/EngineStudio";
 import { ENGINES } from "@/components/naval/config";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Long-Term Games" };
 export const dynamic = "force-dynamic";
 
 const config = ENGINES["long-term-games"];
 
-export default function Page() {
+export default async function Page() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title={config.title} subtitle={config.subtitle} />
+      <PageHeader title={t("page.naval.long_term_games.title")} subtitle={t("page.naval.long_term_games.subtitle")} />
       <EngineStudio config={config} />
     </div>
   );

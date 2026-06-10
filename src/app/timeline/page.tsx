@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, Line } from "@/components/ui";
 import { EVOLUTION_STAGES } from "@/lib/domain/enums";
 import GrowthReplay from "@/components/GrowthReplay";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Growth Timeline" };
 export const dynamic = "force-dynamic";
@@ -13,6 +14,7 @@ const TRACK_KINDS = [
 ] as const;
 
 export default async function TimelinePage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [snapshots, identityScores, transitions, personality, firstEvent] = await Promise.all([
     prisma.scoreSnapshot.findMany({ where: { userId }, orderBy: { date: "asc" } }),
@@ -33,7 +35,7 @@ export default async function TimelinePage() {
 
   return (
     <div>
-      <PageHeader title="Growth Timeline" subtitle="Score trends, personality evolution, and identity history over time." />
+      <PageHeader title={t("page.timeline.title")} subtitle={t("page.timeline.subtitle")} />
 
       <div className="grid gap-5 lg:grid-cols-2">
         {TRACK_KINDS.map(([kind, label, color]) => {

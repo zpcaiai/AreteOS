@@ -1,11 +1,13 @@
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Decisions" };
 export const dynamic = "force-dynamic";
 
 export default async function DecisionsPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const decisions = await prisma.decision.findMany({
     where: { userId }, orderBy: { createdAt: "desc" },
@@ -13,7 +15,7 @@ export default async function DecisionsPage() {
   });
   return (
     <div>
-      <PageHeader title="Decisions" subtitle="Every decision scored on mission/identity/value fit, EV, 2nd-order, risk, reversibility, shadow motive." />
+      <PageHeader title={t("page.decisions.title")} subtitle={t("page.decisions.subtitle")} />
       <a href="/psychology" className="mb-4 block rounded-xl border border-indigo-900/60 bg-indigo-950/30 px-4 py-2 text-sm text-indigo-200 hover:bg-indigo-950/50">New · Decision-motive analysis: surface the motive (fear/pride/values) behind a pending call → Psychology Studio</a>
       <div className="space-y-4">
         {decisions.length ? decisions.map((d) => (

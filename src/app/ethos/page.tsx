@@ -3,12 +3,14 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeIdentityProfile } from "@/lib/ethos/service";
 import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Identity Library" };
 
 export const dynamic = "force-dynamic";
 
 export default async function IdentityLibraryPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [profile, families] = await Promise.all([
     computeIdentityProfile(userId),
@@ -17,7 +19,7 @@ export default async function IdentityLibraryPage() {
 
   return (
     <div>
-      <PageHeader title="Identity Library" subtitle="A structured library of high-leverage human identities. Goals fail; identity persists. Behavior follows identity." />
+      <PageHeader title={t("page.ethos.title")} subtitle={t("page.ethos.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Global Identity Score">

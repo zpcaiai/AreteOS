@@ -4,12 +4,14 @@ import { computeCognitive } from "@/lib/phronesis/service";
 import { computeGraphInsights } from "@/lib/graph-insights";
 import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import CognitiveStudio from "./CognitiveStudio";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Cognitive OS" };
 
 export const dynamic = "force-dynamic";
 
 export default async function CognitivePage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [h, graph] = await Promise.all([
     computeCognitive(userId),
@@ -17,7 +19,7 @@ export default async function CognitivePage() {
   ]);
   return (
     <div>
-      <PageHeader title="Cognitive OS" subtitle="The judgment & decision operating system. Optimize judgment quality, not information quantity." />
+      <PageHeader title={t("page.phronesis.title")} subtitle={t("page.phronesis.subtitle")} />
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Global Cognitive Score">
           <div className="text-4xl font-bold tabular-nums">{Math.round(h.globalCognitiveScore * 100)}</div>

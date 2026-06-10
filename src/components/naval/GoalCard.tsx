@@ -2,12 +2,16 @@
 import { useEffect, useState } from "react";
 import { useApi, useApiMutation } from "@/lib/hooks";
 import { NavalGoalSchema, firstIssue } from "@/lib/schemas";
+import { useI18n } from "@/lib/i18n/client";
 
 interface Goal { id: string; statement: string; horizon: string; why: string; targetDate: string | null }
 const HORIZONS = ["ONE_YEAR", "THREE_YEARS", "FIVE_YEARS", "TEN_YEARS", "LIFETIME"] as const;
-const label = (h: string) => ({ ONE_YEAR: "1 year", THREE_YEARS: "3 years", FIVE_YEARS: "5 years", TEN_YEARS: "10 years", LIFETIME: "Lifetime" } as Record<string, string>)[h] ?? h;
+
 
 export default function GoalCard() {
+  const { t } = useI18n();
+  const label = (h: string) =>
+    ({ ONE_YEAR: t("ui.goal.h1"), THREE_YEARS: t("ui.goal.h3"), FIVE_YEARS: t("ui.goal.h5"), TEN_YEARS: t("ui.goal.h10"), LIFETIME: t("ui.goal.hLife") } as Record<string, string>)[h] ?? h;
   const { data, isLoading } = useApi<{ goal: Goal | null }>("/api/naval/goals");
   const save = useApiMutation<{ statement: string; horizon: string; why: string }, { goal: Goal }>(
     "/api/naval/goals",
@@ -45,15 +49,15 @@ export default function GoalCard() {
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold">North-star goal</h2>
-        {goal && !editing && <button onClick={() => setEditing(true)} className="text-xs text-slate-400 hover:text-slate-200">Edit</button>}
+        <h2 className="text-sm font-semibold">{t("ui.goal.title")}</h2>
+        {goal && !editing && <button onClick={() => setEditing(true)} className="text-xs text-slate-400 hover:text-slate-200">{t("ui.goal.edit")}</button>}
       </div>
       {isLoading ? (
-        <p className="text-sm text-slate-500">Loading…</p>
+        <p className="text-sm text-slate-500">{t("ui.goal.loading")}</p>
       ) : !editing && goal ? (
         <div>
           <p className="text-base text-slate-100">{goal.statement}</p>
-          <p className="mt-1 text-xs text-slate-500">Horizon: {label(goal.horizon)}{goal.why ? ` · ${goal.why}` : ""}</p>
+          <p className="mt-1 text-xs text-slate-500">{t("ui.goal.horizon")}: {label(goal.horizon)}{goal.why ? ` · ${goal.why}` : ""}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -61,7 +65,7 @@ export default function GoalCard() {
             value={statement}
             onChange={(e) => { setStatement(e.target.value); validate({ statement: e.target.value, horizon, why }); }}
             rows={2}
-            placeholder="e.g. Own assets that buy back all my time within 5 years."
+            placeholder={t("ui.goal.placeholder")}
             aria-label="Goal statement"
             aria-invalid={issue ? true : undefined}
             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm"
@@ -73,7 +77,7 @@ export default function GoalCard() {
             <input
               value={why}
               onChange={(e) => { setWhy(e.target.value); validate({ statement, horizon, why: e.target.value }); }}
-              placeholder="Why it matters (optional)"
+              placeholder={t("ui.goal.why")}
               aria-label="Why this goal matters"
               className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm"
             />
@@ -81,7 +85,7 @@ export default function GoalCard() {
           {issue && <p className="text-xs text-amber-400" role="alert">{issue}</p>}
           {save.error && <p className="text-xs text-rose-400" role="alert">{save.error.message}</p>}
           <button onClick={submit} disabled={save.isPending || !!issue} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium disabled:opacity-50">
-            {save.isPending ? "Saving…" : "Save goal"}
+            {save.isPending ? t("ui.goal.saving") : t("ui.goal.save")}
           </button>
         </div>
       )}

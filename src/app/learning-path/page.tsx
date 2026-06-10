@@ -2,18 +2,20 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
 import { StepToggle } from "@/components/ExcellenceClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Excellence Learning Loop" };
 export const dynamic = "force-dynamic";
 
 export default async function LearningPathPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const paths = await prisma.learningPath.findMany({
     where: { userId }, orderBy: { createdAt: "desc" }, include: { steps: { orderBy: { order: "asc" } } },
   });
   return (
     <div>
-      <PageHeader title="Excellence Learning Loop" subtitle="Observe → Imitate → Practice → Internalize → Adapt → Create → Teach." />
+      <PageHeader title={t("page.learning_path.title")} subtitle={t("page.learning_path.subtitle")} />
       {paths.length ? (
         <div className="space-y-4">
           {paths.map((p) => {

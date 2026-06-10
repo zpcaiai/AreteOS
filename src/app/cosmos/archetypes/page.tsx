@@ -1,15 +1,17 @@
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Worldview Archetypes" };
 
 export const dynamic = "force-dynamic";
 
 export default async function WorldviewArchetypesPage() {
+  const { t } = await getDict();
   const archetypes = await prisma.worldviewArchetype.findMany({ orderBy: { name: "asc" } });
   return (
     <div>
-      <PageHeader title="Worldview Archetypes" subtitle="Ten reality-interpretation stances, each with its mission, assumptions, blind spots and growth edges." />
+      <PageHeader title={t("page.cosmos.archetypes.title")} subtitle={t("page.cosmos.archetypes.subtitle")} />
       {archetypes.length ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {archetypes.map((a) => (

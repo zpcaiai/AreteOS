@@ -1,13 +1,15 @@
 import { PageHeader } from "@/components/ui";
 import OnboardingWizard from "@/components/naval/OnboardingWizard";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Naval Onboarding" };
 export const dynamic = "force-dynamic";
 
-export default function NavalOnboardingPage() {
+export default async function NavalOnboardingPage() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title="Get set up" subtitle="Eleven steps to seed your Naval Life OS — specific knowledge through your first 90-day plan." />
+      <PageHeader title={t("page.naval.onboarding.title")} subtitle={t("page.naval.onboarding.subtitle")} />
       <OnboardingWizard />
     </div>
   );

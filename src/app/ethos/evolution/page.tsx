@@ -1,12 +1,14 @@
 import { getUserId } from "@/lib/auth";
 import { computeIdentityProfile } from "@/lib/ethos/service";
 import { Card, ScoreBar, PageHeader, Empty, Scoreboard } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Identity Evolution" };
 
 export const dynamic = "force-dynamic";
 
 export default async function EvolutionPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const p = await computeIdentityProfile(userId);
 
@@ -17,7 +19,7 @@ export default async function EvolutionPage() {
 
   return (
     <div>
-      <PageHeader title="Identity Evolution" subtitle="Discover → Choose → Practice → Internalize → Integrate → Master → Teach → Legacy." />
+      <PageHeader title={t("page.ethos.evolution.title")} subtitle={t("page.ethos.evolution.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title="Global Identity Score">

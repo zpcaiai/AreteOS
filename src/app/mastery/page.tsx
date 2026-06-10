@@ -2,16 +2,18 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
 import { masteryScore } from "@/lib/scoring";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Mastery" };
 export const dynamic = "force-dynamic";
 
 export default async function MasteryPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const skills = await prisma.skill.findMany({ where: { userId }, include: { masteryLevel: true } });
   return (
     <div>
-      <PageHeader title="Mastery" subtitle="Novice → Master across knowledge, execution, problem-solving, teaching." />
+      <PageHeader title={t("page.mastery.title")} subtitle={t("page.mastery.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
         {skills.length ? skills.map((s) => {
           const m = s.masteryLevel;

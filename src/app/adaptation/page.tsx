@@ -2,18 +2,20 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { GeneratePathButton } from "@/components/ExcellenceClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Adapted Blueprints" };
 export const dynamic = "force-dynamic";
 
 export default async function AdaptationPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const adaptations = await prisma.blueprintAdaptation.findMany({
     where: { userId }, orderBy: { createdAt: "desc" }, include: { strategy: { include: { genius: true } }, paths: true },
   });
   return (
     <div>
-      <PageHeader title="Adapted Blueprints" subtitle="Genius blueprints translated into your context. Open a model in the Library to create one." />
+      <PageHeader title={t("page.adaptation.title")} subtitle={t("page.adaptation.subtitle")} />
       {adaptations.length ? (
         <div className="space-y-4">
           {adaptations.map((a) => (

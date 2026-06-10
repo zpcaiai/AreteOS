@@ -5,12 +5,14 @@ import { computeManagement } from "@/lib/oikos/service";
 import { MATURITY, FIRST_PRINCIPLES } from "@/lib/oikos/levels";
 import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import ManagementStudio from "./ManagementStudio";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Management OS" };
 
 export const dynamic = "force-dynamic";
 
 export default async function ManagementPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [health, profile, leverage] = await Promise.all([
     computeManagement(userId),
@@ -20,7 +22,7 @@ export default async function ManagementPage() {
 
   return (
     <div>
-      <PageHeader title="Management OS" subtitle="The Leverage Operating System for knowledge organizations. Management is system design, not people control." />
+      <PageHeader title={t("page.oikos.title")} subtitle={t("page.oikos.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Global Management Score">

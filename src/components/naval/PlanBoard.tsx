@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
 
 interface Task { id: string; month: number; engine: string; task: string; done: boolean }
 interface MonthMeta { month: number; theme: string; focus: string }
 interface Plan { id: string; headline: string; northStar: string; progress: number; status: string; tasks: Task[]; metadata?: { months?: MonthMeta[] } }
 
 export default function PlanBoard() {
+  const { t } = useI18n();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -38,15 +40,15 @@ export default function PlanBoard() {
     if (r.ok) { const d = await r.json(); setPlan((p) => (p ? { ...p, progress: d.progress, status: d.completed ? "COMPLETED" : "ACTIVE" } : p)); }
   }
 
-  if (loading) return <p className="text-sm text-slate-500">Loading plan…</p>;
+  if (loading) return <p className="text-sm text-slate-500">{t("ui.plan.loading")}</p>;
 
   if (!plan) {
     return (
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-        <p className="mb-3 text-sm text-slate-400">No active 90-day plan yet. Generate one from your current Naval state.</p>
+        <p className="mb-3 text-sm text-slate-400">{t("ui.plan.empty")}</p>
         {error && <p className="mb-2 text-sm text-rose-400">{error}</p>}
         <button onClick={generate} disabled={busy} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium disabled:opacity-50">
-          {busy ? "Generating…" : "Generate my 90-day plan"}
+          {busy ? t("ui.plan.generating") : t("ui.plan.generate")}
         </button>
       </div>
     );
@@ -59,10 +61,10 @@ export default function PlanBoard() {
     <div className="space-y-4">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
         <div className="mb-1 flex items-center justify-between">
-          <h2 className="text-sm font-semibold">90-Day Plan {plan.status === "COMPLETED" && <span className="text-emerald-400">· complete 🎉</span>}</h2>
+          <h2 className="text-sm font-semibold">{t("ui.plan.title")} {plan.status === "COMPLETED" && <span className="text-emerald-400">{t("ui.plan.complete")}</span>}</h2>
           <div className="flex items-center gap-3">
             <span className="text-xs tabular-nums text-slate-400">{pct}%</span>
-            <button onClick={generate} disabled={busy} className="rounded-md bg-slate-800 px-2.5 py-1 text-xs hover:bg-slate-700 disabled:opacity-50">{busy ? "…" : "Regenerate"}</button>
+            <button onClick={generate} disabled={busy} className="rounded-md bg-slate-800 px-2.5 py-1 text-xs hover:bg-slate-700 disabled:opacity-50">{busy ? "…" : t("ui.plan.regenerate")}</button>
           </div>
         </div>
         <div className="mb-3 h-2 w-full rounded-full bg-slate-800"><div className="h-2 rounded-full bg-indigo-500" style={{ width: `${pct}%` }} /></div>
@@ -72,7 +74,7 @@ export default function PlanBoard() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {months.map((m) => (
           <div key={m.month} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-indigo-400">Month {m.month}{m.theme ? ` · ${m.theme}` : ""}</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-indigo-400">{t("ui.plan.month").replace("{n}", String(m.month))}{m.theme ? ` · ${m.theme}` : ""}</div>
             {m.focus && <div className="mb-2 text-xs text-slate-500">{m.focus}</div>}
             <ul className="mt-2 space-y-2">
               {plan.tasks.filter((t) => t.month === m.month).map((t) => (
@@ -86,7 +88,7 @@ export default function PlanBoard() {
         ))}
       </div>
 
-      <p className="rounded-lg bg-slate-800/60 px-4 py-3 text-sm italic text-slate-300">North star — {plan.northStar}</p>
+      <p className="rounded-lg bg-slate-800/60 px-4 py-3 text-sm italic text-slate-300">{t("ui.plan.northStar")} — {plan.northStar}</p>
     </div>
   );
 }

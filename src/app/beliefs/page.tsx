@@ -2,16 +2,18 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import AnalyzeBox from "@/components/AnalyzeBox";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Beliefs" };
 export const dynamic = "force-dynamic";
 
 export default async function BeliefsPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const beliefs = await prisma.belief.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, include: { limiting: true, reframes: true } });
   return (
     <div>
-      <PageHeader title="Beliefs" subtitle="Identify limiting beliefs and reframe them into empowering, actionable ones." />
+      <PageHeader title={t("page.beliefs.title")} subtitle={t("page.beliefs.subtitle")} />
       <div className="mb-5"><AnalyzeBox endpoint="/api/beliefs" mode="text" placeholder="Write a worry or a 'I can't because…' thought. e.g. 我年龄太大了，不适合转型。" button="Analyze & reframe" /></div>
       <div className="space-y-3">
         {beliefs.length ? beliefs.map((b) => (

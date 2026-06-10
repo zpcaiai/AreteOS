@@ -5,6 +5,8 @@
 
 import { useState } from "react";
 import { useApiMutation } from "@/lib/hooks";
+import type { DictKey } from "@/lib/i18n/dictionaries";
+import { useI18n } from "@/lib/i18n/client";
 
 interface Point { day: number; growth: number }
 interface Simulation {
@@ -16,15 +18,16 @@ interface Simulation {
   notes: string[];
 }
 
-const LEVERS: { key: string; label: string }[] = [
-  { key: "habitConsistency", label: "Habit consistency" },
-  { key: "reflection", label: "Reflection practice" },
-  { key: "decisionQuality", label: "Decision quality" },
-  { key: "mentalModelUsage", label: "Mental-model usage" },
-  { key: "firstPrinciple", label: "First-principles practice" },
+const LEVERS: { key: string; labelKey: DictKey }[] = [
+  { key: "habitConsistency", labelKey: "ui.whatif.habit" },
+  { key: "reflection", labelKey: "ui.whatif.reflection" },
+  { key: "decisionQuality", labelKey: "ui.whatif.decision" },
+  { key: "mentalModelUsage", labelKey: "ui.whatif.models" },
+  { key: "firstPrinciple", labelKey: "ui.whatif.firstPrinciples" },
 ];
 
 export default function WhatIfSimulator() {
+  const { t } = useI18n();
   const [levers, setLevers] = useState<Record<string, number>>({});
   const [horizon, setHorizon] = useState(90);
   const run = useApiMutation<Record<string, number>, { simulation: Simulation }>("/api/whatif");
@@ -46,7 +49,7 @@ export default function WhatIfSimulator() {
       <div className="space-y-2.5">
         {LEVERS.map((l) => (
           <div key={l.key} className="flex items-center gap-3 text-sm">
-            <label htmlFor={`whatif-${l.key}`} className="w-44 shrink-0 text-slate-400">{l.label}</label>
+            <label htmlFor={`whatif-${l.key}`} className="w-44 shrink-0 text-slate-400">{t(l.labelKey)}</label>
             <input
               id={`whatif-${l.key}`}
               type="range"
@@ -60,7 +63,7 @@ export default function WhatIfSimulator() {
           </div>
         ))}
         <div className="flex items-center gap-3 text-sm">
-          <label htmlFor="whatif-horizon" className="w-44 shrink-0 text-slate-400">Horizon (days)</label>
+          <label htmlFor="whatif-horizon" className="w-44 shrink-0 text-slate-400">{t("ui.whatif.horizon")}</label>
           <input
             id="whatif-horizon"
             type="range"
@@ -79,7 +82,7 @@ export default function WhatIfSimulator() {
         onClick={simulate}
         disabled={run.isPending}
         className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50">
-        {run.isPending ? "Projecting…" : "Project growth"}
+        {run.isPending ? t("ui.whatif.projecting") : t("ui.whatif.project")}
       </button>
       {run.error && <p className="mt-2 text-sm text-rose-400" role="alert">{run.error.message}</p>}
 
@@ -87,12 +90,12 @@ export default function WhatIfSimulator() {
         <div className="mt-4">
           <div className="flex items-end gap-4">
             <div>
-              <div className="text-xs text-slate-500">Today</div>
+              <div className="text-xs text-slate-500">{t("ui.whatif.today")}</div>
               <div className="text-2xl font-bold tabular-nums">{Math.round(sim.baseline.growth * 100)}</div>
             </div>
             <div className="pb-1 text-slate-500">→</div>
             <div>
-              <div className="text-xs text-slate-500">Day {sim.horizonDays}</div>
+              <div className="text-xs text-slate-500">{t("ui.whatif.day").replace("{n}", String(sim.horizonDays))}</div>
               <div className={`text-2xl font-bold tabular-nums ${sim.delta >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                 {Math.round(sim.projected.growth * 100)}
               </div>

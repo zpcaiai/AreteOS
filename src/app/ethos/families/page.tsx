@@ -1,19 +1,21 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Identity Families" };
 
 export const dynamic = "force-dynamic";
 
 export default async function FamiliesPage() {
+  const { t } = await getDict();
   const families = await prisma.identityFamily.findMany({
     orderBy: { sortOrder: "asc" },
     include: { archetypes: { orderBy: { name: "asc" }, select: { id: true, slug: true, name: true, identityStatement: true } } },
   });
   return (
     <div>
-      <PageHeader title="Identity Families" subtitle="Ten families, grouped by the purpose each serves." />
+      <PageHeader title={t("page.ethos.families.title")} subtitle={t("page.ethos.families.subtitle")} />
       {families.length ? families.map((f) => (
         <Card key={f.id} title={`${f.name} — ${f.purpose}`}>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">

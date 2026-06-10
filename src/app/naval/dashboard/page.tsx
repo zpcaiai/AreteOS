@@ -4,11 +4,13 @@ import { computeNavalDashboard, snapshotTrend } from "@/lib/naval/service";
 import { Card, Scoreboard, StatGrid, PageHeader, Empty, Line } from "@/components/ui";
 import Radar from "@/components/naval/Radar";
 import PlanButton from "@/components/naval/PlanButton";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Naval Dashboard" };
 export const dynamic = "force-dynamic";
 
 export default async function NavalDashboard() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [d, trend] = await Promise.all([computeNavalDashboard(userId), snapshotTrend(userId)]);
   const s = d.scores;
@@ -29,7 +31,7 @@ export default async function NavalDashboard() {
 
   return (
     <div>
-      <PageHeader title="Naval Dashboard" subtitle="Your life-strategy cockpit: specific knowledge, leverage, judgment, ownership, freedom, happiness." />
+      <PageHeader title={t("page.naval.dashboard.title")} subtitle={t("page.naval.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Global Naval Score">

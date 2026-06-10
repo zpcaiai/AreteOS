@@ -1,16 +1,18 @@
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Identity" };
 export const dynamic = "force-dynamic";
 
 export default async function IdentityPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const identities = await prisma.identity.findMany({ where: { userId }, include: { roles: true, scores: { orderBy: { date: "desc" }, take: 1 } } });
   return (
     <div>
-      <PageHeader title="Identity" subtitle="Who am I becoming? Behavior follows identity." />
+      <PageHeader title={t("page.identity.title")} subtitle={t("page.identity.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
         {identities.length ? identities.map((i) => (
           <Card key={i.id} title={i.name}>

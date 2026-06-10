@@ -1,15 +1,14 @@
 import { PageHeader } from "@/components/ui";
 import PsychologyStudio from "@/components/PsychologyStudio";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Psychology" };
 
-export default function PsychologyPage() {
+export default async function PsychologyPage() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader
-        title="Psychology"
-        subtitle="Evidence-based engines migrated from emotion-sphere — CBT, narrative identity, behavioral activation, decision-motive. Educational, not clinical."
-      />
+      <PageHeader title={t("page.psychology.title")} subtitle={t("page.psychology.subtitle")} />
       <div className="mt-6"><PsychologyStudio /></div>
     </div>
   );

@@ -1,16 +1,18 @@
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { RefundButton } from "../AdminClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "订单" };
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrders() {
+  const { t } = await getDict();
   const orders = await prisma.storeOrder.findMany({ orderBy: { createdAt: "desc" }, take: 100 });
   return (
     <div>
-      <PageHeader title="订单" subtitle="查看全部订单,必要时退款/取消。" />
+      <PageHeader title={t("page.admin.orders.title")} subtitle={t("page.admin.orders.subtitle")} />
       <Card title={`${orders.length} 笔订单`}>
         {orders.length ? (
           <div className="overflow-x-auto">

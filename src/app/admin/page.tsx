@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { overview } from "@/lib/admin/service";
 import { Card, PageHeader, StatGrid, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "总览" };
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminHome() {
+  const { t } = await getDict();
   const o = await overview();
   return (
     <div>
-      <PageHeader title="总览" subtitle="平台关键指标与最近动态。" />
+      <PageHeader title={t("page.admin.title")} subtitle={t("page.admin.subtitle")} />
       <Card title="关键指标">
         <StatGrid items={[
           { value: o.users, label: "用户" },

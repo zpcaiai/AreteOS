@@ -2,12 +2,14 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeLeadership } from "@/lib/archon/service";
 import { Card, ScoreBar, PageHeader, Line, Empty, Scoreboard } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Leadership Dashboard" };
 
 export const dynamic = "force-dynamic";
 
 export default async function LeadershipDashboard() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [health, pipeline, growth, vision, visionHistory, blueprint] = await Promise.all([
     computeLeadership(userId),
@@ -29,7 +31,7 @@ export default async function LeadershipDashboard() {
 
   return (
     <div>
-      <PageHeader title="Leadership Dashboard" subtitle="Leverage, vision alignment, belonging, and the future-leader pipeline." />
+      <PageHeader title={t("page.archon.dashboard.title")} subtitle={t("page.archon.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title="Global Leadership Score">

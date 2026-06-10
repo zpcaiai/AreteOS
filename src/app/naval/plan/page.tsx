@@ -2,14 +2,16 @@ import { PageHeader } from "@/components/ui";
 import GoalCard from "@/components/naval/GoalCard";
 import PlanBoard from "@/components/naval/PlanBoard";
 import DueReviews from "@/components/naval/DueReviews";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "90-Day Plan" };
 export const dynamic = "force-dynamic";
 
-export default function NavalPlanPage() {
+export default async function NavalPlanPage() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title="90-Day Naval Life Plan" subtitle="Set a north-star goal, generate a plan from your current state, and check off the work." />
+      <PageHeader title={t("page.naval.plan.title")} subtitle={t("page.naval.plan.subtitle")} />
       <div className="space-y-5">
         <GoalCard />
         <PlanBoard />

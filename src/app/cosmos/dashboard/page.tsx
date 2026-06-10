@@ -2,12 +2,14 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeWorldview } from "@/lib/cosmos/service";
 import { Card, ScoreBar, PageHeader, Empty, Scoreboard } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Worldview Dashboard" };
 
 export const dynamic = "force-dynamic";
 
 export default async function WorldviewDashboard() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [health, profile, meaning, conflicts, principles, timeline] = await Promise.all([
     computeWorldview(userId),
@@ -25,7 +27,7 @@ export default async function WorldviewDashboard() {
 
   return (
     <div>
-      <PageHeader title="Worldview Dashboard" subtitle="Clarity, coherence, meaning, conflicts and conscious evolution." />
+      <PageHeader title={t("page.cosmos.dashboard.title")} subtitle={t("page.cosmos.dashboard.subtitle")} />
       <Card title="Scoreboard"><Scoreboard rows={board} /></Card>
 
       {profile && (

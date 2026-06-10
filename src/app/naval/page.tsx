@@ -4,17 +4,19 @@ import { computeNavalDashboard } from "@/lib/naval/service";
 import { Card, PageHeader } from "@/components/ui";
 import EngineStudio from "@/components/naval/EngineStudio";
 import { ENGINES, ENGINE_ORDER } from "@/components/naval/config";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Naval Life OS" };
 export const dynamic = "force-dynamic";
 
 export default async function NavalHome() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const d = await computeNavalDashboard(userId);
 
   return (
     <div>
-      <PageHeader title="Naval Life OS" subtitle="The life-strategy operating system for specific knowledge, judgment, leverage, wealth, freedom and happiness." />
+      <PageHeader title={t("page.naval.title")} subtitle={t("page.naval.subtitle")} />
 
       <div className="mb-6 flex flex-wrap gap-3">
         <Link href="/naval/onboarding" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium">Get set up →</Link>

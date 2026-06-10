@@ -1,11 +1,13 @@
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Mission" };
 export const dynamic = "force-dynamic";
 
 export default async function MissionPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [missions, visions, themes, constitution] = await Promise.all([
     prisma.mission.findMany({ where: { userId }, orderBy: { createdAt: "desc" } }),
@@ -15,7 +17,7 @@ export default async function MissionPage() {
   ]);
   return (
     <div>
-      <PageHeader title="Mission" subtitle="Why do I exist? What contribution do I want to make?" />
+      <PageHeader title={t("page.telos.title")} subtitle={t("page.telos.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
         <Card title="Mission">
           {missions.length ? missions.map((m) => <p key={m.id} className="text-lg">{m.statement}</p>) : <Empty>Define your mission via POST /api/telos</Empty>}

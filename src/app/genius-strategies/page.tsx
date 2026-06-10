@@ -2,11 +2,13 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui";
 import GeniusStudio from "@/components/GeniusStudio";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Genius Strategies" };
 export const dynamic = "force-dynamic";
 
 export default async function GeniusPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [geniuses, adoptions] = await Promise.all([
     prisma.genius.findMany({ orderBy: { name: "asc" }, include: { strategies: { orderBy: { createdAt: "asc" } } } }),
@@ -28,7 +30,7 @@ export default async function GeniusPage() {
 
   return (
     <div>
-      <PageHeader title="Genius Strategies" subtitle="Strategies of Genius × NLP Modeling — reconstruct how a master thinks, then install and practice it." />
+      <PageHeader title={t("page.genius_strategies.title")} subtitle={t("page.genius_strategies.subtitle")} />
       <GeniusStudio geniuses={data} adoptions={ad} />
     </div>
   );

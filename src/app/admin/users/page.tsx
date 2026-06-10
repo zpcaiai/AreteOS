@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { GrantInline } from "../AdminClient";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "用户" };
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsers({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { t } = await getDict();
   const { q } = await searchParams;
   const users = await prisma.user.findMany({
     where: q ? { OR: [{ email: { contains: q, mode: "insensitive" } }, { name: { contains: q, mode: "insensitive" } }] } : undefined,
@@ -15,7 +17,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
   });
   return (
     <div>
-      <PageHeader title="用户" subtitle="搜索用户、查看会员状态、手动发放会员。" />
+      <PageHeader title={t("page.admin.users.title")} subtitle={t("page.admin.users.subtitle")} />
       <form className="mb-4 flex gap-2">
         <input name="q" defaultValue={q ?? ""} placeholder="按邮箱/姓名搜索" className="w-64 rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm" />
         <button className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm">搜索</button>

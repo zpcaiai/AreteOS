@@ -1,11 +1,13 @@
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Legacy" };
 export const dynamic = "force-dynamic";
 
 export default async function LegacyPage() {
+  const { t } = await getDict();
   const userId = await getUserId();
   const [projects, mentees, assets] = await Promise.all([
     prisma.legacyProject.findMany({ where: { userId } }),
@@ -14,7 +16,7 @@ export default async function LegacyPage() {
   ]);
   return (
     <div>
-      <PageHeader title="Legacy" subtitle="Impact that compounds without you: mentoring, knowledge transfer, institutions." />
+      <PageHeader title={t("page.legacy.title")} subtitle={t("page.legacy.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-3">
         <Card title={`Institutions (${projects.length})`}>{projects.length ? projects.map((p) => <p key={p.id} className="text-sm">{p.title}</p>) : <Empty>None yet.</Empty>}</Card>
         <Card title={`Mentees (${mentees.length})`}>{mentees.length ? mentees.map((m) => <p key={m.id} className="text-sm">{m.name} <span className="text-xs text-slate-500">{m.focus}</span></p>) : <Empty>None yet.</Empty>}</Card>

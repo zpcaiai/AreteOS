@@ -11,7 +11,7 @@ test("core app shell and Naval v2 entry points render", async ({ page }) => {
   await expect(page.getByRole("main")).toContainText(/Arete|Dashboard|仪表盘|Mission/i);
 
   await page.goto("/naval");
-  await expect(page.getByRole("heading", { name: /Naval Life OS/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Naval/i })).toBeVisible();
   const main = page.getByRole("main");
   await expect(main.getByRole("link", { name: /90-day plan/i })).toBeVisible();
 
