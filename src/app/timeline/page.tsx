@@ -2,6 +2,7 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, Line } from "@/components/ui";
 import { EVOLUTION_STAGES } from "@/lib/domain/enums";
+import GrowthReplay from "@/components/GrowthReplay";
 
 export const metadata = { title: "Growth Timeline" };
 export const dynamic = "force-dynamic";
@@ -13,11 +14,12 @@ const TRACK_KINDS = [
 
 export default async function TimelinePage() {
   const userId = await getUserId();
-  const [snapshots, identityScores, transitions, personality] = await Promise.all([
+  const [snapshots, identityScores, transitions, personality, firstEvent] = await Promise.all([
     prisma.scoreSnapshot.findMany({ where: { userId }, orderBy: { date: "asc" } }),
     prisma.identityScore.findMany({ where: { identity: { userId } }, include: { identity: { select: { name: true } } }, orderBy: { date: "asc" } }),
     prisma.personalityTransition.findMany({ where: { userId }, orderBy: { createdAt: "asc" } }),
     prisma.personalityState.findUnique({ where: { userId } }),
+    prisma.domainEvent.findFirst({ where: { userId }, orderBy: { occurredAt: "asc" }, select: { occurredAt: true } }),
   ]);
 
   const byKind = (kind: string) => snapshots.filter((s) => s.kind === kind).map((s) => s.value);
@@ -61,6 +63,12 @@ export default async function TimelinePage() {
               ))}
             </ul>
           )}
+        </Card>
+      </div>
+
+      <div className="mt-5">
+        <Card title="Growth Replay (event sourcing)">
+          <GrowthReplay firstEventAt={firstEvent?.occurredAt.toISOString() ?? null} />
         </Card>
       </div>
 

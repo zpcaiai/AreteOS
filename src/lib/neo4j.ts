@@ -28,6 +28,37 @@ async function runCypher(statements: CypherStatement[]): Promise<void> {
   if (data.errors?.length) throw new Error(`Neo4j: ${JSON.stringify(data.errors)}`);
 }
 
+/**
+ * Run a read query and map each result row to an object keyed by the RETURN
+ * column names. Returns null when the graph is not configured.
+ */
+export async function readCypher<T = Record<string, unknown>>(
+  statement: string,
+  parameters?: Record<string, unknown>,
+): Promise<T[] | null> {
+  if (!graphEnabled()) return null;
+  const db = process.env.NEO4J_DB || "neo4j";
+  const user = process.env.NEO4J_USER || "neo4j";
+  const pass = process.env.NEO4J_PASSWORD || "";
+  const auth = Buffer.from(`${user}:${pass}`).toString("base64");
+  const res = await fetch(`${base()}/db/${db}/tx/commit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: `Basic ${auth}` },
+    body: JSON.stringify({ statements: [{ statement, parameters: parameters ?? {} }] }),
+  });
+  if (!res.ok) throw new Error(`Neo4j ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  if (data.errors?.length) throw new Error(`Neo4j: ${JSON.stringify(data.errors)}`);
+  const result = data.results?.[0];
+  if (!result) return [];
+  const columns: string[] = result.columns ?? [];
+  return (result.data ?? []).map((entry: { row: unknown[] }) => {
+    const obj: Record<string, unknown> = {};
+    columns.forEach((col, i) => { obj[col] = entry.row[i]; });
+    return obj as T;
+  });
+}
+
 /** Mission → Identity edge in the identity graph. */
 export function projectIdentityGraph(p: { userId: string; identityId: string; identityName: string; missionStatement?: string }) {
   return runCypher([
