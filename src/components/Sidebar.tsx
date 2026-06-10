@@ -6,7 +6,10 @@ import Logo from "./Logo";
 
 // Grouped by the product's development lifecycle. Classical sub-brand + plain function.
 const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
-  { title: "", items: [{ href: "/dashboard", label: "Dashboard" }] },
+  { title: "", items: [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/coach", label: "AI Coach" },
+  ]},
   { title: "Childhood", items: [
     { href: "/genius", label: "Genius · Kids" },
   ]},

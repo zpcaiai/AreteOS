@@ -171,6 +171,7 @@ model User {
   digitalTwin       DigitalTwinProfile?
   twinMemories      TwinMemory[]
   personalMemories  PersonalMemory[]
+  coachSessions     CoachSession[]
   twinInsights      TwinInsight[]
   driftPredictions  DriftPrediction[]
   strategyAdoptions StrategyAdoption[]
