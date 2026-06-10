@@ -5,6 +5,7 @@
 import { prisma } from "./db";
 import { HttpError } from "./http";
 import { chatWithTools, type ChatMessage, type ChatEventHandler } from "./ai/tools";
+import { hardenText } from "./ai/sanitize";
 import { memoryContext } from "./memory";
 import { computeScoresCached } from "./analytics";
 import { emit } from "./events";
@@ -21,11 +22,7 @@ const FOCUS_HINTS: Record<string, string> = {
 
 /** Strip characters that are commonly used to break out of prompts; cap length. */
 export function hardenUserText(text: string, limit = MAX_MESSAGE_CHARS) {
-  return text
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
-    .replace(/<\/?(system|assistant|developer|instructions?)[^>]*>/gi, "")
-    .trim()
-    .slice(0, limit);
+  return hardenText(text, limit);
 }
 
 function buildSystemPrompt(focus: string, scoreLines: string, memories: string) {

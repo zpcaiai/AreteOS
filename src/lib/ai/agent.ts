@@ -6,6 +6,7 @@
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { getProvider, MOCK_SENTINEL, type CompleteParams } from "./provider";
+import { hardenDeep } from "./sanitize";
 
 export interface AgentExample<I, O> {
   input: I;
@@ -64,7 +65,8 @@ export function defineAgent<IS extends z.ZodTypeAny, OS extends z.ZodTypeAny>(sp
     name: spec.name,
     spec: spec as unknown as AgentSpec<z.input<IS>, z.output<OS>>,
     async run(rawInput): Promise<z.output<OS>> {
-      const input = spec.inputSchema.parse(rawInput) as z.output<IS>;
+      // Validate first, then harden every string field against prompt injection.
+      const input = hardenDeep(spec.inputSchema.parse(rawInput)) as z.output<IS>;
       const provider = getProvider();
       const params: CompleteParams = {
         system: spec.system + "\n\nReturn ONLY a JSON object matching the agreed schema.",

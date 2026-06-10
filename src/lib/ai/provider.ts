@@ -57,7 +57,24 @@ class OpenAIProvider implements LLMProvider {
 class AnthropicProvider implements LLMProvider {
   readonly name = "anthropic";
   constructor(private apiKey: string, private model: string) {}
-  async complete({ system, user, temperature = 0.4 }: CompleteParams): Promise<string> {
+  async complete({ system, user, responseSchema, temperature = 0.4 }: CompleteParams): Promise<string> {
+    // Native structured output: when a schema is provided, force a single tool
+    // whose input IS the schema — the model must emit valid JSON for it.
+    const body: Record<string, unknown> = {
+      model: this.model,
+      max_tokens: 2048,
+      temperature,
+      system,
+      messages: [{ role: "user", content: user }],
+    };
+    if (responseSchema) {
+      body.tools = [{
+        name: "emit_result",
+        description: "Emit the final structured result.",
+        input_schema: responseSchema.schema,
+      }];
+      body.tool_choice = { type: "tool", name: "emit_result" };
+    }
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -65,24 +82,23 @@ class AnthropicProvider implements LLMProvider {
         "x-api-key": this.apiKey,
         "anthropic-version": "2023-06-01",
       },
-      body: JSON.stringify({
-        model: this.model,
-        max_tokens: 2048,
-        temperature,
-        system,
-        messages: [{ role: "user", content: user }],
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) throw new Error(`Anthropic ${res.status}: ${await res.text()}`);
     const data = await res.json();
-    return data.content?.[0]?.text ?? "";
+    if (responseSchema) {
+      const toolUse = (data.content ?? []).find((b: { type: string }) => b.type === "tool_use");
+      if (toolUse?.input) return JSON.stringify(toolUse.input);
+    }
+    const text = (data.content ?? []).find((b: { type: string }) => b.type === "text");
+    return text?.text ?? "";
   }
 }
 
 class OllamaProvider implements LLMProvider {
   readonly name = "ollama";
   constructor(private baseUrl: string, private model: string) {}
-  async complete({ system, user, temperature = 0.4 }: CompleteParams): Promise<string> {
+  async complete({ system, user, json, responseSchema, temperature = 0.4 }: CompleteParams): Promise<string> {
     const res = await fetch(`${this.baseUrl.replace(/\/$/, "")}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -90,6 +106,8 @@ class OllamaProvider implements LLMProvider {
         model: this.model,
         stream: false,
         options: { temperature },
+        // Ollama structured outputs: `format` accepts a JSON schema (or "json").
+        ...(responseSchema ? { format: responseSchema.schema } : json ? { format: "json" } : {}),
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
