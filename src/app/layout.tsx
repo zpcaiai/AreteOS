@@ -4,6 +4,8 @@ import { Inter, EB_Garamond } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import Disclaimer from "@/components/Disclaimer";
 import Providers from "@/components/Providers";
+import { getDict } from "@/lib/i18n/server";
+import { I18nProvider } from "@/lib/i18n/client";
 
 const sans = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 const serif = EB_Garamond({ subsets: ["latin"], display: "swap", weight: ["500", "600"], variable: "--font-serif" });
@@ -33,18 +35,21 @@ export const viewport: Viewport = {
   themeColor: "#0f172a",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { locale, dict } = await getDict();
   return (
-    <html lang="zh-CN" className={`${sans.variable} ${serif.variable}`}>
+    <html lang={locale === "zh" ? "zh-CN" : "en"} className={`${sans.variable} ${serif.variable}`}>
       <body>
         <Providers>
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto p-5 lg:p-8">
-              {children}
-              <Disclaimer />
-            </main>
-          </div>
+          <I18nProvider locale={locale} dict={dict}>
+            <div className="flex min-h-screen">
+              <Sidebar />
+              <main className="flex-1 overflow-y-auto p-5 lg:p-8">
+                {children}
+                <Disclaimer />
+              </main>
+            </div>
+          </I18nProvider>
         </Providers>
       </body>
     </html>

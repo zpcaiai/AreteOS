@@ -2,6 +2,7 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeScoresCached } from "@/lib/analytics";
 import { Card, ScoreBar, PageHeader } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Dashboard" };
 
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const userId = await getUserId();
+  const { t } = await getDict();
   const { scores, stage } = await computeScoresCached(userId);
   const timeline = await prisma.scoreSnapshot.findMany({
     where: { userId, kind: "GROWTH" },
@@ -20,33 +22,33 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <PageHeader title="Dashboard" subtitle="Mission → Identity → Values → Decisions → Habits → Character → Outcomes" />
+      <PageHeader title={t("dashboard.title")} subtitle={t("dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Growth Score">
+        <Card title={t("dashboard.globalScore")}>
           <div className="flex items-end gap-3">
             <div className="text-5xl font-bold tabular-nums">{growthPct}</div>
-            <div className="pb-2 text-sm text-slate-400">/ 100 (geometric mean — every layer counts)</div>
+            <div className="pb-2 text-sm text-slate-400">{t("dashboard.globalScoreHint")}</div>
           </div>
           <Sparkline values={timeline.map((t) => t.value)} />
         </Card>
 
-        <Card title="Personality Stage">
+        <Card title={t("dashboard.stage")}>
           <div className="text-2xl font-semibold">{stage.current}</div>
-          <p className="mt-1 text-sm text-slate-400">Goal: {stage.goal}</p>
+          <p className="mt-1 text-sm text-slate-400">{t("dashboard.stageGoal")}: {stage.goal}</p>
           <div className="mt-3">
-            <ScoreBar label={`Progress → ${stage.next ?? "—"}`} value={stage.progress} />
+            <ScoreBar label={`${t("dashboard.stageProgress")} → ${stage.next ?? "—"}`} value={stage.progress} />
           </div>
           {stage.shouldAdvance && (
-            <p className="mt-2 text-sm text-emerald-400">Ready to advance to {stage.next}.</p>
+            <p className="mt-2 text-sm text-emerald-400">{t("dashboard.stageReady")} {stage.next}.</p>
           )}
         </Card>
 
-        <Card title="This week">
+        <Card title={t("dashboard.thisWeek")}>
           <ul className="space-y-1 text-sm text-slate-300">
-            <li>Decision quality: {Math.round(scores.decisionQuality * 100)}</li>
-            <li>Habit consistency: {Math.round(scores.habitConsistency * 100)}</li>
-            <li>Reflection: {Math.round(scores.reflection * 100)}</li>
+            <li>{t("dashboard.decisionQuality")}: {Math.round(scores.decisionQuality * 100)}</li>
+            <li>{t("dashboard.habitConsistency")}: {Math.round(scores.habitConsistency * 100)}</li>
+            <li>{t("dashboard.reflection")}: {Math.round(scores.reflection * 100)}</li>
           </ul>
         </Card>
       </div>

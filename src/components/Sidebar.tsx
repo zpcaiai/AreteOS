@@ -3,28 +3,30 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Logo from "./Logo";
+import { useI18n, LanguageSwitcher } from "@/lib/i18n/client";
+import type { DictKey } from "@/lib/i18n/dictionaries";
 
 // Grouped by the product's development lifecycle. Classical sub-brand + plain function.
-const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
+const GROUPS: { title: string; titleKey?: DictKey; items: { href: string; label: string; labelKey?: DictKey }[] }[] = [
   { title: "", items: [
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/coach", label: "AI Coach" },
+    { href: "/dashboard", label: "Dashboard", labelKey: "nav.dashboard" },
+    { href: "/coach", label: "AI Coach", labelKey: "nav.coach" },
   ]},
-  { title: "Childhood", items: [
+  { title: "Childhood", titleKey: "nav.childhood", items: [
     { href: "/genius", label: "Genius · Kids" },
   ]},
-  { title: "Foundation", items: [
+  { title: "Foundation", titleKey: "nav.foundation", items: [
     { href: "/cosmos", label: "Cosmos · Worldview" },
     { href: "/cosmos/constellation", label: "Constellation" },
   ]},
-  { title: "Direction", items: [
+  { title: "Direction", titleKey: "nav.direction", items: [
     { href: "/telos", label: "Telos · Mission" },
     { href: "/identity", label: "Identity" },
     { href: "/ethos", label: "Ethos · Identity Library" },
     { href: "/values", label: "Values" },
     { href: "/beliefs", label: "Beliefs" },
   ]},
-  { title: "Thinking", items: [
+  { title: "Thinking", titleKey: "nav.thinking", items: [
     { href: "/phronesis", label: "Phronesis · Cognitive" },
     { href: "/psychology", label: "Psychology · CBT" },
     { href: "/decisions", label: "Decisions" },
@@ -33,19 +35,19 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
     { href: "/models", label: "Genius Library" },
     { href: "/adaptation", label: "Adaptation" },
   ]},
-  { title: "Execution", items: [
+  { title: "Execution", titleKey: "nav.execution", items: [
     { href: "/learning-path", label: "Learning Path" },
     { href: "/habits", label: "Habits" },
     { href: "/mastery", label: "Mastery" },
     { href: "/reflection", label: "Reflection" },
     { href: "/legacy", label: "Legacy" },
   ]},
-  { title: "Organization", items: [
+  { title: "Organization", titleKey: "nav.organization", items: [
     { href: "/archon", label: "Archon · Leadership" },
     { href: "/oikos", label: "Oikos · Management" },
     { href: "/praxis", label: "Praxis · Scaling" },
   ]},
-  { title: "Naval Life OS", items: [
+  { title: "Naval Life OS", titleKey: "nav.naval", items: [
     { href: "/naval", label: "Naval · Overview" },
     { href: "/naval/dashboard", label: "Naval Dashboard" },
     { href: "/naval/onboarding", label: "Naval · Get set up" },
@@ -64,16 +66,16 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
     { href: "/naval/life-portfolio", label: "Life Portfolio" },
     { href: "/naval/twin", label: "Naval Digital Twin" },
   ]},
-  { title: "Analytics", items: [
+  { title: "Analytics", titleKey: "nav.analytics", items: [
     { href: "/reviews", label: "Reviews" },
     { href: "/timeline", label: "Timeline" },
     { href: "/twin", label: "Digital Twin" },
   ]},
-  { title: "Library & Social", items: [
+  { title: "Library & Social", titleKey: "nav.library", items: [
     { href: "/mnemosyne", label: "Mnemosyne · Listen" },
     { href: "/community", label: "Agora · Community" },
   ]},
-  { title: "Account", items: [
+  { title: "Account", titleKey: "nav.account", items: [
     { href: "/emporion", label: "Emporion · Store" },
     { href: "/membership", label: "Membership" },
     { href: "/about", label: "About Arete" },
@@ -85,6 +87,7 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
 export default function Sidebar() {
   const path = usePathname();
   const router = useRouter();
+  const { t } = useI18n();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [mobileOpen, setMobileOpen] = useState(false);
   if (path === "/login") return null;
@@ -128,7 +131,7 @@ export default function Sidebar() {
                 {g.title && (
                   <button onClick={() => setCollapsed((c) => ({ ...c, [g.title]: !c[g.title] }))}
                     className="flex w-full items-center justify-between px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-300">
-                    <span>{g.title}</span>
+                    <span>{g.titleKey ? t(g.titleKey) : g.title}</span>
                     <span className="text-slate-600">{open ? "▾" : "▸"}</span>
                   </button>
                 )}
@@ -140,7 +143,7 @@ export default function Sidebar() {
                         <Link key={n.href} href={n.href} onClick={() => setMobileOpen(false)}
                           aria-current={active ? "page" : undefined}
                           className={`block rounded-lg px-3 py-1.5 text-sm ${active ? "bg-indigo-600 text-white" : "text-slate-300 hover:bg-slate-800"}`}>
-                          {n.label}
+                          {n.labelKey ? t(n.labelKey) : n.label}
                         </Link>
                       );
                     })}
@@ -150,9 +153,12 @@ export default function Sidebar() {
             );
           })}
         </nav>
-        <button onClick={logout} className="mt-3 rounded-lg px-3 py-2 text-left text-sm text-slate-400 hover:bg-slate-800">
-          Sign out
-        </button>
+        <div className="mt-3 flex items-center justify-between">
+          <button onClick={logout} className="rounded-lg px-3 py-2 text-left text-sm text-slate-400 hover:bg-slate-800">
+            {t("common.logout")}
+          </button>
+          <LanguageSwitcher />
+        </div>
       </aside>
     </>
   );
