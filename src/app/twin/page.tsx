@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { computeScoresCached } from "@/lib/analytics";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
 import AnalyzeBox from "@/components/AnalyzeBox";
+import WhatIfSimulator from "@/components/WhatIfSimulator";
 
 export const metadata = { title: "Digital Twin" };
 export const dynamic = "force-dynamic";
@@ -24,6 +25,12 @@ export default async function TwinPage() {
         </Card>
         <Card title="Simulate a scenario">
           <AnalyzeBox endpoint="/api/twin" mode="scenario" placeholder="e.g. Take a manager role / move cities / drop the side project…" button="Simulate" />
+        </Card>
+      </div>
+      <div className="mt-5">
+        <Card title="What-if projection (deterministic)">
+          <p className="mb-3 text-xs text-slate-500">Counterfactual simulation over your real scores using the live scoring math — no AI guesswork. Set the levels you would sustain, then project.</p>
+          <WhatIfSimulator />
         </Card>
       </div>
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
