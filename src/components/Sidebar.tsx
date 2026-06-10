@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 import { useI18n, LanguageSwitcher } from "@/lib/i18n/client";
 import type { DictKey } from "@/lib/i18n/dictionaries";
 
@@ -123,7 +124,7 @@ export default function Sidebar() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" /></svg>
           </button>
         </div>
-        <nav className="flex-1 space-y-3 overflow-y-auto pr-1">
+        <nav aria-label="Primary" className="flex-1 space-y-3 overflow-y-auto pr-1">
           {GROUPS.map((g, gi) => {
             const open = !collapsed[g.title];
             return (
@@ -157,7 +158,10 @@ export default function Sidebar() {
           <button onClick={logout} className="rounded-lg px-3 py-2 text-left text-sm text-slate-400 hover:bg-slate-800">
             {t("common.logout")}
           </button>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </div>
       </aside>
     </>

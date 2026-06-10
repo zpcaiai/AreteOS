@@ -4,6 +4,7 @@ import { Inter, EB_Garamond } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import Disclaimer from "@/components/Disclaimer";
 import Providers from "@/components/Providers";
+import { cookies } from "next/headers";
 import { getDict } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/client";
 
@@ -37,14 +38,17 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { locale, dict } = await getDict();
+  const jar = await cookies();
+  const theme = jar.get("theme")?.value === "light" ? "light" : "dark";
   return (
-    <html lang={locale === "zh" ? "zh-CN" : "en"} className={`${sans.variable} ${serif.variable}`}>
+    <html lang={locale === "zh" ? "zh-CN" : "en"} data-theme={theme} className={`${sans.variable} ${serif.variable}`}>
       <body>
+        <a href="#main" className="skip-link">Skip to content</a>
         <Providers>
           <I18nProvider locale={locale} dict={dict}>
             <div className="flex min-h-screen">
               <Sidebar />
-              <main className="flex-1 overflow-y-auto p-5 lg:p-8">
+              <main id="main" className="flex-1 overflow-y-auto p-5 lg:p-8">
                 {children}
                 <Disclaimer />
               </main>

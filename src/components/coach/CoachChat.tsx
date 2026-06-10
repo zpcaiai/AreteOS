@@ -141,7 +141,7 @@ export default function CoachChat() {
           {!active && <p className="text-sm text-slate-500">Start a new session or pick one on the left. The coach can read your scores, decisions, reflections, habits, and long-term memories to ground its advice.</p>}
           {messages.map((m) => (
             <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
-              <div className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "bg-indigo-600/80 text-white" : "border border-slate-800 bg-slate-950/60 text-slate-200"}`}>
+              <div className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "bg-indigo-600/80 text-white" : "border border-slate-800 bg-slate-950/60 text-slate-200"}`}>
                 {m.content}
                 {Array.isArray(m.toolCalls) && m.toolCalls.length > 0 && (
                   <p className="mt-2 text-[10px] uppercase tracking-wide text-slate-500">

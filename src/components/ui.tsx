@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 
 export function Card({ title, children, accent }: { title?: string; children: ReactNode; accent?: string }) {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+    <section aria-label={title} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
       {title && <h2 className="mb-3 text-sm font-semibold" style={accent ? { color: accent } : undefined}>{title}</h2>}
       {children}
-    </div>
+    </section>
   );
 }
 
@@ -17,7 +17,13 @@ export function ScoreBar({ label, value }: { label: string; value: number }) {
       <div className="mb-1 flex justify-between text-xs text-slate-400">
         <span>{label}</span><span className="tabular-nums">{pct}</span>
       </div>
-      <div className="h-2 w-full rounded-full bg-slate-800">
+      <div
+        className="h-2 w-full rounded-full bg-slate-800"
+        role="progressbar"
+        aria-label={label}
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}>
         <div className="h-2 rounded-full" style={{ width: `${pct}%`, backgroundColor: `hsl(${hue} 70% 50%)` }} />
       </div>
     </div>
@@ -26,25 +32,25 @@ export function ScoreBar({ label, value }: { label: string; value: number }) {
 
 export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="mb-6">
+    <header className="mb-6">
       <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
       {subtitle && <p className="mt-1 text-sm text-slate-400">{subtitle}</p>}
-    </div>
+    </header>
   );
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="text-sm text-slate-500">{children}</p>;
+  return <p className="text-sm text-slate-500" role="status">{children}</p>;
 }
 
-export function Line({ values, color = "#6366f1", height = 48 }: { values: number[]; color?: string; height?: number }) {
+export function Line({ values, color = "#6366f1", height = 48, label }: { values: number[]; color?: string; height?: number; label?: string }) {
   if (values.length < 2) return <p className="text-xs text-slate-500">Not enough data.</p>;
   const w = 320;
   const pts = values
     .map((v, i) => `${((i / (values.length - 1)) * w).toFixed(1)},${(height - Math.max(0, Math.min(1, v)) * height).toFixed(1)}`)
     .join(" ");
   return (
-    <svg viewBox={`0 0 ${w} ${height}`} className="w-full">
+    <svg viewBox={`0 0 ${w} ${height}`} className="w-full" role="img" aria-label={label ?? "Trend line"}>
       <polyline points={pts} fill="none" stroke={color} strokeWidth="2" />
     </svg>
   );
@@ -56,13 +62,13 @@ export function Scoreboard({ rows }: { rows: [string, number][] }) {
 
 export function StatGrid({ items }: { items: { value: ReactNode; label: string }[] }) {
   return (
-    <div className="flex flex-wrap gap-8 text-sm">
+    <dl className="flex flex-wrap gap-8 text-sm">
       {items.map((it) => (
         <div key={it.label}>
-          <div className="text-2xl font-bold tabular-nums">{it.value}</div>
-          <div className="text-xs text-slate-500">{it.label}</div>
+          <dd className="text-2xl font-bold tabular-nums">{it.value}</dd>
+          <dt className="text-xs text-slate-500">{it.label}</dt>
         </div>
       ))}
-    </div>
+    </dl>
   );
 }
