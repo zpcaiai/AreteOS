@@ -33,6 +33,10 @@ export interface ChatResult {
   toolCalls: ToolCallRecord[];
 }
 
+/** Progress events emitted while the model thinks / calls tools (for SSE). */
+export type ChatEvent = { type: "thinking" } | { type: "tool"; tool: string };
+export type ChatEventHandler = (event: ChatEvent) => void;
+
 const int = (v: unknown, fallback: number, max: number) => {
   const n = Number(v);
   return Number.isFinite(n) && n > 0 ? Math.min(Math.floor(n), max) : fallback;
@@ -194,9 +198,10 @@ interface LoopParams {
   messages: ChatMessage[];
   userId: string;
   temperature?: number;
+  onEvent?: ChatEventHandler;
 }
 
-async function openaiLoop({ system, messages, userId, temperature = 0.5 }: LoopParams, baseUrl: string, apiKey: string | undefined, model: string): Promise<ChatResult> {
+async function openaiLoop({ system, messages, userId, temperature = 0.5, onEvent }: LoopParams, baseUrl: string, apiKey: string | undefined, model: string): Promise<ChatResult> {
   const toolCalls: ToolCallRecord[] = [];
   const convo: Record<string, unknown>[] = [
     { role: "system", content: system },
@@ -205,6 +210,7 @@ async function openaiLoop({ system, messages, userId, temperature = 0.5 }: LoopP
   const tools = COACH_TOOLS.map((t) => ({ type: "function", function: { name: t.name, description: t.description, parameters: t.parameters } }));
 
   for (let turn = 0; turn <= MAX_TOOL_TURNS; turn++) {
+    onEvent?.({ type: "thinking" });
     const res = await fetch(`${baseUrl.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}) },
@@ -223,6 +229,7 @@ async function openaiLoop({ system, messages, userId, temperature = 0.5 }: LoopP
       let args: Record<string, unknown> = {};
       try { args = JSON.parse(call.function.arguments || "{}"); } catch { /* tolerate */ }
       toolCalls.push({ tool: call.function.name, args });
+      onEvent?.({ type: "tool", tool: call.function.name });
       const result = await executeTool(call.function.name, args, { userId });
       convo.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify(result).slice(0, 8000) });
     }
@@ -230,12 +237,13 @@ async function openaiLoop({ system, messages, userId, temperature = 0.5 }: LoopP
   return { text: "", toolCalls };
 }
 
-async function anthropicLoop({ system, messages, userId, temperature = 0.5 }: LoopParams, apiKey: string, model: string): Promise<ChatResult> {
+async function anthropicLoop({ system, messages, userId, temperature = 0.5, onEvent }: LoopParams, apiKey: string, model: string): Promise<ChatResult> {
   const toolCalls: ToolCallRecord[] = [];
   const convo: Record<string, unknown>[] = messages.map((m) => ({ role: m.role, content: m.content }));
   const tools = COACH_TOOLS.map((t) => ({ name: t.name, description: t.description, input_schema: t.parameters }));
 
   for (let turn = 0; turn <= MAX_TOOL_TURNS; turn++) {
+    onEvent?.({ type: "thinking" });
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
@@ -262,6 +270,7 @@ async function anthropicLoop({ system, messages, userId, temperature = 0.5 }: Lo
     for (const use of toolUses) {
       const args = (use.input ?? {}) as Record<string, unknown>;
       toolCalls.push({ tool: use.name ?? "", args });
+      onEvent?.({ type: "tool", tool: use.name ?? "" });
       const result = await executeTool(use.name ?? "", args, { userId });
       results.push({ type: "tool_result", tool_use_id: use.id, content: JSON.stringify(result).slice(0, 8000) });
     }
@@ -271,12 +280,14 @@ async function anthropicLoop({ system, messages, userId, temperature = 0.5 }: Lo
 }
 
 /** Deterministic offline loop: pull the most relevant data directly, then compose a grounded reply. */
-async function mockLoop({ messages, userId }: LoopParams): Promise<ChatResult> {
+async function mockLoop({ messages, userId, onEvent }: LoopParams): Promise<ChatResult> {
   const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+  onEvent?.({ type: "thinking" });
   const toolCalls: ToolCallRecord[] = [
     { tool: "get_score_history", args: { days: 30 } },
     { tool: "recall_memories", args: { query: lastUser.slice(0, 200) } },
   ];
+  for (const call of toolCalls) onEvent?.({ type: "tool", tool: call.tool });
   const [scores, memories] = await Promise.all([
     executeTool("get_score_history", { days: 30 }, { userId }),
     executeTool("recall_memories", { query: lastUser.slice(0, 200) }, { userId }),

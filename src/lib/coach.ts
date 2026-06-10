@@ -4,7 +4,7 @@
 
 import { prisma } from "./db";
 import { HttpError } from "./http";
-import { chatWithTools, type ChatMessage } from "./ai/tools";
+import { chatWithTools, type ChatMessage, type ChatEventHandler } from "./ai/tools";
 import { memoryContext } from "./memory";
 import { computeScoresCached } from "./analytics";
 import { emit } from "./events";
@@ -71,7 +71,7 @@ export async function archiveSession(userId: string, sessionId: string) {
   if (!count) throw new HttpError(404, "Coach session not found");
 }
 
-export async function sendMessage(userId: string, sessionId: string, rawText: string) {
+export async function sendMessage(userId: string, sessionId: string, rawText: string, onEvent?: ChatEventHandler) {
   const text = hardenUserText(rawText);
   if (!text) throw new HttpError(400, "Message is empty");
 
@@ -106,6 +106,7 @@ export async function sendMessage(userId: string, sessionId: string, rawText: st
     system: buildSystemPrompt(session.focus, scoreLines, memories),
     messages,
     userId,
+    onEvent,
   });
 
   const reply = result.text || "I could not produce a reply — please try rephrasing.";

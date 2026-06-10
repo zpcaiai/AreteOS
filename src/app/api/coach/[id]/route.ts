@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { getUserId } from "@/lib/auth";
+import { CoachMessageSchema } from "@/lib/schemas";
 import { ok, parseBody, route } from "@/lib/http";
 import { getSession, sendMessage, archiveSession } from "@/lib/coach";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
@@ -27,8 +27,29 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     });
     if (limited) return limited;
 
-    const b = await parseBody(req, z.object({ message: z.string().min(1).max(4000) }));
-    return ok({ message: await sendMessage(userId, id, b.message) });
+    const b = await parseBody(req, CoachMessageSchema);
+
+    const wantsStream =
+      new URL(req.url).searchParams.get("stream") === "1" || req.headers.get("accept")?.includes("text/event-stream");
+    if (!wantsStream) return ok({ message: await sendMessage(userId, id, b.message) });
+
+    const encoder = new TextEncoder();
+    const sse = (event: string, data: unknown) => encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    return new Response(
+      new ReadableStream({
+        async start(controller) {
+          try {
+            const message = await sendMessage(userId, id, b.message, (e) => controller.enqueue(sse(e.type, e)));
+            controller.enqueue(sse("complete", { message }));
+          } catch (e) {
+            controller.enqueue(sse("error", { error: e instanceof Error ? e.message : String(e) }));
+          } finally {
+            controller.close();
+          }
+        },
+      }),
+      { headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache, no-transform", Connection: "keep-alive" } },
+    );
   });
 }
 

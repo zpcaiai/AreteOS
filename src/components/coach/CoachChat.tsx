@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CoachMessageSchema, firstIssue } from "@/lib/schemas";
 
 interface Msg { id: string; role: string; content: string; toolCalls?: { tool: string }[] | null; createdAt: string }
 interface Session { id: string; title: string; focus: string; updatedAt: string }
@@ -19,6 +20,7 @@ export default function CoachChat() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [activity, setActivity] = useState("");
   const [error, setError] = useState("");
   const [focus, setFocus] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -52,26 +54,56 @@ export default function CoachChat() {
 
   async function send() {
     const text = input.trim();
-    if (!text || !active || busy) return;
+    if (!active || busy) return;
+    const problem = firstIssue(CoachMessageSchema, { message: text });
+    if (problem) { setError(problem); return; }
     setInput("");
     setBusy(true);
     setError("");
+    setActivity("Thinking…");
     const optimistic: Msg = { id: `tmp-${Date.now()}`, role: "user", content: text, createdAt: new Date().toISOString() };
     setMessages((m) => [...m, optimistic]);
     try {
-      const r = await fetch(`/api/coach/${active}`, {
+      const r = await fetch(`/api/coach/${active}?stream=1`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", accept: "text/event-stream" },
         body: JSON.stringify({ message: text }),
       });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || "Coach failed to reply");
-      setMessages((m) => [...m, d.message]);
+      if (!r.ok || !r.body) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error((d as { error?: string }).error || "Coach failed to reply");
+      }
+
+      // Parse the SSE stream: thinking / tool events update the activity line;
+      // complete delivers the persisted assistant message.
+      const reader = r.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let done = false;
+      while (!done) {
+        const chunk = await reader.read();
+        done = chunk.done;
+        buffer += decoder.decode(chunk.value ?? new Uint8Array(), { stream: !done });
+        let sep: number;
+        while ((sep = buffer.indexOf("\n\n")) >= 0) {
+          const frame = buffer.slice(0, sep);
+          buffer = buffer.slice(sep + 2);
+          const event = /^event: (.+)$/m.exec(frame)?.[1] ?? "message";
+          const dataRaw = /^data: (.+)$/m.exec(frame)?.[1];
+          if (!dataRaw) continue;
+          const data = JSON.parse(dataRaw) as { tool?: string; message?: Msg; error?: string };
+          if (event === "thinking") setActivity("Thinking…");
+          if (event === "tool" && data.tool) setActivity(`Checking ${data.tool.replaceAll("_", " ")}…`);
+          if (event === "complete" && data.message) setMessages((m) => [...m, data.message as Msg]);
+          if (event === "error") throw new Error(data.error || "Coach failed to reply");
+        }
+      }
       loadSessions();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
+      setActivity("");
     }
   }
 
@@ -122,7 +154,7 @@ export default function CoachChat() {
           {busy && (
             <div className="flex justify-start" aria-live="polite">
               <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-2.5 text-sm text-slate-400">
-                <span className="animate-pulse">Coach is reviewing your data…</span>
+                <span className="animate-pulse">{activity || "Coach is reviewing your data…"}</span>
               </div>
             </div>
           )}
