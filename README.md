@@ -39,6 +39,20 @@ npm run dev                 # http://localhost:3000
 - ✅ **Dashboard + 10 pages**: dashboard, mission, identity, values, decisions, habits, reflection, role-models, mastery, legacy
 - ✅ **Seed data**: `prisma/seed.ts` (coherent demo across all layers)
 
+## Platform upgrades (2026-06)
+- ✅ **AI Coach (`/coach`)** — stateful multi-turn coaching with **read-only tool calling** (score history, decisions, reflections, habits, shadow patterns, semantic memory recall) on OpenAI / Anthropic / Ollama, deterministic offline under mock. Turns stream live tool activity over **SSE**.
+- ✅ **Personal memory (RAG)** — pgvector-backed `personal_memories` (`src/lib/memory.ts`); decisions/reflections/insights are remembered and recalled into coach + agent context. Falls back to a local hash embedding without an API key.
+- ✅ **Structured outputs everywhere** — OpenAI `json_schema` strict mode, Anthropic forced tool-use, Ollama JSON-schema `format`; plus universal **prompt-injection hardening** (`src/lib/ai/sanitize.ts`) on every agent input.
+- ✅ **Graph workflows** — `runGraph()` conditional state graphs with bounded loops (`decision-graph` re-scores weak decisions after first-principles + mental-model passes), alongside the sequential workflows.
+- ✅ **What-if engine (`/twin`)** — deterministic counterfactual projection of the growth score from the live scoring math (`POST /api/whatif`).
+- ✅ **Knowledge-graph insights (`/phronesis`)** — next-model recommendations (Neo4j traversal with Postgres fallback), latticework gaps, unresolved value tensions (`GET /api/graph/insights`).
+- ✅ **Growth replay (`/timeline`)** — point-in-time event-sourcing replay slider (`POST /api/events/replay`).
+- ✅ **Ambient insights** — nightly detectors: score drops, due decision reviews, shadow recurrence, habit adherence halving, reflection staleness → `/twin` + memory + events.
+- ✅ **Eval harness** — `npm run eval:agents` (golden schema checks) and `-- --judge` (LLM-as-judge grading), writes `eval-report.json`.
+- ✅ **i18n (zh/en)** + light/dark **theme toggle** + a11y (semantic landmarks, progressbar roles, skip link, focus rings).
+- ✅ **PWA** — installable manifest + service worker with offline fallback; **React Query** data layer + shared client/server Zod validation.
+- ✅ **Ops** — pino structured logs + Sentry hooks, API pagination, rate limits, `prisma migrate` baseline, parallel nightly job (`NIGHTLY_CONCURRENCY`), WeChat/Alipay webhook adapters.
+
 ## Key flows
 - **Decision**: `POST /api/decisions` → `POST /api/decisions/:id/review` (runs DecisionArchitect, recomputes quality server-side, emits `DecisionReviewed`).
 - **Daily loop**: `POST /api/reflection` (runs ReflectionGuide) and `POST /api/shadow` (runs ShadowDetector), or both via `POST /api/workflows/daily`.
