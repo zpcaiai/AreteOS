@@ -1,16 +1,21 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getUserId } from "@/lib/auth";
-import { ok, created, parseBody, route } from "@/lib/http";
+import { ok, created, pagination, parseBody, route } from "@/lib/http";
 
 export async function GET(req: Request) {
   return route(async () => {
     const userId = await getUserId(req);
-    const decisions = await prisma.decision.findMany({
+    const page = pagination(req);
+    const [decisions, total] = await Promise.all([
+      prisma.decision.findMany({
       where: { userId }, orderBy: { createdAt: "desc" },
       include: { options: true, reviews: { orderBy: { createdAt: "desc" } } },
-    });
-    return ok({ decisions });
+      skip: page.skip, take: page.limit,
+      }),
+      prisma.decision.count({ where: { userId } }),
+    ]);
+    return ok({ decisions, pagination: { page: page.page, limit: page.limit, total } });
   });
 }
 

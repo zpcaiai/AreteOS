@@ -45,6 +45,8 @@ const GROUPS: { title: string; items: { href: string; label: string }[] }[] = [
   { title: "Naval Life OS", items: [
     { href: "/naval", label: "Naval · Overview" },
     { href: "/naval/dashboard", label: "Naval Dashboard" },
+    { href: "/naval/onboarding", label: "Naval · Get set up" },
+    { href: "/naval/plan", label: "90-Day Plan" },
     { href: "/naval/specific-knowledge", label: "Specific Knowledge" },
     { href: "/naval/talent-stack", label: "Talent Stack" },
     { href: "/naval/leverage", label: "Leverage" },
@@ -133,6 +135,7 @@ export default function Sidebar() {
                       const active = path === n.href || path.startsWith(n.href + "/");
                       return (
                         <Link key={n.href} href={n.href} onClick={() => setMobileOpen(false)}
+                          aria-current={active ? "page" : undefined}
                           className={`block rounded-lg px-3 py-1.5 text-sm ${active ? "bg-indigo-600 text-white" : "text-slate-300 hover:bg-slate-800"}`}>
                           {n.label}
                         </Link>

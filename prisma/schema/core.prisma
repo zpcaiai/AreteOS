@@ -170,6 +170,7 @@ model User {
   beliefChangeLogs  BeliefChangeLog[]
   digitalTwin       DigitalTwinProfile?
   twinMemories      TwinMemory[]
+  personalMemories  PersonalMemory[]
   twinInsights      TwinInsight[]
   driftPredictions  DriftPrediction[]
   strategyAdoptions StrategyAdoption[]

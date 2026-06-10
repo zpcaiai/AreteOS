@@ -313,3 +313,22 @@ immediately.
 Wealth: educational framing only — no specific securities, no promised returns, no
 regulated advice. Happiness: not therapy; the agent defers to professional support
 on crisis/self-harm language. Business: long-term, ethical value creation only.
+
+### Naval Life OS v2 — goals, plans, onboarding
+
+Builds on the engines with persistence and a guided flow:
+
+- **North-star goal** (`NavalGoal`) anchors plans and the digital twin.
+- **Persisted 90-day plan** (`NavalPlan` + `NavalPlanTask`) — generated from your
+  current state, with checkable tasks and a live progress bar. `/naval/plan`.
+- **Onboarding** (`NavalOnboarding`) — the 11-step flow (Section 25) that resumes
+  where you left off. `/naval/onboarding`.
+- **Automatic digital twin** — `POST /api/naval/twin/auto` collects signals from
+  every engine into `NavalTwinMemory`, then synthesizes the twin (no manual entry).
+- **Due decision reviews** — `GET /api/naval/decision-journal/due` surfaces
+  decisions whose review date has arrived, closing the judgment feedback loop.
+- **Nightly snapshots** — set `NAVAL_NIGHTLY=true` so `npm run nightly` records a
+  daily `NavalScoreSnapshot` per user for the dashboard trend line.
+
+New v2 service logic lives in `src/lib/naval/plan.ts`; v2 routes under
+`/api/naval/{goals,onboarding,plan/save,plan/active,plan/task,twin/auto,decision-journal/due}`.

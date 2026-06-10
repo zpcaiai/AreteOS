@@ -80,6 +80,12 @@ export async function payAndFulfill(orderId: string, userId: string) {
   });
 }
 
+export async function payAndFulfillByOutTradeNo(outTradeNo: string) {
+  const order = await prisma.storeOrder.findUnique({ where: { outTradeNo } });
+  if (!order) throw new HttpError(404, "订单不存在");
+  return payAndFulfill(order.id, order.userId);
+}
+
 /** A user's wallet + unlocks, for the store page. */
 export async function getEntitlements(userId: string) {
   const [credit, unlocks] = await Promise.all([

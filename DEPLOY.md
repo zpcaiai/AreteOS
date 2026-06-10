@@ -43,11 +43,15 @@ export DATABASE_URL="<neon arete POOLED>"
 export DIRECT_URL="<neon arete DIRECT>"
 npm ci
 npx prisma generate
-npx prisma db push          # creates/updates every table on Neon
+npx prisma migrate deploy   # applies tracked migrations to Neon
 npm run db:seed             # genius/identity/cognitive/worldview/audiobooks/emporion catalogs
 ```
-> To **update** the schema later, edit `prisma/schema/*.prisma` then re-run `npx prisma db push`.
-> For audited migrations instead, use `npx prisma migrate dev --name <x>` locally and `npx prisma migrate deploy` in CI.
+> To **update** the schema later, edit `prisma/schema/*.prisma`, run
+> `npm run db:migrate -- --name <x>` locally, commit the generated migration, then
+> use `npm run db:migrate:deploy` in CI/production.
+> If an existing Neon database was previously created with `db push`, baseline it
+> once with `npx prisma migrate resolve --applied 20260610092400_init` before the
+> first `migrate deploy`.
 
 ### A3. Vercel (whole Next app — front + API together)
 ```bash
@@ -122,7 +126,7 @@ Put the resulting `https://<ui>.vercel.app` into the Space's `APP_CORS_ORIGINS`,
 - UI: open the Vercel UI URL → it talks to the HF backend with no CORS error.
 
 ## Notes / gotchas
-- **Neon + Prisma**: always keep `DIRECT_URL` set for `db push`/`migrate`; runtime uses the pooled `DATABASE_URL`.
+- **Neon + Prisma**: always keep `DIRECT_URL` set for migrations; runtime uses the pooled `DATABASE_URL`.
 - **R2DBC + Neon**: use the **direct** (non-pooler) host and keep `?sslMode=require`.
 - **HF cold start**: free Spaces sleep; first request after idle is slow.
 - **AI**: `AI_PROVIDER=mock` runs the whole Arete app with no API keys; switch to `openai`/`anthropic` + key to go live.

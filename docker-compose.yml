@@ -3,7 +3,7 @@
 # gitignored — no secrets live in this committed file. Defaults match a fresh setup.
 #
 #   docker compose up -d        # start the DB
-#   npm run db:push             # create tables
+#   npm run db:migrate:deploy   # create/update tables from tracked migrations
 #   npm run db:seed:naval       # demo data
 #   docker compose down         # stop (data persists in the named volume)
 services:

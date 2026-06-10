@@ -30,6 +30,10 @@ async function main() {
   await prisma.freedomProfile.deleteMany({ where: { userId } });
   await prisma.happinessProfile.deleteMany({ where: { userId } });
   await prisma.lifePortfolio.deleteMany({ where: { userId } });
+  await prisma.navalPlanTask.deleteMany({ where: { userId } });
+  await prisma.navalPlan.deleteMany({ where: { userId } });
+  await prisma.navalGoal.deleteMany({ where: { userId } });
+  await prisma.navalOnboarding.deleteMany({ where: { userId } });
 
   // 1 · Specific Knowledge
   const skF = { curiosityDepth: 0.8, skillRarity: 0.7, marketRelevance: 0.7, personalEnergy: 0.8, compounding: 0.7 };
@@ -166,6 +170,46 @@ async function main() {
   };
   await prisma.navalScoreSnapshot.create({ data: snap(45, 25, 30, 30) });
   await prisma.navalScoreSnapshot.create({ data: snap(S.specificKnowledgeScore(skF), S.leverageScore(levF), S.wealthCreationScore(wF), S.freedomScore(fF)) });
+
+  // ── v2 · north-star goal ──────────────────────────────────────────────────
+  const goal = await prisma.navalGoal.create({
+    data: { userId, statement: "Own assets that buy back all my time within five years.", horizon: "FIVE_YEARS", why: "Freedom to build and teach without permission.", status: "ACTIVE" },
+  });
+
+  // ── v2 · persisted 90-day plan with checkable tasks ───────────────────────
+  const planTasks = [
+    { month: 1, engine: "specific-knowledge", task: "Name your rare combination and publish one teardown a week.", order: 0, done: true },
+    { month: 1, engine: "talent-stack", task: "Clarify the 3-4 skills that make you hard to replace.", order: 1, done: true },
+    { month: 1, engine: "decision-journal", task: "Log every meaningful decision with its assumptions.", order: 2, done: false },
+    { month: 2, engine: "leverage", task: "Ship one owned, compounding code or media asset.", order: 3, done: false },
+    { month: 2, engine: "long-term-games", task: "Commit to teaching AI engineering in public for a decade.", order: 4, done: false },
+    { month: 2, engine: "leverage", task: "Audit and cut low-leverage, time-for-money commitments.", order: 5, done: false },
+    { month: 3, engine: "opportunities", task: "Launch a permissionless project; run one validation experiment.", order: 6, done: false },
+    { month: 3, engine: "decision-journal", task: "Review month-1 decisions: expected vs actual, extract lessons.", order: 7, done: false },
+    { month: 3, engine: "freedom", task: "Update the freedom roadmap and re-snapshot the global score.", order: 8, done: false },
+  ];
+  const planDone = planTasks.filter((t) => t.done).length;
+  await prisma.navalPlan.create({
+    data: {
+      userId, goalId: goal.id, headline: "Compound specific knowledge into leverage, ownership and freedom.",
+      northStar: "Own equity in something. Apply leverage. Play long-term games with long-term people.",
+      status: "ACTIVE", progress: planDone / planTasks.length,
+      metadata: { months: [ { month: 1, theme: "Discover", focus: "Specific knowledge & clarity" }, { month: 2, theme: "Build", focus: "Leverage & long-term game" }, { month: 3, theme: "Launch", focus: "Permissionless project & review" } ] },
+      tasks: { create: planTasks.map((t) => ({ userId, month: t.month, engine: t.engine, task: t.task, order: t.order, done: t.done, doneAt: t.done ? new Date() : null, dueDate: new Date(Date.now() + t.month * 30 * 86400000) })) },
+    },
+  });
+
+  // ── v2 · onboarding (first 5 steps done) ──────────────────────────────────
+  await prisma.navalOnboarding.upsert({
+    where: { userId },
+    update: { currentStep: 6, completedSteps: [1, 2, 3, 4, 5], status: "IN_PROGRESS", startedAt: new Date() },
+    create: { userId, currentStep: 6, completedSteps: [1, 2, 3, 4, 5], status: "IN_PROGRESS", startedAt: new Date() },
+  });
+
+  // ── v2 · a decision now due for review (past reviewDate, not yet reviewed) ─
+  await prisma.decisionJournalEntry.create({
+    data: { userId, title: "Switch the newsletter to weekly cadence", context: "Test whether weekly compounds faster than biweekly.", options: ["Keep biweekly", "Go weekly"], assumptions: ["I can sustain weekly"], expectedOutcome: "Faster list growth.", confidence: 0.5, modelsUsed: ["Compounding"], rationale: "More at-bats, more compounding.", reviewDate: new Date(Date.now() - 3 * 86400000), status: "ACTIVE" },
+  });
 
   console.log("Naval Life OS seed complete for", userId);
 }

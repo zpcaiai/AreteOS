@@ -16,6 +16,11 @@ export default async function NavalHome() {
     <div>
       <PageHeader title="Naval Life OS" subtitle="The life-strategy operating system for specific knowledge, judgment, leverage, wealth, freedom and happiness." />
 
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Link href="/naval/onboarding" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium">Get set up →</Link>
+        <Link href="/naval/plan" className="rounded-lg bg-slate-800 px-4 py-2 text-sm hover:bg-slate-700">90-day plan</Link>
+      </div>
+
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title="Global Naval Score">
           <div className="text-5xl font-bold tabular-nums">{Math.round(d.scores.global)}</div>

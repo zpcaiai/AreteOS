@@ -5,6 +5,9 @@
 import { prisma } from "../src/lib/db";
 import { recordProgress } from "../src/lib/analytics";
 import { generateReview } from "../src/lib/reviews";
+import { recordSnapshot } from "../src/lib/naval/service";
+import { runAmbientInsights } from "../src/lib/ambient";
+import { reportError } from "../src/lib/logger";
 
 async function main() {
   const users = await prisma.user.findMany({ select: { id: true } });
@@ -15,10 +18,12 @@ async function main() {
       const { transition } = await recordProgress(u.id, { force: true });
       if (transition.advanced) advanced++;
       await generateReview(u.id, "WEEKLY");
+      if (process.env.NAVAL_NIGHTLY === "true") await recordSnapshot(u.id);
+      await runAmbientInsights(u.id);
       if (now.getDate() === 1) await generateReview(u.id, "MONTHLY");
       if (now.getDate() === 1 && now.getMonth() % 3 === 0) await generateReview(u.id, "QUARTERLY");
     } catch (e) {
-      console.error("nightly failed for user", u.id, e);
+      reportError(e, { surface: "nightly", userId: u.id });
     }
   }
   console.log(`nightly: processed ${users.length} users, ${advanced} stage advancements`);
@@ -26,4 +31,4 @@ async function main() {
 
 main()
   .then(() => prisma.$disconnect())
-  .catch(async (e) => { console.error(e); await prisma.$disconnect(); process.exit(1); });
+  .catch(async (e) => { reportError(e, { surface: "nightly-main" }); await prisma.$disconnect(); process.exit(1); });

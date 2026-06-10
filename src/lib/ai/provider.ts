@@ -1,11 +1,15 @@
 // Provider-agnostic LLM access. Zero-dependency (uses fetch) so it runs on the
-// edge or node. Switch via AI_PROVIDER = openai | anthropic | mock.
+// edge or node. Switch via AI_PROVIDER = openai | anthropic | ollama | mock.
 
 export interface CompleteParams {
   system: string;
   user: string;
   /** Ask the model to return strict JSON. */
   json?: boolean;
+  responseSchema?: {
+    name: string;
+    schema: unknown;
+  };
   temperature?: number;
 }
 
@@ -17,14 +21,27 @@ export interface LLMProvider {
 class OpenAIProvider implements LLMProvider {
   readonly name = "openai";
   constructor(private apiKey: string, private model: string) {}
-  async complete({ system, user, json, temperature = 0.4 }: CompleteParams): Promise<string> {
+  async complete({ system, user, json, responseSchema, temperature = 0.4 }: CompleteParams): Promise<string> {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
       body: JSON.stringify({
         model: this.model,
         temperature,
-        ...(json ? { response_format: { type: "json_object" } } : {}),
+        ...(responseSchema
+          ? {
+              response_format: {
+                type: "json_schema",
+                json_schema: {
+                  name: responseSchema.name,
+                  strict: true,
+                  schema: responseSchema.schema,
+                },
+              },
+            }
+          : json
+            ? { response_format: { type: "json_object" } }
+            : {}),
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -62,6 +79,29 @@ class AnthropicProvider implements LLMProvider {
   }
 }
 
+class OllamaProvider implements LLMProvider {
+  readonly name = "ollama";
+  constructor(private baseUrl: string, private model: string) {}
+  async complete({ system, user, temperature = 0.4 }: CompleteParams): Promise<string> {
+    const res = await fetch(`${this.baseUrl.replace(/\/$/, "")}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: this.model,
+        stream: false,
+        options: { temperature },
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error(`Ollama ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    return data.message?.content ?? "";
+  }
+}
+
 /** Mock provider: returns the sentinel so agents fall back to their example output. */
 class MockProvider implements LLMProvider {
   readonly name = "mock";
@@ -80,6 +120,8 @@ export function getProvider(): LLMProvider {
     cached = new OpenAIProvider(process.env.OPENAI_API_KEY, process.env.OPENAI_MODEL ?? "gpt-4o");
   } else if (provider === "anthropic" && process.env.ANTHROPIC_API_KEY) {
     cached = new AnthropicProvider(process.env.ANTHROPIC_API_KEY, process.env.ANTHROPIC_MODEL ?? "claude-3-5-sonnet-latest");
+  } else if (provider === "ollama") {
+    cached = new OllamaProvider(process.env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434", process.env.OLLAMA_MODEL ?? "llama3.1");
   } else {
     cached = new MockProvider();
   }

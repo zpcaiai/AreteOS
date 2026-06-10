@@ -1,16 +1,16 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getUserId } from "@/lib/auth";
-import { ok, created, parseBody, route } from "@/lib/http";
+import { ok, created, pagination, parseBody, route } from "@/lib/http";
 import { STATUS_KEYS } from "@/lib/community/statuses";
 
 export async function GET(req: Request) {
   return route(async () => {
     await getUserId(req);
-    const url = new URL(req.url);
-    const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 30, 1), 100);
-    const posts = await prisma.communityPost.findMany({
-      orderBy: { createdAt: "desc" }, take: limit,
+    const page = pagination(req);
+    const [posts, total] = await Promise.all([
+      prisma.communityPost.findMany({
+      orderBy: { createdAt: "desc" }, skip: page.skip, take: page.limit,
       include: {
         user: { select: { name: true, email: true } },
         comments: {
@@ -18,8 +18,10 @@ export async function GET(req: Request) {
           include: { user: { select: { name: true, email: true } } },
         },
       },
-    });
-    return ok({ posts });
+      }),
+      prisma.communityPost.count(),
+    ]);
+    return ok({ posts, pagination: { page: page.page, limit: page.limit, total } });
   });
 }
 

@@ -49,3 +49,9 @@ export async function activateOrder(orderId: string, userId: string) {
   });
   return { order, membership };
 }
+
+export async function activateOrderByOutTradeNo(outTradeNo: string) {
+  const order = await prisma.membershipOrder.findUnique({ where: { outTradeNo } });
+  if (!order) throw new HttpError(404, "订单不存在");
+  return activateOrder(order.id, order.userId);
+}

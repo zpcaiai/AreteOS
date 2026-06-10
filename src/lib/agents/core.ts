@@ -171,6 +171,7 @@ export const DecisionArchitect = defineAgent({
     mission: z.string().optional(),
     identity: z.string().optional(),
     values: z.array(z.string()).default([]),
+    memoryContext: z.string().optional(),
   }),
   outputSchema: z.object({
     reviews: z.array(
@@ -192,7 +193,7 @@ export const DecisionArchitect = defineAgent({
     recommendation: z.string(),
   }),
   buildUserPrompt: (i) =>
-    `Decision: ${i.title}\nContext: ${i.context}\nMission: ${i.mission ?? "-"} Identity: ${i.identity ?? "-"} Values: ${i.values?.join(", ") || "-"}\nOptions: ${i.options.join(" | ")}\nScore every option on each dimension (0..1) and recommend one.`,
+    `Decision: ${i.title}\nContext: ${i.context}\nMission: ${i.mission ?? "-"} Identity: ${i.identity ?? "-"} Values: ${i.values?.join(", ") || "-"}\nRelevant memory:\n${i.memoryContext ?? "-"}\nOptions: ${i.options.join(" | ")}\nScore every option on each dimension (0..1) and recommend one. Use relevant memory to flag repeated bias, assumption drift, or proven strengths.`,
   example: {
     input: { title: "Take the manager role?", context: "More pay, less building", options: ["Accept", "Decline"], mission: "Build durable tools", identity: "Builder", values: ["Craft"] },
     output: {
@@ -291,6 +292,7 @@ export const ReflectionGuide = defineAgent({
     failed: z.string().default(""),
     learned: z.string().default(""),
     wrongAssumptions: z.string().default(""),
+    memoryContext: z.string().optional(),
   }),
   outputSchema: z.object({
     lessons: z.array(z.string()),
@@ -299,7 +301,7 @@ export const ReflectionGuide = defineAgent({
     depth: scoreField,
   }),
   buildUserPrompt: (i) =>
-    `Worked: ${i.worked}\nFailed: ${i.failed}\nLearned: ${i.learned}\nWrong assumptions: ${i.wrongAssumptions}\nExtract lessons, the identity reinforced, one next focus, and rate depth.`,
+    `Worked: ${i.worked}\nFailed: ${i.failed}\nLearned: ${i.learned}\nWrong assumptions: ${i.wrongAssumptions}\nRelevant memory:\n${i.memoryContext ?? "-"}\nExtract lessons, repeated patterns, the identity reinforced, one next focus, and rate depth.`,
   example: {
     input: { worked: "Shipped tests", failed: "Got distracted AM", learned: "Tests reduce fear", wrongAssumptions: "That I needed more time" },
     output: {

@@ -4,6 +4,7 @@
 // one or more agents (AGENT_ORCHESTRATOR=langgraph) without changing call sites.
 
 import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { getProvider, MOCK_SENTINEL, type CompleteParams } from "./provider";
 
 export interface AgentExample<I, O> {
@@ -52,6 +53,13 @@ export function defineAgent<IS extends z.ZodTypeAny, OS extends z.ZodTypeAny>(sp
   buildUserPrompt: (input: z.output<IS>) => string;
   temperature?: number;
 }): Agent<z.input<IS>, z.output<OS>> {
+  const responseSchema = zodToJsonSchema(spec.outputSchema, {
+    name: `${spec.name}Output`,
+    nameStrategy: "title",
+    $refStrategy: "none",
+    target: "openAi",
+  });
+
   return {
     name: spec.name,
     spec: spec as unknown as AgentSpec<z.input<IS>, z.output<OS>>,
@@ -62,6 +70,7 @@ export function defineAgent<IS extends z.ZodTypeAny, OS extends z.ZodTypeAny>(sp
         system: spec.system + "\n\nReturn ONLY a JSON object matching the agreed schema.",
         user: spec.buildUserPrompt(input),
         json: true,
+        responseSchema: { name: `${spec.name}Output`, schema: responseSchema },
         temperature: spec.temperature ?? 0.4,
       };
       const raw = await provider.complete(params);

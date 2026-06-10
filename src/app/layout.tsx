@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, EB_Garamond } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import Disclaimer from "@/components/Disclaimer";
+import Providers from "@/components/Providers";
 
 const sans = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
 const serif = EB_Garamond({ subsets: ["latin"], display: "swap", weight: ["500", "600"], variable: "--font-serif" });
@@ -36,13 +37,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-CN" className={`${sans.variable} ${serif.variable}`}>
       <body>
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto p-5 lg:p-8">
-            {children}
-            <Disclaimer />
-          </main>
-        </div>
+        <Providers>
+          <div className="flex min-h-screen">
+            <Sidebar />
+            <main className="flex-1 overflow-y-auto p-5 lg:p-8">
+              {children}
+              <Disclaimer />
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

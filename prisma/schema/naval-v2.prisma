@@ -1,0 +1,106 @@
+// Naval Life OS v2 — goals, persisted 90-day plans, and onboarding flow.
+// Separate file in the prisma/schema/ folder (all *.prisma share one namespace),
+// so these models reference NavalStatus from naval.prisma directly.
+
+enum GoalHorizon {
+  ONE_YEAR
+  THREE_YEARS
+  FIVE_YEARS
+  TEN_YEARS
+  LIFETIME
+}
+
+enum NavalPlanStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum OnboardingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+/// The user's north-star life goal; anchors plans and the digital twin.
+model NavalGoal {
+  id         String      @id @default(cuid())
+  userId     String
+  statement  String
+  horizon    GoalHorizon @default(FIVE_YEARS)
+  targetDate DateTime?
+  why        String      @default("")
+  status     NavalStatus @default(ACTIVE)
+  metadata   Json?
+  plans      NavalPlan[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("naval_goals")
+}
+
+/// A persisted 90-day plan (Section 26). progress = fraction of tasks done.
+model NavalPlan {
+  id          String          @id @default(cuid())
+  userId      String
+  goalId      String?
+  goal        NavalGoal?      @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  headline    String          @default("")
+  northStar   String          @default("")
+  status      NavalPlanStatus @default(ACTIVE)
+  progress    Float           @default(0)
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  metadata    Json?
+  tasks       NavalPlanTask[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("naval_plans")
+}
+
+/// One checkable task inside a 90-day plan.
+model NavalPlanTask {
+  id        String    @id @default(cuid())
+  userId    String
+  planId    String
+  plan      NavalPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  month     Int       @default(1)
+  engine    String    @default("")
+  task      String
+  done      Boolean   @default(false)
+  dueDate   DateTime?
+  order     Int       @default(0)
+  doneAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([planId])
+  @@index([done])
+  @@map("naval_plan_tasks")
+}
+
+/// Tracks the 11-step onboarding flow (Section 25) so it can resume.
+model NavalOnboarding {
+  id             String           @id @default(cuid())
+  userId         String           @unique
+  currentStep    Int              @default(1)
+  completedSteps Int[]            @default([])
+  status         OnboardingStatus @default(NOT_STARTED)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  metadata       Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("naval_onboarding")
+}

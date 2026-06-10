@@ -1,4 +1,5 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
 
 /** @type {import('next').NextConfig} */
 const securityHeaders = [
@@ -18,4 +19,9 @@ const nextConfig = {
 };
 
 const withAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === "true" });
-export default withAnalyzer(nextConfig);
+export default withSentryConfig(withAnalyzer(nextConfig), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+  webpack: { treeshake: { removeDebugLogging: true } },
+});

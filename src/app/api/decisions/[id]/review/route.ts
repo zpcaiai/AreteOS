@@ -5,6 +5,7 @@ import { DecisionArchitect } from "@/lib/agents/registry";
 import { decisionQualityScore } from "@/lib/scoring";
 import { emit } from "@/lib/events";
 import { recordProgress } from "@/lib/analytics";
+import { memoryContext, remember } from "@/lib/memory";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   return route(async () => {
@@ -19,11 +20,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       prisma.valueRanking.findMany({ where: { userId }, orderBy: { rank: "asc" }, take: 5, include: { value: true } }),
     ]);
 
+    const relevantMemory = await memoryContext(
+      userId,
+      `${decision.title}\n${decision.context}\n${decision.options.map((o) => o.label).join("\n")}`,
+      { kinds: ["DECISION", "REFLECTION", "SHADOW"], limit: 5 },
+    );
+
     const result = await DecisionArchitect.run({
       title: decision.title, context: decision.context,
       options: decision.options.map((o) => o.label),
       mission: mission?.statement, identity: identity?.name,
       values: values.map((v) => v.value.name),
+      memoryContext: relevantMemory,
     });
 
     // Persist one review per option; recompute quality server-side (don't trust the model's number).
@@ -43,6 +51,17 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
     await prisma.decision.update({ where: { id: decision.id }, data: { status: "REVIEWED", quality: best.quality } });
     await emit({ userId, aggregateType: "Decision", aggregateId: decision.id, type: "DecisionReviewed", payload: { best, recommendation: result.recommendation } });
+    await remember({
+      userId,
+      kind: "DECISION",
+      sourceType: "Decision",
+      sourceId: decision.id,
+      title: decision.title,
+      content: `Context: ${decision.context}\nOptions: ${decision.options.map((o) => o.label).join(", ")}\nBest: ${best.option} (${best.quality.toFixed(2)})\nRecommendation: ${result.recommendation}`,
+      metadata: { best, reviewCount: result.reviews.length },
+      importance: Math.max(0.5, best.quality),
+      occurredAt: decision.createdAt,
+    }).catch(() => null);
     await recordProgress(userId).catch(() => null);
     return ok({ recommendation: result.recommendation, best, reviews: result.reviews });
   });

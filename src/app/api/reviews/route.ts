@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getUserId } from "@/lib/auth";
-import { ok, created, parseBody, route } from "@/lib/http";
+import { ok, created, pagination, parseBody, route } from "@/lib/http";
 import { generateReview } from "@/lib/reviews";
 
 export async function GET(req: Request) {
@@ -9,11 +9,16 @@ export async function GET(req: Request) {
     const userId = await getUserId(req);
     const url = new URL(req.url);
     const period = url.searchParams.get("period") || undefined;
-    const reviews = await prisma.review.findMany({
+    const page = pagination(req, { limit: 30, max: 100 });
+    const where = { userId, ...(period ? { period: period as never } : {}) };
+    const [reviews, total] = await Promise.all([
+      prisma.review.findMany({
       where: { userId, ...(period ? { period: period as never } : {}) },
-      orderBy: { createdAt: "desc" }, take: 50,
-    });
-    return ok({ reviews });
+      orderBy: { createdAt: "desc" }, skip: page.skip, take: page.limit,
+      }),
+      prisma.review.count({ where }),
+    ]);
+    return ok({ reviews, pagination: { page: page.page, limit: page.limit, total } });
   });
 }
 
