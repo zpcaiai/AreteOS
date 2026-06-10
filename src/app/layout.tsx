@@ -4,6 +4,7 @@ import { Inter, EB_Garamond } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import Disclaimer from "@/components/Disclaimer";
 import Providers from "@/components/Providers";
+import ServiceWorker from "@/components/ServiceWorker";
 import { cookies } from "next/headers";
 import { getDict } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/client";
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary", title: "Arete", description: "成为你本来所是的样子。" },
   robots: { index: true, follow: true },
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
@@ -44,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={locale === "zh" ? "zh-CN" : "en"} data-theme={theme} className={`${sans.variable} ${serif.variable}`}>
       <body>
         <a href="#main" className="skip-link">Skip to content</a>
+        <ServiceWorker />
         <Providers>
           <I18nProvider locale={locale} dict={dict}>
             <div className="flex min-h-screen">
