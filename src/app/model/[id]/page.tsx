@@ -4,11 +4,13 @@ import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader } from "@/components/ui";
 import { AdaptForm } from "@/components/ExcellenceClient";
+import { getDict } from "@/lib/i18n/server";
 export const dynamic = "force-dynamic";
 
 const SYS: Record<string, string> = { V: "Visual", A: "Auditory", K: "Kinesthetic", Ad: "Self-talk" };
 
 export default async function ModelDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = await getDict();
   await getUserId();
   const { id } = await params;
   const genius = await prisma.genius.findUnique({ where: { id }, include: { strategies: { orderBy: { createdAt: "asc" } } } });
@@ -24,15 +26,15 @@ export default async function ModelDetail({ params }: { params: Promise<{ id: st
           <Card title={`Strategy · ${s.name}`}><p className="text-sm text-slate-300">{s.description}</p></Card>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card title="Identity Blueprint"><p className="text-sm">{s.identity}</p></Card>
-            <Card title="Belief Blueprint"><p className="text-sm">{s.beliefs}</p><p className="mt-1 text-xs text-slate-500">Values: {s.values}</p></Card>
-            <Card title="Decision Blueprint">
+            <Card title={t("card.identity_blueprint")}><p className="text-sm">{s.identity}</p></Card>
+            <Card title={t("card.belief_blueprint")}><p className="text-sm">{s.beliefs}</p><p className="mt-1 text-xs text-slate-500">Values: {s.values}</p></Card>
+            <Card title={t("card.decision_blueprint")}>
               {s.tote ? (() => { const t = s.tote as { test: string; operate: string; testExit: string; exit: string }; return (
                 <p className="text-sm">T.O.T.E. — Test: {t.test} · Operate: {t.operate} · Exit when: {t.testExit} → {t.exit}</p>
               ); })() : <p className="text-sm text-slate-500">—</p>}
               {s.highLeverage && <p className="mt-1 text-xs text-amber-300">High-leverage: {s.highLeverage}</p>}
             </Card>
-            <Card title="Creative Blueprint">
+            <Card title={t("card.creative_blueprint")}>
               <p className="text-sm">{s.creativeProcess || "—"}</p>
               {Array.isArray(s.repSequence) && (
                 <ol className="mt-2 space-y-1 text-sm">
@@ -42,8 +44,8 @@ export default async function ModelDetail({ params }: { params: Promise<{ id: st
                 </ol>
               )}
             </Card>
-            <Card title="Learning Blueprint"><p className="text-sm">{s.learningProcess || "—"}</p><p className="mt-1 text-xs text-slate-500">Feedback: {s.feedbackProcess || "—"}</p></Card>
-            <Card title="Failure Blueprint"><p className="text-sm text-rose-300">Shadow: {s.shadowPatterns || "—"}</p><p className="mt-1 text-sm text-rose-300">Failure modes: {s.failureModes || "—"}</p></Card>
+            <Card title={t("card.learning_blueprint")}><p className="text-sm">{s.learningProcess || "—"}</p><p className="mt-1 text-xs text-slate-500">Feedback: {s.feedbackProcess || "—"}</p></Card>
+            <Card title={t("card.failure_blueprint")}><p className="text-sm text-rose-300">Shadow: {s.shadowPatterns || "—"}</p><p className="mt-1 text-sm text-rose-300">Failure modes: {s.failureModes || "—"}</p></Card>
           </div>
 
           <AdaptForm strategyId={s.id} />

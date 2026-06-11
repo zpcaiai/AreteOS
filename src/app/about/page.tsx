@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Card, PageHeader } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "About Arete" };
 
@@ -16,7 +17,8 @@ const SUBBRANDS: { name: string; greek: string; meaning: string; module: string 
   { name: "Mnemosyne", greek: "Μνημοσύνη", meaning: "memory, mother of the Muses — listen and internalize", module: "Audiobooks" },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { t } = await getDict();
   return (
     <div>
       <div className="mb-6 flex items-center gap-4">
@@ -27,7 +29,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <Card title="The name">
+      <Card title={t("card.the_name")}>
         <p className="text-sm leading-relaxed text-slate-300">
           <strong>Arete</strong> (ἀρετή, /ˈɑːrəteɪ/) is the ancient Greek word for <em>excellence</em> —
           the full realization of what a person or thing can become. For the Greeks, a knife's arete was
@@ -42,7 +44,7 @@ export default function AboutPage() {
         </p>
       </Card>
 
-      <Card title="The lifecycle">
+      <Card title={t("card.the_lifecycle")}>
         <p className="text-sm leading-relaxed text-slate-300">
           Arete spans the whole arc of development: the child's <strong>Genius</strong> → the adult's
           <strong> Cosmos, Telos, Ethos</strong> and <strong>Phronesis</strong> → the organization's
@@ -51,7 +53,7 @@ export default function AboutPage() {
         </p>
       </Card>
 
-      <Card title="The constellation of modules">
+      <Card title={t("card.the_constellation_of_modules")}>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {SUBBRANDS.map((s) => (
             <div key={s.name} className="rounded-lg border border-slate-800 p-3">
@@ -66,7 +68,7 @@ export default function AboutPage() {
         </div>
       </Card>
 
-      <Card title="What Arete is not">
+      <Card title={t("card.what_arete_is_not")}>
         <p className="text-sm leading-relaxed text-slate-300">
           An original system inspired by widely-taught ideas — not affiliated with, endorsed by, or
           licensed from any author or rights-holder. The figures in our libraries are factual case studies

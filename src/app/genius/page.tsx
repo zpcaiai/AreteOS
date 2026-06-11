@@ -17,14 +17,14 @@ export default async function ChildHub() {
   return (
     <div>
       <PageHeader title={t("page.genius.title")} subtitle={t("page.genius.subtitle")} />
-      <Card title="Why this exists">
+      <Card title={t("card.why_this_exists")}>
         <p className="text-sm text-slate-300">We optimize for the six capabilities that predict long-term flourishing far better than test scores:</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {SIX_CAPABILITIES.map((c) => <span key={c} className="rounded-full bg-indigo-950/50 px-3 py-1 text-xs text-indigo-200">{c}</span>)}
         </div>
       </Card>
       <ChildCreateForm />
-      <Card title="Your children">
+      <Card title={t("card.your_children")}>
         {children.length ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {children.map((c) => (

@@ -34,23 +34,23 @@ export default async function NavalDashboard() {
       <PageHeader title={t("page.naval.dashboard.title")} subtitle={t("page.naval.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Naval Score">
+        <Card title={t("card.global_naval_score")}>
           <div className="text-5xl font-bold tabular-nums">{Math.round(s.global)}</div>
           <div className="mt-4"><StatGrid items={[
             { value: d.counts.assets, label: "Assets" }, { value: d.counts.decisions, label: "Decisions" },
             { value: d.counts.opportunities, label: "Opportunities" }, { value: d.counts.games, label: "Games" },
           ]} /></div>
         </Card>
-        <Card title="Seven drivers"><Radar points={radar} /></Card>
-        <Card title="Recommended next action">
+        <Card title={t("card.seven_drivers")}><Radar points={radar} /></Card>
+        <Card title={t("card.recommended_next_action")}>
           <p className="text-sm text-slate-300">{d.recommendedNextAction}</p>
           {trend.length > 1 && <div className="mt-4"><div className="mb-1 text-xs text-slate-500">Global score trend</div><Line values={trend.map((t) => t.global / 100)} /></div>}
         </Card>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Scoreboard"><Scoreboard rows={board} /></Card>
-        <Card title="Long-term games">
+        <Card title={t("card.scoreboard")}><Scoreboard rows={board} /></Card>
+        <Card title={t("card.long_term_games")}>
           {d.longTermGames.length ? (
             <ul className="space-y-2 text-sm">
               {d.longTermGames.map((g) => (
@@ -64,7 +64,7 @@ export default async function NavalDashboard() {
       </div>
 
       <div className="mt-6">
-        <Card title="90-Day Naval Life Plan">
+        <Card title={t("card.90_day_naval_life_plan")}>
           <p className="mb-3 text-sm text-slate-400">Discover (month 1) → Build leverage & choose a game (month 2) → Launch & review (month 3).</p>
           <PlanButton />
         </Card>

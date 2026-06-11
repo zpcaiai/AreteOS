@@ -13,7 +13,7 @@ export default async function AdminHome() {
   return (
     <div>
       <PageHeader title={t("page.admin.title")} subtitle={t("page.admin.subtitle")} />
-      <Card title="关键指标">
+      <Card title={t("card.key_metrics")}>
         <StatGrid items={[
           { value: o.users, label: "用户" },
           { value: o.ordersDone, label: "完成订单" },
@@ -22,7 +22,7 @@ export default async function AdminHome() {
           { value: o.posts, label: "社区帖子" },
         ]} />
       </Card>
-      <Card title="会员分布">
+      <Card title={t("card.membership_distribution")}>
         <div className="flex gap-6 text-sm">
           {["FREE", "PLUS", "PRO"].map((t) => (
             <div key={t}><span className="text-slate-400">{t}</span> <span className="font-bold tabular-nums">{o.tiers[t] ?? 0}</span></div>
@@ -30,7 +30,7 @@ export default async function AdminHome() {
         </div>
       </Card>
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="最近订单">
+        <Card title={t("card.recent_orders")}>
           {o.recentOrders.length ? (
             <ul className="space-y-1 text-sm">
               {o.recentOrders.map((r) => (
@@ -43,7 +43,7 @@ export default async function AdminHome() {
           ) : <Empty>暂无订单</Empty>}
           <Link href="/admin/orders" className="mt-2 inline-block text-xs text-indigo-400">全部订单 →</Link>
         </Card>
-        <Card title="最近注册">
+        <Card title={t("card.recent_signups")}>
           {o.recentUsers.length ? (
             <ul className="space-y-1 text-sm">
               {o.recentUsers.map((u) => (

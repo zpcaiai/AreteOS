@@ -49,7 +49,7 @@ export default async function TimelinePage() {
       </div>
 
       <div className="mt-5">
-        <Card title="Personality Evolution">
+        <Card title={t("card.personality_evolution")}>
           <div className="flex flex-wrap items-center gap-2">
             {EVOLUTION_STAGES.map((s, i) => (
               <div key={s} className="flex items-center gap-2">
@@ -69,13 +69,13 @@ export default async function TimelinePage() {
       </div>
 
       <div className="mt-5">
-        <Card title="Growth Replay (event sourcing)">
+        <Card title={t("card.growth_replay_event_sourcing")}>
           <GrowthReplay firstEventAt={firstEvent?.occurredAt.toISOString() ?? null} />
         </Card>
       </div>
 
       <div className="mt-5">
-        <Card title="Identity Evolution (alignment over time)">
+        <Card title={t("card.identity_evolution_alignment_over_time")}>
           {byIdentity.size ? (
             <div className="grid gap-5 lg:grid-cols-2">
               {[...byIdentity.entries()].map(([name, vals]) => (

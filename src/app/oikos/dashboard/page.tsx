@@ -35,20 +35,20 @@ export default async function ManagementDashboard() {
       <PageHeader title={t("page.oikos.dashboard.title")} subtitle={t("page.oikos.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Global Management Score">
+        <Card title={t("card.global_management_score")}>
           <div className="text-5xl font-bold tabular-nums">{Math.round(health.globalManagementScore * 100)}<span className="text-lg text-slate-500"> / 100</span></div>
           <p className="mt-1 text-xs text-slate-400">Dependency risk: {Math.round(health.dependencyRisk * 100)}</p>
         </Card>
-        <Card title="Org Health Over Time">
+        <Card title={t("card.org_health_over_time")}>
           {healthHistory.length > 1 ? <Line values={healthHistory.map((h) => h.healthScore)} color="#10b981" /> : <Empty>Not enough health snapshots yet.</Empty>}
         </Card>
       </div>
 
-      <Card title="Scoreboard">
+      <Card title={t("card.scoreboard")}>
         <Scoreboard rows={board} />
       </Card>
 
-      <Card title="Knowledge Assets">
+      <Card title={t("card.knowledge_assets")}>
         {assets.length ? (
           <ul className="space-y-2 text-sm">
             {assets.map((a) => (
@@ -62,7 +62,7 @@ export default async function ManagementDashboard() {
       </Card>
 
       {fragility && (
-        <Card title="Fragility Map">
+        <Card title={t("card.fragility_map")}>
           <div className="mt-1 space-y-2">
             <ScoreBar label="Founder dependency" value={fragility.founderDependency} />
             <ScoreBar label="Key-person dependency" value={fragility.keyPersonDependency} />
@@ -75,7 +75,7 @@ export default async function ManagementDashboard() {
       )}
 
       {governance && (
-        <Card title="Decision Governance">
+        <Card title={t("card.decision_governance")}>
           <div className="mt-1 space-y-2">
             <ScoreBar label="Quality" value={governance.quality} />
             <ScoreBar label="Consistency" value={governance.consistency} />
@@ -87,7 +87,7 @@ export default async function ManagementDashboard() {
         </Card>
       )}
 
-      <Card title="Organization Blueprints">
+      <Card title={t("card.organization_blueprints")}>
         {designs.length ? (
           <ul className="space-y-2 text-sm text-slate-300">
             {designs.map((d) => (

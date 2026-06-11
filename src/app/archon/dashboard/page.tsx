@@ -34,20 +34,20 @@ export default async function LeadershipDashboard() {
       <PageHeader title={t("page.archon.dashboard.title")} subtitle={t("page.archon.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Global Leadership Score">
+        <Card title={t("card.global_leadership_score")}>
           <div className="text-5xl font-bold tabular-nums">{Math.round(health.globalLeadershipScore * 100)}<span className="text-lg text-slate-500"> / 100</span></div>
         </Card>
-        <Card title="Vision Alignment Over Time">
+        <Card title={t("card.vision_alignment_over_time")}>
           {visionHistory.length > 1 ? <Line values={visionHistory.map((v) => v.alignmentScore)} color="#10b981" /> : <Empty>Not enough vision snapshots yet.</Empty>}
           {vision && <p className="mt-2 text-sm text-slate-300">{vision.statement}</p>}
         </Card>
       </div>
 
-      <Card title="Scoreboard">
+      <Card title={t("card.scoreboard")}>
         <Scoreboard rows={board} />
       </Card>
 
-      <Card title="Future-Leader Pipeline">
+      <Card title={t("card.future_leader_pipeline")}>
         {pipeline.length ? (
           <div className="mt-2 space-y-2 text-sm">
             {pipeline.map((p) => (
@@ -63,7 +63,7 @@ export default async function LeadershipDashboard() {
         ) : <Empty>No candidates assessed yet.</Empty>}
       </Card>
 
-      <Card title="Role Transformation Plans">
+      <Card title={t("card.role_transformation_plans")}>
         {growth.length ? (
           <ul className="space-y-2 text-sm text-slate-300">
             {growth.map((g) => (
@@ -77,7 +77,7 @@ export default async function LeadershipDashboard() {
       </Card>
 
       {blueprint && (
-        <Card title="Culture Blueprint">
+        <Card title={t("card.culture_blueprint")}>
           <div className="text-sm text-slate-300">
             <p><span className="text-slate-500">Values:</span> {blueprint.values.join(", ")}</p>
             <p><span className="text-slate-500">Rituals:</span> {blueprint.rituals.join(", ")}</p>

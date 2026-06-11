@@ -28,10 +28,10 @@ export default async function WorldviewDashboard() {
   return (
     <div>
       <PageHeader title={t("page.cosmos.dashboard.title")} subtitle={t("page.cosmos.dashboard.subtitle")} />
-      <Card title="Scoreboard"><Scoreboard rows={board} /></Card>
+      <Card title={t("card.scoreboard")}><Scoreboard rows={board} /></Card>
 
       {profile && (
-        <Card title="Dimensions">
+        <Card title={t("card.dimensions")}>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             {(["reality","humanNature","meaning","success","failure","responsibility","time","change","risk","purpose"] as const).map((d) => (
               <div key={d} className="rounded-lg bg-slate-800/60 p-2 text-center">
@@ -44,7 +44,7 @@ export default async function WorldviewDashboard() {
       )}
 
       {meaning && (
-        <Card title="Meaning Profile">
+        <Card title={t("card.meaning_profile")}>
           <div className="mt-1 space-y-2">
             <ScoreBar label="Work" value={meaning.work} /><ScoreBar label="Learning" value={meaning.learning} />
             <ScoreBar label="Relationships" value={meaning.relationships} /><ScoreBar label="Contribution" value={meaning.contribution} />
@@ -53,7 +53,7 @@ export default async function WorldviewDashboard() {
         </Card>
       )}
 
-      <Card title="Assumption ⚔ Value Conflicts">
+      <Card title={t("card.assumption_value_conflicts")}>
         {conflicts.length ? (
           <ul className="space-y-2 text-sm">{conflicts.map((c) => (
             <li key={c.id} className="border-t border-slate-800 pt-2">
@@ -65,11 +65,11 @@ export default async function WorldviewDashboard() {
         ) : <Empty>No conflicts recorded.</Empty>}
       </Card>
 
-      <Card title="Personal Principles">
+      <Card title={t("card.personal_principles")}>
         {principles.length ? <ul className="space-y-1 text-sm text-slate-300">{principles.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.principle}</li>)}</ul> : <Empty>No principles distilled yet.</Empty>}
       </Card>
 
-      <Card title="Evolution Timeline">
+      <Card title={t("card.evolution_timeline")}>
         {timeline.length ? <ul className="space-y-1 text-sm text-slate-300">{timeline.map((t) => <li key={t.id} className="flex justify-between border-t border-slate-800 pt-1"><span>{String(t.stage).replace(/_/g," ")} · {t.note}</span><span className="text-xs text-slate-600">{new Date(t.createdAt).toLocaleDateString()}</span></li>)}</ul> : <Empty>No evolution entries yet.</Empty>}
       </Card>
     </div>

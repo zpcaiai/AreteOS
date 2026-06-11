@@ -25,7 +25,7 @@ export default async function AudiobooksPage() {
   return (
     <div>
       <PageHeader title={t("page.mnemosyne.title")} subtitle={t("page.mnemosyne.subtitle")} />
-      <Card title="Your listening">
+      <Card title={t("card.your_listening")}>
         <div className="flex gap-8 text-sm">
           <div><div className="text-2xl font-bold tabular-nums">{totalMin}</div><div className="text-xs text-slate-500">minutes listened</div></div>
           <div><div className="text-2xl font-bold tabular-nums">{new Set(sessions.map((s) => s.bookId)).size}</div><div className="text-xs text-slate-500">books opened</div></div>
@@ -36,7 +36,7 @@ export default async function AudiobooksPage() {
         books={books.map((b) => ({ id: b.id, title: b.title, author: b.author, relatedModule: b.relatedModule, inspiredByNote: b.inspiredByNote, sourceType: b.sourceType, isPublicDomain: b.isPublicDomain }))}
         progress={Object.fromEntries(progress.map((p) => [p.bookId, { percent: p.percent, completed: p.completed }]))}
       />
-      <Card title="About this library (please read)">
+      <Card title={t("card.about_this_library_please_read")}>
         <p className="text-sm leading-relaxed text-slate-300">
           This is a study companion, not a bookstore. For copyrighted books we play <strong>original summaries</strong> of the
           ideas — never the book's text. Public-domain works may include longer excerpts. You can add your own legally-owned

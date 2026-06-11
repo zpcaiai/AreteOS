@@ -24,15 +24,15 @@ export default async function NavalHome() {
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Naval Score">
+        <Card title={t("card.global_naval_score")}>
           <div className="text-5xl font-bold tabular-nums">{Math.round(d.scores.global)}</div>
           <p className="mt-2 text-xs text-slate-400">Geometric mean of seven life drivers — a near-zero area pulls the whole score down.</p>
           <Link href="/naval/dashboard" className="mt-3 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">Open dashboard →</Link>
         </Card>
-        <Card title="Recommended next action">
+        <Card title={t("card.recommended_next_action")}>
           <p className="text-sm text-slate-300">{d.recommendedNextAction}</p>
         </Card>
-        <Card title="The loop">
+        <Card title={t("card.the_loop")}>
           <p className="text-sm text-slate-400">Specific knowledge → judgment → leverage → assets → wealth → freedom → happiness → better judgment.</p>
         </Card>
       </div>

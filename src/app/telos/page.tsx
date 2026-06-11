@@ -19,16 +19,16 @@ export default async function MissionPage() {
     <div>
       <PageHeader title={t("page.telos.title")} subtitle={t("page.telos.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
-        <Card title="Mission">
+        <Card title={t("card.mission")}>
           {missions.length ? missions.map((m) => <p key={m.id} className="text-lg">{m.statement}</p>) : <Empty>Define your mission via POST /api/telos</Empty>}
         </Card>
-        <Card title="Vision">
+        <Card title={t("card.vision")}>
           {visions.length ? visions.map((v) => <p key={v.id} className="text-slate-300">{v.statement} <span className="text-xs text-slate-500">({v.horizon})</span></p>) : <Empty>No vision yet.</Empty>}
         </Card>
-        <Card title="Life Themes">
+        <Card title={t("card.life_themes")}>
           <div className="flex flex-wrap gap-2">{themes.map((t) => <span key={t.id} className="rounded-full bg-slate-800 px-3 py-1 text-sm">{t.name}</span>)}</div>
         </Card>
-        <Card title="Personal Constitution">
+        <Card title={t("card.personal_constitution")}>
           <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-300">{constitution.map((c) => <li key={c.id}>{c.article}</li>)}</ol>
         </Card>
       </div>

@@ -22,15 +22,15 @@ export default async function EvolutionPage() {
       <PageHeader title={t("page.ethos.evolution.title")} subtitle={t("page.ethos.evolution.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Global Identity Score">
+        <Card title={t("card.global_identity_score")}>
           <div className="text-5xl font-bold tabular-nums">{Math.round(p.globalScore * 100)}<span className="text-lg text-slate-500"> / 100</span></div>
         </Card>
-        <Card title="Scoreboard">
+        <Card title={t("card.scoreboard")}>
           <div className="mt-1 space-y-2">{board.map(([l, v]) => <ScoreBar key={l} label={l} value={v} />)}</div>
         </Card>
       </div>
 
-      <Card title="Your Identity Stack">
+      <Card title={t("card.your_identity_stack")}>
         {p.stack.length ? (
           <div className="space-y-2 text-sm">
             {p.stack.map((s) => (
@@ -43,7 +43,7 @@ export default async function EvolutionPage() {
         ) : <Empty>No stack yet — build one in the Stack tab.</Empty>}
       </Card>
 
-      <Card title="Conflicts">
+      <Card title={t("card.conflicts")}>
         {p.conflicts.length ? (
           <ul className="space-y-2 text-sm">
             {p.conflicts.map((c) => (
@@ -57,7 +57,7 @@ export default async function EvolutionPage() {
         ) : <Empty>No conflicts detected.</Empty>}
       </Card>
 
-      <Card title="Evolution Timeline">
+      <Card title={t("card.evolution_timeline")}>
         {p.snapshots.length ? (
           <ul className="space-y-1 text-sm text-slate-300">
             {p.snapshots.map((s) => (

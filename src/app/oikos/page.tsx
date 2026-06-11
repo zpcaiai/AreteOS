@@ -25,17 +25,17 @@ export default async function ManagementPage() {
       <PageHeader title={t("page.oikos.title")} subtitle={t("page.oikos.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Management Score">
+        <Card title={t("card.global_management_score")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.globalManagementScore * 100)}</div>
           <p className="mt-1 text-xs text-slate-400">(Leverage × Knowledge × Alignment × Decisions × Health × Resilience) ÷ Dependency</p>
           {profile && <p className="mt-2 text-sm text-indigo-300">Maturity: {profile.level.replace(/_/g, " ")}</p>}
         </Card>
-        <Card title="Leverage & Knowledge">
+        <Card title={t("card.leverage_knowledge")}>
           <ScoreBar label="Leverage" value={health.leverageScore} />
           <ScoreBar label="Knowledge-worker effectiveness" value={health.knowledge} />
           <ScoreBar label="Decision governance" value={health.decisionQuality} />
         </Card>
-        <Card title="Health & Resilience">
+        <Card title={t("card.health_resilience")}>
           <ScoreBar label="Org health" value={health.healthScore} />
           <ScoreBar label="Resilience (anti-fragility)" value={health.resilience} />
           <ScoreBar label="Dependency risk" value={health.dependencyRisk} />
@@ -44,7 +44,7 @@ export default async function ManagementPage() {
       </div>
 
       {leverage && (
-        <Card title="Leverage Distribution">
+        <Card title={t("card.leverage_distribution")}>
           <div className="mt-2 grid grid-cols-3 gap-3 text-center text-sm">
             <div><div className="text-2xl font-bold tabular-nums text-rose-400">{Math.round(leverage.lowShare * 100)}%</div><div className="text-xs text-slate-500">Low</div></div>
             <div><div className="text-2xl font-bold tabular-nums text-amber-400">{Math.round(leverage.mediumShare * 100)}%</div><div className="text-xs text-slate-500">Medium</div></div>
@@ -58,7 +58,7 @@ export default async function ManagementPage() {
         </Card>
       )}
 
-      <Card title="Management Maturity Model">
+      <Card title={t("card.management_maturity_model")}>
         <div className="mt-2 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs uppercase text-slate-500"><tr><th className="py-1 pr-3">Lvl</th><th className="px-3">Role</th><th className="px-3">Focus</th><th className="px-3">Question</th></tr></thead>
@@ -76,7 +76,7 @@ export default async function ManagementPage() {
         </div>
       </Card>
 
-      <Card title="First Principles">
+      <Card title={t("card.first_principles")}>
         <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm text-slate-300">
           {FIRST_PRINCIPLES.map((p, i) => <li key={i}>{p}</li>)}
         </ol>

@@ -13,7 +13,7 @@ export default async function AdminMemberships() {
   return (
     <div>
       <PageHeader title={t("page.admin.memberships.title")} subtitle={t("page.admin.memberships.subtitle")} />
-      <Card title="发放会员"><GrantForm /></Card>
+      <Card title={t("card.grant_membership")}><GrantForm /></Card>
     </div>
   );
 }

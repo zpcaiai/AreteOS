@@ -19,7 +19,7 @@ export default async function StackPage() {
     <div>
       <PageHeader title={t("page.ethos.stack.title")} subtitle={t("page.ethos.stack.subtitle")} />
       <StackTool />
-      <Card title="Current Stack">
+      <Card title={t("card.current_stack")}>
         {stack.length ? (
           <div className="space-y-2 text-sm">
             {stack.map((s) => (
@@ -32,7 +32,7 @@ export default async function StackPage() {
         ) : <Empty>No stack yet — build one above.</Empty>}
       </Card>
       {recs.length > 0 && (
-        <Card title="Recommended Identities">
+        <Card title={t("card.recommended_identities")}>
           <ul className="space-y-2 text-sm">
             {recs.map((r) => (
               <li key={r.id} className="border-t border-slate-800 pt-2">

@@ -25,17 +25,17 @@ export default async function WorldviewPage() {
       <PageHeader title={t("page.cosmos.title")} subtitle={t("page.cosmos.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Worldview Score">
+        <Card title={t("card.global_worldview_score")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.globalWorldviewScore * 100)}</div>
           <p className="mt-1 text-xs text-slate-400">Clarity × Coherence × Assumption-awareness × Meaning × Mission × Identity × Wisdom</p>
           <p className="mt-2 text-sm text-indigo-300">Stage: {String(health.stage).replace(/_/g, " ")}</p>
         </Card>
-        <Card title="Worldview Health">
+        <Card title={t("card.worldview_health")}>
           <ScoreBar label="Clarity" value={health.clarity} />
           <ScoreBar label="Coherence" value={health.coherence} />
           <ScoreBar label="Assumption awareness" value={health.assumptionAwareness} />
         </Card>
-        <Card title="Meaning & Wisdom">
+        <Card title={t("card.meaning_wisdom")}>
           <ScoreBar label="Meaning" value={health.meaningScore} />
           <ScoreBar label="Wisdom" value={health.wisdom} />
           <div className="mt-3 flex gap-2 text-xs">
@@ -48,7 +48,7 @@ export default async function WorldviewPage() {
       <div className="mt-5"><AnalyzeBox endpoint="/api/cosmos" mode="answers" placeholder="Describe what you believe creates success, what failure means, what you're responsible for…" button="Analyze worldview" /></div>
 
       {worldview && (
-        <Card title="Worldview Profile (dimensions)">
+        <Card title={t("card.worldview_profile_dimensions")}>
           {worldview.summary && <p className="mb-3 text-sm text-slate-400">Hidden assumptions: {worldview.summary}</p>}
           <div className="grid gap-3 sm:grid-cols-2">
             {worldview.dimensions.map((d) => (

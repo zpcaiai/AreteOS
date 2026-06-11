@@ -9,10 +9,10 @@ export default async function AttributionsPage() {
   return (
     <div>
       <PageHeader title={t("page.about.attributions.title")} subtitle={t("page.about.attributions.subtitle")} />
-      <Card title="Disclaimer">
+      <Card title={t("card.disclaimer")}>
         <p className="text-sm leading-relaxed text-slate-300">{DISCLAIMER_LONG}</p>
       </Card>
-      <Card title="Inspired by (ideas, not implementations)">
+      <Card title={t("card.inspired_by_ideas_not_implementations")}>
         <ul className="space-y-2 text-sm text-slate-300">
           {INSPIRATIONS.map((i) => (
             <li key={i.area} className="border-t border-slate-800 pt-2">
@@ -22,7 +22,7 @@ export default async function AttributionsPage() {
           ))}
         </ul>
       </Card>
-      <Card title="On the figures in our libraries">
+      <Card title={t("card.on_the_figures_in_our_libraries")}>
         <p className="text-sm leading-relaxed text-slate-300">
           Historical and contemporary figures are presented as factual, educational case studies — original
           analysis of publicly documented ways of thinking and working. No verbatim text, diagrams, or tables

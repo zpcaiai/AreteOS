@@ -21,16 +21,16 @@ export default async function CognitivePage() {
     <div>
       <PageHeader title={t("page.phronesis.title")} subtitle={t("page.phronesis.subtitle")} />
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Cognitive Score">
+        <Card title={t("card.global_cognitive_score")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(h.globalCognitiveScore * 100)}</div>
           <p className="mt-1 text-xs text-slate-400">(Model diversity × Judgment × Decision quality × Bias resistance × Reflection × Wisdom) ÷ Blind spots</p>
         </Card>
-        <Card title="Judgment & Models">
+        <Card title={t("card.judgment_models")}>
           <ScoreBar label="Judgment" value={h.judgmentScore} />
           <ScoreBar label="Model diversity" value={h.modelDiversity} />
           <ScoreBar label="Bias resistance" value={h.biasResistance} />
         </Card>
-        <Card title="Decisions & Wisdom">
+        <Card title={t("card.decisions_wisdom")}>
           <ScoreBar label="Decision quality" value={h.decisionQuality} />
           <ScoreBar label="Reflection" value={h.reflection} />
           <ScoreBar label="Wisdom" value={h.wisdom} />
@@ -42,7 +42,7 @@ export default async function CognitivePage() {
       </div>
       {graph && (
         <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <Card title="Next models to learn" accent={graph.source === "neo4j" ? "graph" : undefined}>
+          <Card title={t("card.next_models_to_learn")} accent={graph.source === "neo4j" ? "graph" : undefined}>
             {graph.recommendations.length ? (
               <ul className="space-y-2 text-sm">
                 {graph.recommendations.map((r) => (
@@ -55,7 +55,7 @@ export default async function CognitivePage() {
               </ul>
             ) : <Empty>Log model usage to unlock latticework recommendations.</Empty>}
           </Card>
-          <Card title="Latticework gaps">
+          <Card title={t("card.latticework_gaps")}>
             {graph.gaps.length ? (
               <ul className="space-y-2 text-sm">
                 {graph.gaps.map((g) => (
@@ -68,7 +68,7 @@ export default async function CognitivePage() {
               </ul>
             ) : <Empty>Every major discipline is covered — strong latticework.</Empty>}
           </Card>
-          <Card title="Unresolved value tensions">
+          <Card title={t("card.unresolved_value_tensions")}>
             {graph.tensions.length ? (
               <ul className="space-y-2 text-sm">
                 {graph.tensions.map((t, i) => (

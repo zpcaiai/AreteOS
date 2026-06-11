@@ -22,16 +22,16 @@ export default async function IdentityLibraryPage() {
       <PageHeader title={t("page.ethos.title")} subtitle={t("page.ethos.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Identity Score">
+        <Card title={t("card.global_identity_score")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(profile.globalScore * 100)}</div>
           <p className="mt-1 text-xs text-slate-400">Clarity × Alignment × Stability × Conflict-resolution × Evolution × Integration</p>
         </Card>
-        <Card title="Your Identity Health">
+        <Card title={t("card.your_identity_health")}>
           <ScoreBar label="Clarity" value={profile.clarity} />
           <ScoreBar label="Stability" value={profile.stability} />
           <ScoreBar label="Integration" value={profile.integration} />
         </Card>
-        <Card title="Get started">
+        <Card title={t("card.get_started")}>
           <div className="flex flex-col gap-2 text-sm">
             <Link href="/ethos/assessment" className="rounded-lg bg-indigo-600 px-3 py-1.5 text-center font-medium">Assess my identity</Link>
             <Link href="/ethos/stack" className="rounded-lg bg-slate-800 px-3 py-1.5 text-center hover:bg-slate-700">Build my stack</Link>
@@ -40,7 +40,7 @@ export default async function IdentityLibraryPage() {
         </Card>
       </div>
 
-      <Card title="Identity Families">
+      <Card title={t("card.identity_families")}>
         <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {families.length ? families.map((f) => (
             <Link key={f.id} href={`/ethos/archetypes?family=${f.slug}`}

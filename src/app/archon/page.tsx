@@ -29,23 +29,23 @@ export default async function LeadershipPage() {
       <PageHeader title={t("page.archon.title")} subtitle={t("page.archon.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Global Leadership Score">
+        <Card title={t("card.global_leadership_score")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.globalLeadershipScore * 100)}</div>
           <p className="mt-1 text-xs text-slate-400">(Mission × Identity × Vision × Belonging × Readiness) ÷ Blind spots</p>
         </Card>
-        <Card title="Leverage">
+        <Card title={t("card.leverage")}>
           <ScoreBar label="Leverage score" value={health.leverageScore} />
           <ScoreBar label="Vision alignment" value={health.visionAlignment} />
           <ScoreBar label="Belonging" value={health.belongingScore} />
         </Card>
-        <Card title="Maturity & Alignment">
+        <Card title={t("card.maturity_alignment")}>
           <ScoreBar label="Leadership maturity" value={health.maturity} />
           <ScoreBar label="Org alignment" value={health.alignmentScore} />
           <Link href="/archon/dashboard" className="mt-3 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">Full dashboard →</Link>
         </Card>
       </div>
 
-      <Card title="Logical-Level Leadership Model">
+      <Card title={t("card.logical_level_leadership_model")}>
         <div className="mt-2 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs uppercase text-slate-500">
@@ -70,7 +70,7 @@ export default async function LeadershipPage() {
         )}
       </Card>
 
-      <Card title="Shared Vision">
+      <Card title={t("card.shared_vision")}>
         {vision ? (
           <div className="text-sm text-slate-300">
             <p className="font-semibold text-white">{vision.statement}</p>

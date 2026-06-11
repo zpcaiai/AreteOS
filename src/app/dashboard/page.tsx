@@ -54,7 +54,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Direction & Thinking">
+        <Card title={t("card.direction_thinking")}>
           <ScoreBar label="Mission Alignment" value={scores.missionAlignment} />
           <ScoreBar label="Identity Alignment" value={scores.identityAlignment} />
           <ScoreBar label="Value Integrity" value={scores.valueIntegrity} />
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
           <ScoreBar label="First Principle" value={scores.firstPrinciple} />
           <ScoreBar label="Decision Quality" value={scores.decisionQuality} />
         </Card>
-        <Card title="Execution & Contribution">
+        <Card title={t("card.execution_contribution")}>
           <ScoreBar label="Habit Consistency" value={scores.habitConsistency} />
           <ScoreBar label="Mastery" value={scores.mastery} />
           <ScoreBar label="Leadership" value={scores.leadership} />

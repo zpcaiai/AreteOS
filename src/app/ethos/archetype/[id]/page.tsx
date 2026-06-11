@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ function List({ title, items }: { title: string; items: string[] }) {
 }
 
 export default async function ArchetypeDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = await getDict();
   const { id } = await params;
   const a = await prisma.identityArchetype.findFirst({ where: { OR: [{ id }, { slug: id }] }, include: { family: true } });
   if (!a) notFound();
@@ -25,27 +27,27 @@ export default async function ArchetypeDetail({ params }: { params: Promise<{ id
       <Link href={`/ethos/archetypes?family=${a.family.slug}`} className="text-sm text-indigo-400">← {a.family.name}</Link>
       <PageHeader title={a.name} subtitle={a.identityStatement} />
 
-      <Card title="Mission">
+      <Card title={t("card.mission")}>
         <p className="text-sm text-slate-200">{a.mission}</p>
         <p className="mt-2 text-xs text-slate-500">Legacy: {a.legacyExpression}</p>
       </Card>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Core Values & Beliefs">
+        <Card title={t("card.core_values_beliefs")}>
           <div className="space-y-3"><List title="Values" items={a.values} /><List title="Beliefs" items={a.beliefs} /></div>
         </Card>
-        <Card title="Mental Models & Decision Rules">
+        <Card title={t("card.mental_models_decision_rules")}>
           <div className="space-y-3"><List title="Mental models" items={a.mentalModels} /><List title="Decision rules" items={a.decisionRules} /></div>
         </Card>
-        <Card title="Habits & Capabilities">
+        <Card title={t("card.habits_capabilities")}>
           <div className="space-y-3"><List title="Habits" items={a.habits} /><List title="Capabilities" items={a.capabilities} /></div>
         </Card>
-        <Card title="Shadows & Failure Modes">
+        <Card title={t("card.shadows_failure_modes")}>
           <div className="space-y-3"><List title="Shadow patterns" items={a.shadowPatterns} /><List title="Failure modes" items={a.failureModes} /></div>
         </Card>
       </div>
 
-      <Card title="Growth Path">
+      <Card title={t("card.growth_path")}>
         <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-300">{a.growthPath.map((g, i) => <li key={i}>{g}</li>)}</ol>
       </Card>
     </div>

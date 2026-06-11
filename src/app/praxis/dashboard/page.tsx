@@ -34,21 +34,21 @@ export default async function SfmDashboard() {
       <PageHeader title={t("page.praxis.dashboard.title")} subtitle={t("page.praxis.dashboard.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Replication Readiness">
+        <Card title={t("card.replication_readiness")}>
           <div className="text-5xl font-bold tabular-nums">{Math.round(health.replicationReadiness * 100)}<span className="text-lg text-slate-500"> / 100</span></div>
           <Line values={history.map((h) => h.replicationReadiness)} />
         </Card>
-        <Card title="Organizational Health">
+        <Card title={t("card.organizational_health")}>
           <div className="text-5xl font-bold tabular-nums">{Math.round(health.organizationalHealth * 100)}<span className="text-lg text-slate-500"> / 100</span></div>
           <Line values={history.map((h) => h.organizationalHealth)} color="#10b981" />
         </Card>
       </div>
 
-      <Card title="Scoreboard">
+      <Card title={t("card.scoreboard")}>
         <Scoreboard rows={board} />
       </Card>
 
-      <Card title="Scaling Bottlenecks">
+      <Card title={t("card.scaling_bottlenecks")}>
         {bottlenecks.length ? (
           <ul className="space-y-2 text-sm">
             {bottlenecks.map((b) => (
@@ -63,7 +63,7 @@ export default async function SfmDashboard() {
         ) : <Empty>No open bottlenecks recorded.</Empty>}
       </Card>
 
-      <Card title="Replication Playbooks">
+      <Card title={t("card.replication_playbooks")}>
         {playbooks.length ? (
           <ul className="space-y-2 text-sm text-slate-300">
             {playbooks.map((p) => (

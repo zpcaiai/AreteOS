@@ -27,7 +27,7 @@ export default async function SfmPage() {
       <PageHeader title={t("page.praxis.title")} subtitle={t("page.praxis.subtitle")} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <Card title="Replication Readiness">
+        <Card title={t("card.replication_readiness")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.replicationReadiness * 100)}</div>
           <p className="mt-1 text-xs text-slate-400">Can this succeed without the founder in the room?</p>
           <div className="mt-3 space-y-2">
@@ -36,7 +36,7 @@ export default async function SfmPage() {
             <ScoreBar label="Scalability" value={health.scalability} />
           </div>
         </Card>
-        <Card title="Organizational Health">
+        <Card title={t("card.organizational_health")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.organizationalHealth * 100)}</div>
           <div className="mt-3 space-y-2">
             <ScoreBar label="Values alignment" value={health.valuesAlignment} />
@@ -44,7 +44,7 @@ export default async function SfmPage() {
             <ScoreBar label="Collaboration" value={health.collaborationQuality} />
           </div>
         </Card>
-        <Card title="Leadership & Resilience">
+        <Card title={t("card.leadership_resilience")}>
           <div className="mt-1 space-y-2">
             <ScoreBar label="Leadership maturity" value={health.leadershipMaturity} />
             <ScoreBar label="Resilience" value={health.resilience} />
@@ -54,7 +54,7 @@ export default async function SfmPage() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Company Identity">
+        <Card title={t("card.company_identity")}>
           {identity ? (
             <div className="space-y-1 text-sm text-slate-300">
               <p className="font-semibold text-white">{identity.identityStatement}</p>
@@ -64,7 +64,7 @@ export default async function SfmPage() {
             </div>
           ) : <Empty>No company identity yet. Build one below.</Empty>}
         </Card>
-        <Card title="Founder DNA">
+        <Card title={t("card.founder_dna")}>
           {founder ? (
             <div className="space-y-1 text-sm text-slate-300">
               <p className="font-semibold text-white">{founder.founderIdentity}</p>
@@ -76,7 +76,7 @@ export default async function SfmPage() {
       </div>
 
       {factors.length > 0 && (
-        <Card title="Top Success Factors" >
+        <Card title={t("card.top_success_factors")} >
           <div className="mt-2 overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="text-xs uppercase text-slate-500">
@@ -99,7 +99,7 @@ export default async function SfmPage() {
       )}
 
       {values.length > 0 && (
-        <Card title="Core Values → Operating Principles">
+        <Card title={t("card.core_values_operating_principles")}>
           <ul className="space-y-2 text-sm">
             {values.map((v) => (
               <li key={v.id} className="border-t border-slate-800 pt-2">
@@ -112,7 +112,7 @@ export default async function SfmPage() {
       )}
 
       {principles.length > 0 && (
-        <Card title="Operating Principles">
+        <Card title={t("card.operating_principles")}>
           <ul className="space-y-2 text-sm text-slate-300">
             {principles.map((p) => (
               <li key={p.id} className="border-t border-slate-800 pt-2">

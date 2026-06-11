@@ -21,27 +21,27 @@ export default async function TwinPage() {
     <div>
       <PageHeader title={t("page.twin.title")} subtitle={t("page.twin.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
-        <Card title="Current twin">
+        <Card title={t("card.current_twin")}>
           <p className="text-sm text-slate-300">Stage: <span className="font-medium">{stage.current}</span></p>
           <div className="mt-3"><ScoreBar label="Growth" value={scores.growth} /><ScoreBar label="Identity alignment" value={scores.identityAlignment} /><ScoreBar label="Habit consistency" value={scores.habitConsistency} /></div>
         </Card>
-        <Card title="Simulate a scenario">
+        <Card title={t("card.simulate_a_scenario")}>
           <AnalyzeBox endpoint="/api/twin" mode="scenario" placeholder="e.g. Take a manager role / move cities / drop the side project…" button="Simulate" />
         </Card>
       </div>
       <div className="mt-5">
-        <Card title="What-if projection (deterministic)">
+        <Card title={t("card.what_if_projection_deterministic")}>
           <p className="mb-3 text-xs text-slate-500">Counterfactual simulation over your real scores using the live scoring math — no AI guesswork. Set the levels you would sustain, then project.</p>
           <WhatIfSimulator />
         </Card>
       </div>
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Card title="Drift predictions">
+        <Card title={t("card.drift_predictions")}>
           {drifts.length ? drifts.map((d) => (
             <div key={d.id} className="mb-2"><ScoreBar label={d.towardIdentity || "drift risk"} value={d.risk} />{d.rationale && <p className="text-xs text-slate-400">{d.rationale}</p>}</div>
           )) : <Empty>No drift predictions yet.</Empty>}
         </Card>
-        <Card title="Twin insights">
+        <Card title={t("card.twin_insights")}>
           {insights.length ? <ul className="space-y-2 text-sm text-slate-300">{insights.map((i) => <li key={i.id}>· {i.insight}</li>)}</ul> : <Empty>Run a simulation to generate insights.</Empty>}
         </Card>
       </div>

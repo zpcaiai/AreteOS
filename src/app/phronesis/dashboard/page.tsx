@@ -29,9 +29,9 @@ export default async function CognitiveDashboard() {
   return (
     <div>
       <PageHeader title={t("page.phronesis.dashboard.title")} subtitle={t("page.phronesis.dashboard.subtitle")} />
-      <Card title="Scoreboard"><Scoreboard rows={board} /></Card>
+      <Card title={t("card.scoreboard")}><Scoreboard rows={board} /></Card>
 
-      <Card title="Decision Journal">
+      <Card title={t("card.decision_journal")}>
         {journals.length ? (
           <ul className="space-y-2 text-sm">
             {journals.map((j) => (
@@ -45,7 +45,7 @@ export default async function CognitiveDashboard() {
         ) : <Empty>No journaled decisions yet.</Empty>}
       </Card>
 
-      <Card title="Recent Bias Events">
+      <Card title={t("card.recent_bias_events")}>
         {biasEvents.length ? (
           <ul className="space-y-1 text-sm text-slate-300">
             {biasEvents.map((b) => <li key={b.id} className="border-t border-slate-800 pt-1"><span className="text-amber-400">{b.biasName}</span> <span className="text-xs text-slate-500">sev {Math.round(b.severity * 100)}</span></li>)}
@@ -54,16 +54,16 @@ export default async function CognitiveDashboard() {
       </Card>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Card title="Wisdom Insights">
+        <Card title={t("card.wisdom_insights")}>
           {insights.length ? <ul className="space-y-1 text-sm text-slate-300">{insights.map((i) => <li key={i.id} className="border-t border-slate-800 pt-1">{i.insight}</li>)}</ul> : <Empty>No insights yet.</Empty>}
         </Card>
-        <Card title="Personal Principles">
+        <Card title={t("card.personal_principles")}>
           {principles.length ? <ul className="space-y-1 text-sm text-slate-300">{principles.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.principle}</li>)}</ul> : <Empty>No principles yet.</Empty>}
         </Card>
       </div>
 
       {diagnoses.length > 0 && (
-        <Card title="Diagnoses">
+        <Card title={t("card.diagnoses")}>
           <ul className="space-y-2 text-sm text-slate-300">{diagnoses.map((d) => <li key={d.id} className="border-t border-slate-800 pt-2"><span className="font-medium text-slate-100">{d.problem}</span><div className="text-xs text-slate-500">{d.diagnosis}</div></li>)}</ul>
         </Card>
       )}

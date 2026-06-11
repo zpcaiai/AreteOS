@@ -26,7 +26,7 @@ export default async function EmporionPage() {
     <div>
       <PageHeader title={t("page.emporion.title")} subtitle={t("page.emporion.subtitle")} />
 
-      <Card title="我的资产">
+      <Card title={t("card.my_assets")}>
         <StatGrid items={[
           { value: ent.credits, label: "点数余额" },
           { value: ent.unlockedKeys.length, label: "已解锁内容" },
@@ -34,7 +34,7 @@ export default async function EmporionPage() {
         ]} />
       </Card>
 
-      <Card title="商品">
+      <Card title={t("card.products")}>
         {products.length ? (
           <EmporionClient products={products.map((p) => ({
             slug: p.slug, name: p.name, description: p.description,
@@ -44,7 +44,7 @@ export default async function EmporionPage() {
         ) : <Empty>暂无商品 — 运行 <code>npm run db:seed</code> 加载商品目录。</Empty>}
       </Card>
 
-      <Card title="我的订单">
+      <Card title={t("card.my_orders")}>
         {orders.length ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
