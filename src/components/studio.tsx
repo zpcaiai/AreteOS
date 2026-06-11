@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTx } from "@/lib/i18n/client";
 
 // Shared primitives for the engine "Studios" (Cosmos, Phronesis, Praxis, Archon, Oikos…).
 // Previously every studio re-declared its own useRun hook + Box + Btn + input class + lines
@@ -50,10 +51,11 @@ export function useAgentRun() {
 export function StudioShell({
   title, intro, error, note, children,
 }: { title: string; intro: string; error?: string; note?: string; children: React.ReactNode }) {
+  const tx = useTx();
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-lg font-bold">{title}</h2>
-      <p className="mt-1 text-sm text-slate-400">{intro}</p>
+      <h2 className="text-lg font-bold">{tx(title)}</h2>
+      <p className="mt-1 text-sm text-slate-400">{tx(intro)}</p>
       {error ? <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p> : null}
       {note ? <p className="mt-2 rounded bg-indigo-950/40 px-3 py-1 text-sm text-indigo-200">{note}</p> : null}
       {children}
@@ -65,10 +67,11 @@ export function StudioShell({
 export function StudioSection({
   title, hint, children, open = false,
 }: { title: string; hint?: string; children: React.ReactNode; open?: boolean }) {
+  const tx = useTx();
   return (
     <details className="mt-3 rounded-lg border border-slate-800 p-3" open={open}>
-      <summary className="cursor-pointer text-sm font-semibold">{title}</summary>
-      {hint ? <p className="mt-1 text-xs text-slate-500">{hint}</p> : null}
+      <summary className="cursor-pointer text-sm font-semibold">{tx(title)}</summary>
+      {hint ? <p className="mt-1 text-xs text-slate-500">{tx(hint)}</p> : null}
       <div className="mt-2 space-y-2">{children}</div>
     </details>
   );
@@ -78,13 +81,14 @@ export function StudioSection({
 export function RunButton({
   busy, runKey, onClick, label,
 }: { busy: string | null; runKey: string; onClick: () => void; label: string }) {
+  const tx = useTx();
   return (
     <button
       disabled={busy !== null}
       onClick={onClick}
       className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium disabled:opacity-50"
     >
-      {busy === runKey ? "Running…" : label}
+      {busy === runKey ? tx("Running…") : tx(label)}
     </button>
   );
 }

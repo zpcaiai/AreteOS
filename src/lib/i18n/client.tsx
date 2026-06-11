@@ -7,6 +7,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { DEFAULT_LOCALE, DICTIONARIES, type Dict, type DictKey, type Locale } from "./dictionaries";
+import { txFor } from "./lookup";
 
 interface I18nValue {
   locale: Locale;
@@ -21,6 +22,12 @@ export function I18nProvider({ locale, dict, children }: { locale: Locale; dict:
 
 export function useI18n() {
   return useContext(I18nContext);
+}
+
+/** Translate by ENGLISH dictionary value (identity for unknown strings). */
+export function useTx() {
+  const { locale } = useContext(I18nContext);
+  return txFor(locale);
 }
 
 export function LanguageSwitcher({ className = "" }: { className?: string }) {

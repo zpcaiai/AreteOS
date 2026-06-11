@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
+import { useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 
 
 export default function CognitiveStudio() {
+  const tx = useTx();
   const { busy, error, note, run } = useAgentRun();
   const out = note;
   const [goal, setGoal] = useState("");
@@ -26,12 +28,12 @@ export default function CognitiveStudio() {
       {out && <p className="mt-2 rounded bg-indigo-950/40 px-3 py-1 text-sm text-indigo-200">{out}</p>}
 
       <StudioSection title="1 · Build a Latticework" hint="A goal — get a diverse model network + blind spots">
-        <input value={goal} onChange={(e) => setGoal(e.target.value)} className={ta} placeholder="e.g. Build an AI startup" />
+        <input value={goal} onChange={(e) => setGoal(e.target.value)} className={ta} placeholder={tx("e.g. Build an AI startup")} />
         <RunButton busy={busy} runKey="lat" onClick={() => run("lat", "/api/phronesis/latticework", { goal })} label="Build Latticework" />
       </StudioSection>
 
       <StudioSection title="2 · Decision Lens" hint="A decision — analyzed through 8 lenses with a confidence score">
-        <input value={decision} onChange={(e) => setDecision(e.target.value)} className={ta} placeholder="e.g. Should I start a company?" />
+        <input value={decision} onChange={(e) => setDecision(e.target.value)} className={ta} placeholder={tx("e.g. Should I start a company?")} />
         <RunButton busy={busy} runKey="lens" onClick={() => run("lens", "/api/phronesis/lens", { decision }, (j) => `Confidence: ${Math.round(((j.result as { confidence: number })?.confidence ?? 0) * 100)}`)} label="Run Lenses" />
       </StudioSection>
 
@@ -49,17 +51,17 @@ export default function CognitiveStudio() {
       </StudioSection>
 
       <StudioSection title="5 · Decision Journal" hint="A decision to journal (assumptions + expected outcome get structured)">
-        <input value={journal} onChange={(e) => setJournal(e.target.value)} className={ta} placeholder="e.g. Hire a senior engineer now" />
+        <input value={journal} onChange={(e) => setJournal(e.target.value)} className={ta} placeholder={tx("e.g. Hire a senior engineer now")} />
         <RunButton busy={busy} runKey="jrnl" onClick={() => run("jrnl", "/api/phronesis/decision-journal", { decision: journal })} label="Journal Decision" />
       </StudioSection>
 
       <StudioSection title="6 · Uncertainty" hint="A situation under uncertainty — get options + tail risks">
-        <input value={situation} onChange={(e) => setSituation(e.target.value)} className={ta} placeholder="e.g. Launching into a new market" />
+        <input value={situation} onChange={(e) => setSituation(e.target.value)} className={ta} placeholder={tx("e.g. Launching into a new market")} />
         <RunButton busy={busy} runKey="unc" onClick={() => run("unc", "/api/phronesis/uncertainty", { situation })} label="Assess Uncertainty" />
       </StudioSection>
 
       <StudioSection title="7 · Strategic Diagnosis" hint="A problem — get root causes + leverage points">
-        <input value={problem} onChange={(e) => setProblem(e.target.value)} className={ta} placeholder="e.g. Growth has stalled" />
+        <input value={problem} onChange={(e) => setProblem(e.target.value)} className={ta} placeholder={tx("e.g. Growth has stalled")} />
         <RunButton busy={busy} runKey="diag" onClick={() => run("diag", "/api/phronesis/diagnosis", { problem })} label="Diagnose" />
       </StudioSection>
 

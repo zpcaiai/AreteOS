@@ -2,8 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { STATUS_LIBRARY } from "@/lib/community/statuses";
+import { useTx } from "@/lib/i18n/client";
 
 export function Composer() {
+  const tx = useTx();
   const router = useRouter();
   const [status, setStatus] = useState(STATUS_LIBRARY[0].key);
   const [message, setMessage] = useState("");
@@ -26,17 +28,18 @@ export function Composer() {
           {STATUS_LIBRARY.map((s) => <option key={s.key} value={s.key}>{s.emoji} {s.label}</option>)}
         </select>
       </div>
-      <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder="Share an update with the community…"
+      <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder={tx("Share an update with the community…")}
         className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
       {err && <p className="mt-1 text-sm text-rose-400">{err}</p>}
       <button onClick={post} disabled={busy} className="mt-2 rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium disabled:opacity-50">
-        {busy ? "Posting…" : "Post"}
+        {busy ? tx("Posting…") : tx("Post")}
       </button>
     </div>
   );
 }
 
 export function CommentForm({ postId }: { postId: string }) {
+  const tx = useTx();
   const router = useRouter();
   const [content, setContent] = useState("");
   const [busy, setBusy] = useState(false);
@@ -48,7 +51,7 @@ export function CommentForm({ postId }: { postId: string }) {
   }
   return (
     <div className="mt-2 flex gap-2">
-      <input value={content} onChange={(e) => setContent(e.target.value)} placeholder="Add a comment…"
+      <input value={content} onChange={(e) => setContent(e.target.value)} placeholder={tx("Add a comment…")}
         onKeyDown={(e) => { if (e.key === "Enter") send(); }}
         className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm" />
       <button onClick={send} disabled={busy} className="rounded-lg bg-slate-700 px-3 py-1.5 text-sm disabled:opacity-50">Send</button>

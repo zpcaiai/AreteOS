@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
+import { useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 const DIMS = ["reality","humanNature","meaning","success","failure","responsibility","time","change","risk","purpose"] as const;
 
 
 export default function WorldviewStudio() {
+  const tx = useTx();
   const { busy, error, note, run } = useAgentRun();
   const out = note;
   const [dims, setDims] = useState<Record<string, number>>(Object.fromEntries(DIMS.map((d) => [d, 0.5])));
@@ -55,13 +57,13 @@ export default function WorldviewStudio() {
       </StudioSection>
 
       <StudioSection title="5 · Worldview Simulator" hint="Compare two worldviews' projected outcomes">
-        <input value={wvA} onChange={(e) => setWvA(e.target.value)} className={ta} placeholder="Worldview A (e.g. 'effort alone creates success')" />
-        <input value={wvB} onChange={(e) => setWvB(e.target.value)} className={ta} placeholder="Worldview B (e.g. 'leverage and selection create success')" />
+        <input value={wvA} onChange={(e) => setWvA(e.target.value)} className={ta} placeholder={tx("Worldview A (e.g. 'effort alone creates success')")} />
+        <input value={wvB} onChange={(e) => setWvB(e.target.value)} className={ta} placeholder={tx("Worldview B (e.g. 'leverage and selection create success')")} />
         <RunButton busy={busy} runKey="sim" onClick={() => run("sim", "/api/cosmos/simulator", { worldviewA: wvA, worldviewB: wvB }, (j) => (j.contrast as string) || "Simulated")} label="Simulate" />
       </StudioSection>
 
       <StudioSection title="6 · Twin & Wisdom" hint="Detect drift and distill a personal philosophy">
-        <textarea value={lessons} onChange={(e) => setLessons(e.target.value)} rows={2} className={ta} placeholder="Recent behavior / lessons, one per line" />
+        <textarea value={lessons} onChange={(e) => setLessons(e.target.value)} rows={2} className={ta} placeholder={tx("Recent behavior / lessons, one per line")} />
         <div className="flex gap-2">
           <RunButton busy={busy} runKey="twin" onClick={() => run("twin", "/api/cosmos/twin", { recentBehavior: lines(lessons) }, (j) => ((j.twin as { driftDetected: boolean })?.driftDetected ? "Drift detected" : "No drift"))} label="Worldview Twin" />
           <RunButton busy={busy} runKey="wis" onClick={() => run("wis", "/api/cosmos/wisdom", { lessons: lines(lessons) })} label="Distill Philosophy" />

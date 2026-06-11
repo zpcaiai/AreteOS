@@ -2,11 +2,13 @@
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
 import { ROLES } from "@/lib/archon/levels";
+import { useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 
 
 export default function LeadershipStudio() {
+  const tx = useTx();
   const { busy, error, run } = useAgentRun();
   const [inputs, setInputs] = useState("");
   const [mission, setMission] = useState("");
@@ -50,13 +52,13 @@ export default function LeadershipStudio() {
         <select value={role} onChange={(e) => setRole(e.target.value)} className={ta}>
           {ROLES.map((r) => <option key={r.role} value={r.role}>{r.role} — {r.mindset}</option>)}
         </select>
-        <textarea value={situation} onChange={(e) => setSituation(e.target.value)} rows={2} className={ta} placeholder="Situation…" />
+        <textarea value={situation} onChange={(e) => setSituation(e.target.value)} rows={2} className={ta} placeholder={tx("Situation…")} />
         <RunButton busy={busy} runKey="conv" onClick={() => run("conv", "/api/archon/conversation", { role, situation })} label="Generate Conversation Script" />
       </StudioSection>
 
       <StudioSection title="6 · Future Leaders" hint="Candidate + evidence (one per line)">
-        <input value={candidate} onChange={(e) => setCandidate(e.target.value)} className={ta} placeholder="Candidate name" />
-        <textarea value={evidence} onChange={(e) => setEvidence(e.target.value)} rows={2} className={ta} placeholder="Evidence…" />
+        <input value={candidate} onChange={(e) => setCandidate(e.target.value)} className={ta} placeholder={tx("Candidate name")} />
+        <textarea value={evidence} onChange={(e) => setEvidence(e.target.value)} rows={2} className={ta} placeholder={tx("Evidence…")} />
         <RunButton busy={busy} runKey="fut" onClick={() => run("fut", "/api/archon/future-leader", { candidate, evidence: lines(evidence) })} label="Assess Readiness" />
       </StudioSection>
 

@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
+import { useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 
 
 export default function ManagementStudio() {
+  const tx = useTx();
   const { busy, error, run } = useAgentRun();
   const [reflections, setReflections] = useState("");
   const [activities, setActivities] = useState("");
@@ -43,8 +45,8 @@ export default function ManagementStudio() {
       </StudioSection>
 
       <StudioSection title="3 · Knowledge Capture (SECI)" hint="Topic + expert notes (one per line)">
-        <input value={topic} onChange={(e) => setTopic(e.target.value)} className={ta} placeholder="Topic (e.g. incident triage)" />
-        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className={ta} placeholder="Tacit notes…" />
+        <input value={topic} onChange={(e) => setTopic(e.target.value)} className={ta} placeholder={tx("Topic (e.g. incident triage)")} />
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className={ta} placeholder={tx("Tacit notes…")} />
         <RunButton busy={busy} runKey="cap" onClick={() => run("cap", "/api/oikos/knowledge/capture", { topic, notes: lines(notes) })} label="Capture → Playbook + Prompts" />
       </StudioSection>
 
@@ -76,7 +78,7 @@ export default function ManagementStudio() {
             </label>
           ))}
         </div>
-        <input value={scenario} onChange={(e) => setScenario(e.target.value)} className={ta} placeholder="Scenario (e.g. key engineer leaves)" />
+        <input value={scenario} onChange={(e) => setScenario(e.target.value)} className={ta} placeholder={tx("Scenario (e.g. key engineer leaves)")} />
         <RunButton busy={busy} runKey="stress" onClick={() => run("stress", "/api/oikos/stress-test", { ...frag, scenario, context: [] })} label="Run Stress Test" />
       </StudioSection>
 
@@ -86,7 +88,7 @@ export default function ManagementStudio() {
       </StudioSection>
 
       <StudioSection title="10 · Management Digital Twin" hint="Simulate a change against your modeled org">
-        <input value={scenario} onChange={(e) => setScenario(e.target.value)} className={ta} placeholder="Scenario to simulate" />
+        <input value={scenario} onChange={(e) => setScenario(e.target.value)} className={ta} placeholder={tx("Scenario to simulate")} />
         <div className="flex gap-2">
           <RunButton busy={busy} runKey="twin" onClick={() => run("twin", "/api/oikos/twin/simulate", { scenario })} label="Simulate Twin" />
           <RunButton busy={busy} runKey="coach" onClick={() => run("coach", "/api/oikos/coaching", { context: lines(reflections) })} label="Coaching Plan" />

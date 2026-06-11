@@ -3,10 +3,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { inputCls, lines } from "@/components/studio";
+import { useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 
 export function AssessmentTool() {
+  const tx = useTx();
   const router = useRouter();
   const [reflections, setReflections] = useState("");
   const [mission, setMission] = useState("");
@@ -34,9 +36,9 @@ export function AssessmentTool() {
       <h2 className="text-lg font-bold">Identity Assessment</h2>
       <p className="mt-1 text-sm text-slate-400">Reflect on how you actually spend attention and make decisions — one thought per line.</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
-      <input value={mission} onChange={(e) => setMission(e.target.value)} placeholder="Your mission (optional)" className={`mt-3 ${ta}`} />
-      <textarea value={reflections} onChange={(e) => setReflections(e.target.value)} rows={5} placeholder="Reflections, one per line…" className={`mt-2 ${ta}`} />
-      <button onClick={run} disabled={busy} className="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium disabled:opacity-50">{busy ? "Assessing…" : "Assess my identity"}</button>
+      <input value={mission} onChange={(e) => setMission(e.target.value)} placeholder={tx("Your mission (optional)")} className={`mt-3 ${ta}`} />
+      <textarea value={reflections} onChange={(e) => setReflections(e.target.value)} rows={5} placeholder={tx("Reflections, one per line…")} className={`mt-2 ${ta}`} />
+      <button onClick={run} disabled={busy} className="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium disabled:opacity-50">{busy ? tx("Assessing…") : tx("Assess my identity")}</button>
       {result && (
         <div className="mt-3 rounded-lg border border-indigo-800 bg-indigo-950/30 p-3 text-sm">
           <div className="text-2xl font-bold tabular-nums">{Math.round(result.globalScore * 100)}<span className="text-sm text-slate-500"> / 100</span></div>
@@ -48,6 +50,7 @@ export function AssessmentTool() {
 }
 
 export function StackTool() {
+  const tx = useTx();
   const router = useRouter();
   const [mission, setMission] = useState("");
   const [values, setValues] = useState("");
@@ -81,11 +84,11 @@ export function StackTool() {
       <textarea value={current} onChange={(e) => setCurrent(e.target.value)} rows={2} className={ta} />
       <div className="mt-2 flex flex-wrap gap-2">
         <button disabled={busy !== null} onClick={() => call("stack", "/api/ethos/stack", { mission, values: lines(values), strengths: lines(strengths), current: lines(current) })}
-          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium disabled:opacity-50">{busy === "stack" ? "Building…" : "Build stack"}</button>
+          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium disabled:opacity-50">{busy === "stack" ? tx("Building…") : tx("Build stack")}</button>
         <button disabled={busy !== null} onClick={() => call("rec", "/api/ethos/recommend", { mission, values: lines(values), strengths: lines(strengths) })}
-          className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm hover:bg-slate-700 disabled:opacity-50">{busy === "rec" ? "…" : "Recommend identities"}</button>
+          className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm hover:bg-slate-700 disabled:opacity-50">{busy === "rec" ? "…" : tx("Recommend identities")}</button>
         <button disabled={busy !== null} onClick={() => call("conf", "/api/ethos/conflicts", { identities: lines(current) })}
-          className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm hover:bg-slate-700 disabled:opacity-50">{busy === "conf" ? "…" : "Detect conflicts"}</button>
+          className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm hover:bg-slate-700 disabled:opacity-50">{busy === "conf" ? "…" : tx("Detect conflicts")}</button>
       </div>
       <p className="mt-3 text-xs text-slate-500">Results appear in the <Link href="/ethos/evolution" className="text-indigo-400">Evolution</Link> view.</p>
     </div>
