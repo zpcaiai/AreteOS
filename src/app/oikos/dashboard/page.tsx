@@ -40,7 +40,7 @@ export default async function ManagementDashboard() {
           <p className="mt-1 text-xs text-slate-400">Dependency risk: {Math.round(health.dependencyRisk * 100)}</p>
         </Card>
         <Card title={t("card.org_health_over_time")}>
-          {healthHistory.length > 1 ? <Line values={healthHistory.map((h) => h.healthScore)} color="#10b981" /> : <Empty>Not enough health snapshots yet.</Empty>}
+          {healthHistory.length > 1 ? <Line values={healthHistory.map((h) => h.healthScore)} color="#10b981" /> : <Empty>{t("empty.not_enough_health_snapshots_yet")}</Empty>}
         </Card>
       </div>
 
@@ -58,17 +58,17 @@ export default async function ManagementDashboard() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No knowledge captured yet.</Empty>}
+        ) : <Empty>{t("empty.no_knowledge_captured_yet")}</Empty>}
       </Card>
 
       {fragility && (
         <Card title={t("card.fragility_map")}>
           <div className="mt-1 space-y-2">
-            <ScoreBar label="Founder dependency" value={fragility.founderDependency} />
-            <ScoreBar label="Key-person dependency" value={fragility.keyPersonDependency} />
-            <ScoreBar label="Customer concentration" value={fragility.customerConcentration} />
-            <ScoreBar label="Knowledge concentration" value={fragility.knowledgeConcentration} />
-            <ScoreBar label="Product concentration" value={fragility.productConcentration} />
+            <ScoreBar label={t("score.founder_dependency")} value={fragility.founderDependency} />
+            <ScoreBar label={t("score.key_person_dependency")} value={fragility.keyPersonDependency} />
+            <ScoreBar label={t("score.customer_concentration")} value={fragility.customerConcentration} />
+            <ScoreBar label={t("score.knowledge_concentration")} value={fragility.knowledgeConcentration} />
+            <ScoreBar label={t("score.product_concentration")} value={fragility.productConcentration} />
           </div>
           {fragility.stressTest && <p className="mt-2 text-sm text-amber-400">{fragility.stressTest}</p>}
         </Card>
@@ -77,11 +77,11 @@ export default async function ManagementDashboard() {
       {governance && (
         <Card title={t("card.decision_governance")}>
           <div className="mt-1 space-y-2">
-            <ScoreBar label="Quality" value={governance.quality} />
-            <ScoreBar label="Consistency" value={governance.consistency} />
-            <ScoreBar label="Speed" value={governance.speed} />
-            <ScoreBar label="Ownership" value={governance.ownership} />
-            <ScoreBar label="Learning" value={governance.learning} />
+            <ScoreBar label={t("score.quality")} value={governance.quality} />
+            <ScoreBar label={t("score.consistency")} value={governance.consistency} />
+            <ScoreBar label={t("score.speed")} value={governance.speed} />
+            <ScoreBar label={t("score.ownership")} value={governance.ownership} />
+            <ScoreBar label={t("score.learning")} value={governance.learning} />
           </div>
           {governance.notes && <p className="mt-2 text-sm text-slate-400">{governance.notes}</p>}
         </Card>
@@ -98,7 +98,7 @@ export default async function ManagementDashboard() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No organization designs yet.</Empty>}
+        ) : <Empty>{t("empty.no_organization_designs_yet")}</Empty>}
       </Card>
     </div>
   );

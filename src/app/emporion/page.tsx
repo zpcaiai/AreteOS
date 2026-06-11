@@ -68,7 +68,7 @@ export default async function EmporionPage() {
               </tbody>
             </table>
           </div>
-        ) : <Empty>还没有订单。</Empty>}
+        ) : <Empty>{t("empty.no_orders_yet_alt")}</Empty>}
       </Card>
 
       <p className="mt-4 text-xs text-slate-500">

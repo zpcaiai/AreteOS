@@ -20,10 +20,10 @@ export default async function MissionPage() {
       <PageHeader title={t("page.telos.title")} subtitle={t("page.telos.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
         <Card title={t("card.mission")}>
-          {missions.length ? missions.map((m) => <p key={m.id} className="text-lg">{m.statement}</p>) : <Empty>Define your mission via POST /api/telos</Empty>}
+          {missions.length ? missions.map((m) => <p key={m.id} className="text-lg">{m.statement}</p>) : <Empty>{t("empty.define_your_mission_via_post_api")}</Empty>}
         </Card>
         <Card title={t("card.vision")}>
-          {visions.length ? visions.map((v) => <p key={v.id} className="text-slate-300">{v.statement} <span className="text-xs text-slate-500">({v.horizon})</span></p>) : <Empty>No vision yet.</Empty>}
+          {visions.length ? visions.map((v) => <p key={v.id} className="text-slate-300">{v.statement} <span className="text-xs text-slate-500">({v.horizon})</span></p>) : <Empty>{t("empty.no_vision_yet")}</Empty>}
         </Card>
         <Card title={t("card.life_themes")}>
           <div className="flex flex-wrap gap-2">{themes.map((t) => <span key={t.id} className="rounded-full bg-slate-800 px-3 py-1 text-sm">{t.name}</span>)}</div>

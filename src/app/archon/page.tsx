@@ -34,13 +34,13 @@ export default async function LeadershipPage() {
           <p className="mt-1 text-xs text-slate-400">(Mission × Identity × Vision × Belonging × Readiness) ÷ Blind spots</p>
         </Card>
         <Card title={t("card.leverage")}>
-          <ScoreBar label="Leverage score" value={health.leverageScore} />
-          <ScoreBar label="Vision alignment" value={health.visionAlignment} />
-          <ScoreBar label="Belonging" value={health.belongingScore} />
+          <ScoreBar label={t("score.leverage_score")} value={health.leverageScore} />
+          <ScoreBar label={t("score.vision_alignment")} value={health.visionAlignment} />
+          <ScoreBar label={t("score.belonging")} value={health.belongingScore} />
         </Card>
         <Card title={t("card.maturity_alignment")}>
-          <ScoreBar label="Leadership maturity" value={health.maturity} />
-          <ScoreBar label="Org alignment" value={health.alignmentScore} />
+          <ScoreBar label={t("score.leadership_maturity")} value={health.maturity} />
+          <ScoreBar label={t("score.org_alignment")} value={health.alignmentScore} />
           <Link href="/archon/dashboard" className="mt-3 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">Full dashboard →</Link>
         </Card>
       </div>
@@ -76,7 +76,7 @@ export default async function LeadershipPage() {
             <p className="font-semibold text-white">{vision.statement}</p>
             <p className="mt-1 text-xs text-slate-500">Communicate: {vision.communication}</p>
           </div>
-        ) : <Empty>No vision yet. Create one in the studio below.</Empty>}
+        ) : <Empty>{t("empty.no_vision_yet_create_one_in")}</Empty>}
       </Card>
 
       <div className="mt-6"><LeadershipStudio /></div>

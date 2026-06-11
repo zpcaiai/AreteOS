@@ -40,7 +40,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
               </tbody>
             </table>
           </div>
-        ) : <Empty>无匹配用户</Empty>}
+        ) : <Empty>{t("empty.no_matching_users")}</Empty>}
       </Card>
     </div>
   );

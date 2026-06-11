@@ -17,11 +17,11 @@ export default async function IdentityPage() {
         {identities.length ? identities.map((i) => (
           <Card key={i.id} title={i.name}>
             <p className="text-slate-300">{i.statement || "—"}</p>
-            <div className="mt-3"><ScoreBar label="Clarity" value={i.clarity} /></div>
-            {i.scores[0] && <ScoreBar label="Alignment" value={i.scores[0].alignment} />}
+            <div className="mt-3"><ScoreBar label={t("score.clarity")} value={i.clarity} /></div>
+            {i.scores[0] && <ScoreBar label={t("score.alignment")} value={i.scores[0].alignment} />}
             {i.roles.length > 0 && <div className="mt-2 flex flex-wrap gap-2">{i.roles.map((r) => <span key={r.id} className="rounded-full bg-slate-800 px-2 py-0.5 text-xs">{r.name}</span>)}</div>}
           </Card>
-        )) : <Empty>No identities yet.</Empty>}
+        )) : <Empty>{t("empty.no_identities_yet")}</Empty>}
       </div>
     </div>
   );

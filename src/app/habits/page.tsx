@@ -28,7 +28,7 @@ export default async function HabitsPage() {
               <p className="mt-1 text-xs text-slate-500">Log via POST /api/habits/{h.id}/log</p>
             </Card>
           );
-        }) : <Empty>No habits yet.</Empty>}
+        }) : <Empty>{t("empty.no_habits_yet")}</Empty>}
       </div>
     </div>
   );

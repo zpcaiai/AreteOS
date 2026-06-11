@@ -31,23 +31,23 @@ export default async function SfmPage() {
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.replicationReadiness * 100)}</div>
           <p className="mt-1 text-xs text-slate-400">Can this succeed without the founder in the room?</p>
           <div className="mt-3 space-y-2">
-            <ScoreBar label="Founder independence" value={1 - health.founderDependency} />
-            <ScoreBar label="Repeatability" value={health.repeatability} />
-            <ScoreBar label="Scalability" value={health.scalability} />
+            <ScoreBar label={t("score.founder_independence")} value={1 - health.founderDependency} />
+            <ScoreBar label={t("score.repeatability")} value={health.repeatability} />
+            <ScoreBar label={t("score.scalability")} value={health.scalability} />
           </div>
         </Card>
         <Card title={t("card.organizational_health")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.organizationalHealth * 100)}</div>
           <div className="mt-3 space-y-2">
-            <ScoreBar label="Values alignment" value={health.valuesAlignment} />
-            <ScoreBar label="Decision consistency" value={health.decisionConsistency} />
-            <ScoreBar label="Collaboration" value={health.collaborationQuality} />
+            <ScoreBar label={t("score.values_alignment")} value={health.valuesAlignment} />
+            <ScoreBar label={t("score.decision_consistency")} value={health.decisionConsistency} />
+            <ScoreBar label={t("score.collaboration")} value={health.collaborationQuality} />
           </div>
         </Card>
         <Card title={t("card.leadership_resilience")}>
           <div className="mt-1 space-y-2">
-            <ScoreBar label="Leadership maturity" value={health.leadershipMaturity} />
-            <ScoreBar label="Resilience" value={health.resilience} />
+            <ScoreBar label={t("score.leadership_maturity")} value={health.leadershipMaturity} />
+            <ScoreBar label={t("score.resilience")} value={health.resilience} />
           </div>
           <Link href="/praxis/dashboard" className="mt-4 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">Full dashboard →</Link>
         </Card>
@@ -62,7 +62,7 @@ export default async function SfmPage() {
               <p><span className="text-slate-500">We refuse to:</span> {identity.enemyToAvoid}</p>
               <p><span className="text-slate-500">Customers trust us because:</span> {identity.promiseToCustomer}</p>
             </div>
-          ) : <Empty>No company identity yet. Build one below.</Empty>}
+          ) : <Empty>{t("empty.no_company_identity_yet_build_one")}</Empty>}
         </Card>
         <Card title={t("card.founder_dna")}>
           {founder ? (
@@ -71,7 +71,7 @@ export default async function SfmPage() {
               <p><span className="text-slate-500">Strengths:</span> {founder.strengths.join(", ")}</p>
               <p><span className="text-slate-500">Shadow risks:</span> {founder.shadowRisks.join(", ")}</p>
             </div>
-          ) : <Empty>No founder profile yet. Run the Founder DNA interview below.</Empty>}
+          ) : <Empty>{t("empty.no_founder_profile_yet_run_the")}</Empty>}
         </Card>
       </div>
 

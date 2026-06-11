@@ -35,30 +35,30 @@ export default async function ChildDashboard({ params }: { params: Promise<{ id:
           <p className="mt-1 text-xs text-slate-400">Geometric mean — every capability counts.</p>
         </Card>
         <Card title={t("card.capabilities")}>
-          <ScoreBar label="Explorer (curiosity)" value={health.explorer} />
-          <ScoreBar label="Creator (creativity)" value={health.creator} />
-          <ScoreBar label="Problem solver" value={health.problemSolver} />
+          <ScoreBar label={t("score.explorer_curiosity")} value={health.explorer} />
+          <ScoreBar label={t("score.creator_creativity")} value={health.creator} />
+          <ScoreBar label={t("score.problem_solver")} value={health.problemSolver} />
         </Card>
         <Card title={t("card.character_support")}>
-          <ScoreBar label="Resilience" value={health.resilience} />
-          <ScoreBar label="Autonomy (agency)" value={health.autonomy} />
-          <ScoreBar label="Growth mindset" value={health.growthMindset} />
-          <ScoreBar label="Parent support" value={health.parentSupport} />
+          <ScoreBar label={t("score.resilience")} value={health.resilience} />
+          <ScoreBar label={t("score.autonomy_agency")} value={health.autonomy} />
+          <ScoreBar label={t("score.growth_mindset")} value={health.growthMindset} />
+          <ScoreBar label={t("score.parent_support")} value={health.parentSupport} />
         </Card>
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title={t("card.today_s_questions")}>
-          {questions.length ? <ul className="space-y-1 text-sm text-slate-300">{questions.filter((q) => q.question).map((q) => <li key={q.id} className="border-t border-slate-800 pt-1">{q.question}</li>)}</ul> : <Empty>No questions logged yet.</Empty>}
+          {questions.length ? <ul className="space-y-1 text-sm text-slate-300">{questions.filter((q) => q.question).map((q) => <li key={q.id} className="border-t border-slate-800 pt-1">{q.question}</li>)}</ul> : <Empty>{t("empty.no_questions_logged_yet")}</Empty>}
         </Card>
         <Card title={t("card.projects_in_progress")}>
-          {projects.length ? <ul className="space-y-1 text-sm text-slate-300">{projects.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.title} <span className="text-xs text-slate-500">({p.status})</span></li>)}</ul> : <Empty>No projects yet.</Empty>}
+          {projects.length ? <ul className="space-y-1 text-sm text-slate-300">{projects.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.title} <span className="text-xs text-slate-500">({p.status})</span></li>)}</ul> : <Empty>{t("empty.no_projects_yet")}</Empty>}
         </Card>
       </div>
 
       {env && (
         <Card title={t("card.learning_environment_parent")}>
-          <ScoreBar label="Environment quality" value={env.qualityScore} />
+          <ScoreBar label={t("score.environment_quality")} value={env.qualityScore} />
           {env.upgradePlan.length > 0 && <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-slate-400">{env.upgradePlan.map((u, i) => <li key={i}>{u}</li>)}</ul>}
         </Card>
       )}

@@ -40,7 +40,7 @@ export default async function AdminCommunity() {
             </ul>
           )}
         </Card>
-      )) : <Empty>暂无社区内容</Empty>}
+      )) : <Empty>{t("empty.no_community_content_yet")}</Empty>}
     </div>
   );
 }

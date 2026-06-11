@@ -35,7 +35,7 @@ export default async function ChildHub() {
               </Link>
             ))}
           </div>
-        ) : <Empty>No children yet — add one above to begin.</Empty>}
+        ) : <Empty>{t("empty.no_children_yet_add_one_above")}</Empty>}
       </Card>
     </div>
   );

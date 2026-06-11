@@ -32,7 +32,7 @@ export default async function AdminOrders() {
               </tbody>
             </table>
           </div>
-        ) : <Empty>暂无订单</Empty>}
+        ) : <Empty>{t("empty.no_orders_yet")}</Empty>}
       </Card>
     </div>
   );

@@ -31,14 +31,14 @@ export default async function ManagementPage() {
           {profile && <p className="mt-2 text-sm text-indigo-300">Maturity: {profile.level.replace(/_/g, " ")}</p>}
         </Card>
         <Card title={t("card.leverage_knowledge")}>
-          <ScoreBar label="Leverage" value={health.leverageScore} />
-          <ScoreBar label="Knowledge-worker effectiveness" value={health.knowledge} />
-          <ScoreBar label="Decision governance" value={health.decisionQuality} />
+          <ScoreBar label={t("score.leverage")} value={health.leverageScore} />
+          <ScoreBar label={t("score.knowledge_worker_effectiveness")} value={health.knowledge} />
+          <ScoreBar label={t("score.decision_governance")} value={health.decisionQuality} />
         </Card>
         <Card title={t("card.health_resilience")}>
-          <ScoreBar label="Org health" value={health.healthScore} />
-          <ScoreBar label="Resilience (anti-fragility)" value={health.resilience} />
-          <ScoreBar label="Dependency risk" value={health.dependencyRisk} />
+          <ScoreBar label={t("score.org_health")} value={health.healthScore} />
+          <ScoreBar label={t("score.resilience_anti_fragility")} value={health.resilience} />
+          <ScoreBar label={t("score.dependency_risk")} value={health.dependencyRisk} />
           <Link href="/oikos/dashboard" className="mt-3 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">Full dashboard →</Link>
         </Card>
       </div>

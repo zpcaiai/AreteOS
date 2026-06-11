@@ -38,7 +38,7 @@ export default async function LearningPathPage() {
             );
           })}
         </div>
-      ) : <Empty>No learning paths yet. Create an adaptation, then "Generate learning path".</Empty>}
+      ) : <Empty>{t("empty.no_learning_paths_yet_create_an")}</Empty>}
     </div>
   );
 }

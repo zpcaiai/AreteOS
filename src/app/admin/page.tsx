@@ -40,7 +40,7 @@ export default async function AdminHome() {
                 </li>
               ))}
             </ul>
-          ) : <Empty>暂无订单</Empty>}
+          ) : <Empty>{t("empty.no_orders_yet")}</Empty>}
           <Link href="/admin/orders" className="mt-2 inline-block text-xs text-indigo-400">全部订单 →</Link>
         </Card>
         <Card title={t("card.recent_signups")}>
@@ -53,7 +53,7 @@ export default async function AdminHome() {
                 </li>
               ))}
             </ul>
-          ) : <Empty>暂无用户</Empty>}
+          ) : <Empty>{t("empty.no_users_yet")}</Empty>}
           <Link href="/admin/users" className="mt-2 inline-block text-xs text-indigo-400">全部用户 →</Link>
         </Card>
       </div>

@@ -27,9 +27,9 @@ export default async function IdentityLibraryPage() {
           <p className="mt-1 text-xs text-slate-400">Clarity × Alignment × Stability × Conflict-resolution × Evolution × Integration</p>
         </Card>
         <Card title={t("card.your_identity_health")}>
-          <ScoreBar label="Clarity" value={profile.clarity} />
-          <ScoreBar label="Stability" value={profile.stability} />
-          <ScoreBar label="Integration" value={profile.integration} />
+          <ScoreBar label={t("score.clarity")} value={profile.clarity} />
+          <ScoreBar label={t("score.stability")} value={profile.stability} />
+          <ScoreBar label={t("score.integration")} value={profile.integration} />
         </Card>
         <Card title={t("card.get_started")}>
           <div className="flex flex-col gap-2 text-sm">

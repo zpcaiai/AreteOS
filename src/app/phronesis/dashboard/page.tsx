@@ -42,7 +42,7 @@ export default async function CognitiveDashboard() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No journaled decisions yet.</Empty>}
+        ) : <Empty>{t("empty.no_journaled_decisions_yet")}</Empty>}
       </Card>
 
       <Card title={t("card.recent_bias_events")}>
@@ -50,15 +50,15 @@ export default async function CognitiveDashboard() {
           <ul className="space-y-1 text-sm text-slate-300">
             {biasEvents.map((b) => <li key={b.id} className="border-t border-slate-800 pt-1"><span className="text-amber-400">{b.biasName}</span> <span className="text-xs text-slate-500">sev {Math.round(b.severity * 100)}</span></li>)}
           </ul>
-        ) : <Empty>No biases flagged yet.</Empty>}
+        ) : <Empty>{t("empty.no_biases_flagged_yet")}</Empty>}
       </Card>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title={t("card.wisdom_insights")}>
-          {insights.length ? <ul className="space-y-1 text-sm text-slate-300">{insights.map((i) => <li key={i.id} className="border-t border-slate-800 pt-1">{i.insight}</li>)}</ul> : <Empty>No insights yet.</Empty>}
+          {insights.length ? <ul className="space-y-1 text-sm text-slate-300">{insights.map((i) => <li key={i.id} className="border-t border-slate-800 pt-1">{i.insight}</li>)}</ul> : <Empty>{t("empty.no_insights_yet")}</Empty>}
         </Card>
         <Card title={t("card.personal_principles")}>
-          {principles.length ? <ul className="space-y-1 text-sm text-slate-300">{principles.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.principle}</li>)}</ul> : <Empty>No principles yet.</Empty>}
+          {principles.length ? <ul className="space-y-1 text-sm text-slate-300">{principles.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.principle}</li>)}</ul> : <Empty>{t("empty.no_principles_yet")}</Empty>}
         </Card>
       </div>
 

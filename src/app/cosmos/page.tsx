@@ -31,13 +31,13 @@ export default async function WorldviewPage() {
           <p className="mt-2 text-sm text-indigo-300">Stage: {String(health.stage).replace(/_/g, " ")}</p>
         </Card>
         <Card title={t("card.worldview_health")}>
-          <ScoreBar label="Clarity" value={health.clarity} />
-          <ScoreBar label="Coherence" value={health.coherence} />
-          <ScoreBar label="Assumption awareness" value={health.assumptionAwareness} />
+          <ScoreBar label={t("score.clarity")} value={health.clarity} />
+          <ScoreBar label={t("score.coherence")} value={health.coherence} />
+          <ScoreBar label={t("score.assumption_awareness")} value={health.assumptionAwareness} />
         </Card>
         <Card title={t("card.meaning_wisdom")}>
-          <ScoreBar label="Meaning" value={health.meaningScore} />
-          <ScoreBar label="Wisdom" value={health.wisdom} />
+          <ScoreBar label={t("score.meaning")} value={health.meaningScore} />
+          <ScoreBar label={t("score.wisdom")} value={health.wisdom} />
           <div className="mt-3 flex gap-2 text-xs">
             <Link href="/cosmos/archetypes" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Archetypes</Link>
             <Link href="/cosmos/dashboard" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Dashboard</Link>
@@ -61,7 +61,7 @@ export default async function WorldviewPage() {
         </Card>
       )}
 
-      {!worldview && !profile && <Empty>No worldview profile yet — analyze above or use the studio below.</Empty>}
+      {!worldview && !profile && <Empty>{t("empty.no_worldview_profile_yet_analyze_above")}</Empty>}
 
       <div className="mt-6"><WorldviewStudio /></div>
     </div>

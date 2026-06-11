@@ -28,7 +28,7 @@ export default async function BeliefsPage() {
               </div>
             ))}
           </Card>
-        )) : <Empty>No beliefs analyzed yet.</Empty>}
+        )) : <Empty>{t("empty.no_beliefs_analyzed_yet")}</Empty>}
       </div>
     </div>
   );

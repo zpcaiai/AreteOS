@@ -38,7 +38,7 @@ export default async function AdaptationPage() {
             </Card>
           ))}
         </div>
-      ) : <Empty>No adaptations yet. Go to the Library, open a genius, and click "Adapt this blueprint to me".</Empty>}
+      ) : <Empty>{t("empty.no_adaptations_yet_go_to_the")}</Empty>}
     </div>
   );
 }

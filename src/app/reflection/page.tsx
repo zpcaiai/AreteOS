@@ -24,7 +24,7 @@ export default async function ReflectionPage() {
             </div>
             {r.lessons.length > 0 && <ul className="mt-3 list-disc pl-5 text-sm text-slate-300">{r.lessons.map((l) => <li key={l.id}>{l.text}</li>)}</ul>}
           </Card>
-        )) : <Empty>No reflections yet. POST /api/reflection to add one (runs ReflectionGuide).</Empty>}
+        )) : <Empty>{t("empty.no_reflections_yet_post_api_reflection")}</Empty>}
       </div>
     </div>
   );

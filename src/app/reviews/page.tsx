@@ -20,7 +20,7 @@ export default async function ReviewsPage() {
           <Card key={r.id} title={`${r.period} · ${r.periodKey}`}>
             <pre className="whitespace-pre-wrap font-sans text-sm text-slate-300">{r.summary}</pre>
           </Card>
-        )) : <Empty>No reviews yet — generate one above.</Empty>}
+        )) : <Empty>{t("empty.no_reviews_yet_generate_one_above")}</Empty>}
       </div>
     </div>
   );

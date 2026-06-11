@@ -55,20 +55,20 @@ export default async function DashboardPage() {
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title={t("card.direction_thinking")}>
-          <ScoreBar label="Mission Alignment" value={scores.missionAlignment} />
-          <ScoreBar label="Identity Alignment" value={scores.identityAlignment} />
-          <ScoreBar label="Value Integrity" value={scores.valueIntegrity} />
-          <ScoreBar label="Mental Model Usage" value={scores.mentalModelUsage} />
-          <ScoreBar label="First Principle" value={scores.firstPrinciple} />
-          <ScoreBar label="Decision Quality" value={scores.decisionQuality} />
+          <ScoreBar label={t("score.mission_alignment")} value={scores.missionAlignment} />
+          <ScoreBar label={t("score.identity_alignment")} value={scores.identityAlignment} />
+          <ScoreBar label={t("score.value_integrity")} value={scores.valueIntegrity} />
+          <ScoreBar label={t("score.mental_model_usage")} value={scores.mentalModelUsage} />
+          <ScoreBar label={t("score.first_principle")} value={scores.firstPrinciple} />
+          <ScoreBar label={t("score.decision_quality")} value={scores.decisionQuality} />
         </Card>
         <Card title={t("card.execution_contribution")}>
-          <ScoreBar label="Habit Consistency" value={scores.habitConsistency} />
-          <ScoreBar label="Mastery" value={scores.mastery} />
-          <ScoreBar label="Leadership" value={scores.leadership} />
-          <ScoreBar label="Legacy" value={scores.legacy} />
-          <ScoreBar label="Reflection" value={scores.reflection} />
-          <ScoreBar label="Growth" value={scores.growth} />
+          <ScoreBar label={t("score.habit_consistency")} value={scores.habitConsistency} />
+          <ScoreBar label={t("score.mastery")} value={scores.mastery} />
+          <ScoreBar label={t("score.leadership")} value={scores.leadership} />
+          <ScoreBar label={t("score.legacy")} value={scores.legacy} />
+          <ScoreBar label={t("score.reflection")} value={scores.reflection} />
+          <ScoreBar label={t("score.growth")} value={scores.growth} />
         </Card>
       </div>
     </div>

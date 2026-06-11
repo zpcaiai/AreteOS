@@ -23,7 +23,7 @@ export default async function TwinPage() {
       <div className="grid gap-5 lg:grid-cols-2">
         <Card title={t("card.current_twin")}>
           <p className="text-sm text-slate-300">Stage: <span className="font-medium">{stage.current}</span></p>
-          <div className="mt-3"><ScoreBar label="Growth" value={scores.growth} /><ScoreBar label="Identity alignment" value={scores.identityAlignment} /><ScoreBar label="Habit consistency" value={scores.habitConsistency} /></div>
+          <div className="mt-3"><ScoreBar label={t("score.growth")} value={scores.growth} /><ScoreBar label={t("score.identity_alignment")} value={scores.identityAlignment} /><ScoreBar label={t("score.habit_consistency")} value={scores.habitConsistency} /></div>
         </Card>
         <Card title={t("card.simulate_a_scenario")}>
           <AnalyzeBox endpoint="/api/twin" mode="scenario" placeholder="e.g. Take a manager role / move cities / drop the side project…" button="Simulate" />
@@ -39,10 +39,10 @@ export default async function TwinPage() {
         <Card title={t("card.drift_predictions")}>
           {drifts.length ? drifts.map((d) => (
             <div key={d.id} className="mb-2"><ScoreBar label={d.towardIdentity || "drift risk"} value={d.risk} />{d.rationale && <p className="text-xs text-slate-400">{d.rationale}</p>}</div>
-          )) : <Empty>No drift predictions yet.</Empty>}
+          )) : <Empty>{t("empty.no_drift_predictions_yet")}</Empty>}
         </Card>
         <Card title={t("card.twin_insights")}>
-          {insights.length ? <ul className="space-y-2 text-sm text-slate-300">{insights.map((i) => <li key={i.id}>· {i.insight}</li>)}</ul> : <Empty>Run a simulation to generate insights.</Empty>}
+          {insights.length ? <ul className="space-y-2 text-sm text-slate-300">{insights.map((i) => <li key={i.id}>· {i.insight}</li>)}</ul> : <Empty>{t("empty.run_a_simulation_to_generate_insights")}</Empty>}
         </Card>
       </div>
     </div>

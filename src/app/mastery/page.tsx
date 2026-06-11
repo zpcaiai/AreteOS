@@ -21,14 +21,14 @@ export default async function MasteryPage() {
           return (
             <Card key={s.id} title={`${s.name} · ${m?.stage ?? "NOVICE"}`}>
               <p className="text-xs text-slate-500">{s.domain}</p>
-              <div className="mt-3"><ScoreBar label="Mastery" value={score} /></div>
+              <div className="mt-3"><ScoreBar label={t("score.mastery")} value={score} /></div>
               {m && <div className="mt-2 grid grid-cols-2 gap-x-4 text-xs text-slate-400">
                 <span>Knowledge {Math.round(m.knowledge*100)}</span><span>Execution {Math.round(m.execution*100)}</span>
                 <span>Problem-solving {Math.round(m.problemSolving*100)}</span><span>Teaching {Math.round(m.teaching*100)}</span>
               </div>}
             </Card>
           );
-        }) : <Empty>No skills tracked yet.</Empty>}
+        }) : <Empty>{t("empty.no_skills_tracked_yet")}</Empty>}
       </div>
     </div>
   );

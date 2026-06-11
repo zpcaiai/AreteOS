@@ -38,7 +38,7 @@ export default async function LeadershipDashboard() {
           <div className="text-5xl font-bold tabular-nums">{Math.round(health.globalLeadershipScore * 100)}<span className="text-lg text-slate-500"> / 100</span></div>
         </Card>
         <Card title={t("card.vision_alignment_over_time")}>
-          {visionHistory.length > 1 ? <Line values={visionHistory.map((v) => v.alignmentScore)} color="#10b981" /> : <Empty>Not enough vision snapshots yet.</Empty>}
+          {visionHistory.length > 1 ? <Line values={visionHistory.map((v) => v.alignmentScore)} color="#10b981" /> : <Empty>{t("empty.not_enough_vision_snapshots_yet")}</Empty>}
           {vision && <p className="mt-2 text-sm text-slate-300">{vision.statement}</p>}
         </Card>
       </div>
@@ -56,11 +56,11 @@ export default async function LeadershipDashboard() {
                   <span className="font-medium text-slate-200">{p.candidate}</span>
                   <span className="tabular-nums text-emerald-400">{Math.round(p.readinessScore * 100)}</span>
                 </div>
-                <ScoreBar label="Readiness" value={p.readinessScore} />
+                <ScoreBar label={t("score.readiness")} value={p.readinessScore} />
               </div>
             ))}
           </div>
-        ) : <Empty>No candidates assessed yet.</Empty>}
+        ) : <Empty>{t("empty.no_candidates_assessed_yet")}</Empty>}
       </Card>
 
       <Card title={t("card.role_transformation_plans")}>
@@ -73,7 +73,7 @@ export default async function LeadershipDashboard() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No role-transformation plans yet.</Empty>}
+        ) : <Empty>{t("empty.no_role_transformation_plans_yet")}</Empty>}
       </Card>
 
       {blueprint && (

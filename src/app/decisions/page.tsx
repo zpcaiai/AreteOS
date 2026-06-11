@@ -24,11 +24,11 @@ export default async function DecisionsPage() {
             <div className="mt-2 flex flex-wrap gap-2">
               {d.options.map((o) => <span key={o.id} className={`rounded-full px-3 py-1 text-xs ${o.chosen ? "bg-emerald-700" : "bg-slate-800"}`}>{o.label}</span>)}
             </div>
-            {d.quality != null && <div className="mt-3"><ScoreBar label="Decision Quality" value={d.quality} /></div>}
+            {d.quality != null && <div className="mt-3"><ScoreBar label={t("score.decision_quality")} value={d.quality} /></div>}
             {d.reviews[0]?.note && <p className="mt-1 text-sm text-slate-400">{d.reviews[0].note}</p>}
             <p className="mt-2 text-xs text-slate-500">Status: {d.status} · review via POST /api/decisions/{d.id}/review</p>
           </Card>
-        )) : <Empty>No decisions yet.</Empty>}
+        )) : <Empty>{t("empty.no_decisions_yet")}</Empty>}
       </div>
     </div>
   );

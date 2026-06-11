@@ -26,14 +26,14 @@ export default async function CognitivePage() {
           <p className="mt-1 text-xs text-slate-400">(Model diversity × Judgment × Decision quality × Bias resistance × Reflection × Wisdom) ÷ Blind spots</p>
         </Card>
         <Card title={t("card.judgment_models")}>
-          <ScoreBar label="Judgment" value={h.judgmentScore} />
-          <ScoreBar label="Model diversity" value={h.modelDiversity} />
-          <ScoreBar label="Bias resistance" value={h.biasResistance} />
+          <ScoreBar label={t("score.judgment")} value={h.judgmentScore} />
+          <ScoreBar label={t("score.model_diversity")} value={h.modelDiversity} />
+          <ScoreBar label={t("score.bias_resistance")} value={h.biasResistance} />
         </Card>
         <Card title={t("card.decisions_wisdom")}>
-          <ScoreBar label="Decision quality" value={h.decisionQuality} />
-          <ScoreBar label="Reflection" value={h.reflection} />
-          <ScoreBar label="Wisdom" value={h.wisdom} />
+          <ScoreBar label={t("score.decision_quality")} value={h.decisionQuality} />
+          <ScoreBar label={t("score.reflection")} value={h.reflection} />
+          <ScoreBar label={t("score.wisdom")} value={h.wisdom} />
           <div className="mt-3 flex gap-2 text-xs">
             <Link href="/phronesis/models" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Model library</Link>
             <Link href="/phronesis/dashboard" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Dashboard</Link>
@@ -53,7 +53,7 @@ export default async function CognitivePage() {
                   </li>
                 ))}
               </ul>
-            ) : <Empty>Log model usage to unlock latticework recommendations.</Empty>}
+            ) : <Empty>{t("empty.log_model_usage_to_unlock_latticework")}</Empty>}
           </Card>
           <Card title={t("card.latticework_gaps")}>
             {graph.gaps.length ? (
@@ -66,7 +66,7 @@ export default async function CognitivePage() {
                   </li>
                 ))}
               </ul>
-            ) : <Empty>Every major discipline is covered — strong latticework.</Empty>}
+            ) : <Empty>{t("empty.every_major_discipline_is_covered_strong")}</Empty>}
           </Card>
           <Card title={t("card.unresolved_value_tensions")}>
             {graph.tensions.length ? (
@@ -78,7 +78,7 @@ export default async function CognitivePage() {
                   </li>
                 ))}
               </ul>
-            ) : <Empty>No unresolved value conflicts on record.</Empty>}
+            ) : <Empty>{t("empty.no_unresolved_value_conflicts_on_record")}</Empty>}
           </Card>
         </div>
       )}

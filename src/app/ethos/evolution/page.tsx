@@ -40,7 +40,7 @@ export default async function EvolutionPage() {
               </div>
             ))}
           </div>
-        ) : <Empty>No stack yet — build one in the Stack tab.</Empty>}
+        ) : <Empty>{t("empty.no_stack_yet_build_one_in")}</Empty>}
       </Card>
 
       <Card title={t("card.conflicts")}>
@@ -54,7 +54,7 @@ export default async function EvolutionPage() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No conflicts detected.</Empty>}
+        ) : <Empty>{t("empty.no_conflicts_detected")}</Empty>}
       </Card>
 
       <Card title={t("card.evolution_timeline")}>
@@ -67,7 +67,7 @@ export default async function EvolutionPage() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No evolution snapshots yet.</Empty>}
+        ) : <Empty>{t("empty.no_evolution_snapshots_yet")}</Empty>}
       </Card>
     </div>
   );

@@ -55,7 +55,7 @@ export default async function CommunityPage() {
             </div>
           ))}
         </div>
-      ) : <Empty>No posts yet — be the first to share a status.</Empty>}
+      ) : <Empty>{t("empty.no_posts_yet_be_the_first")}</Empty>}
     </div>
   );
 }

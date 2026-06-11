@@ -42,7 +42,7 @@ export default async function TimelinePage() {
           const vals = byKind(kind);
           return (
             <Card key={kind} title={label}>
-              {vals.length > 1 ? <Line values={vals} color={color} /> : <Empty>Not enough history.</Empty>}
+              {vals.length > 1 ? <Line values={vals} color={color} /> : <Empty>{t("empty.not_enough_history")}</Empty>}
             </Card>
           );
         })}
@@ -81,11 +81,11 @@ export default async function TimelinePage() {
               {[...byIdentity.entries()].map(([name, vals]) => (
                 <div key={name}>
                   <div className="mb-1 text-sm font-medium">{name}</div>
-                  {vals.length > 1 ? <Line values={vals} color="#a855f7" /> : <Empty>One data point so far.</Empty>}
+                  {vals.length > 1 ? <Line values={vals} color="#a855f7" /> : <Empty>{t("empty.one_data_point_so_far")}</Empty>}
                 </div>
               ))}
             </div>
-          ) : <Empty>No identity alignment history yet.</Empty>}
+          ) : <Empty>{t("empty.no_identity_alignment_history_yet")}</Empty>}
         </Card>
       </div>
     </div>

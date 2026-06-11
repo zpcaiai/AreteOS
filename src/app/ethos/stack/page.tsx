@@ -29,7 +29,7 @@ export default async function StackPage() {
               </div>
             ))}
           </div>
-        ) : <Empty>No stack yet — build one above.</Empty>}
+        ) : <Empty>{t("empty.no_stack_yet_build_one_above")}</Empty>}
       </Card>
       {recs.length > 0 && (
         <Card title={t("card.recommended_identities")}>

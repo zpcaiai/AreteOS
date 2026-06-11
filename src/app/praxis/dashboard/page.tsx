@@ -60,7 +60,7 @@ export default async function SfmDashboard() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No open bottlenecks recorded.</Empty>}
+        ) : <Empty>{t("empty.no_open_bottlenecks_recorded")}</Empty>}
       </Card>
 
       <Card title={t("card.replication_playbooks")}>
@@ -74,7 +74,7 @@ export default async function SfmDashboard() {
               </li>
             ))}
           </ul>
-        ) : <Empty>No playbooks generated yet.</Empty>}
+        ) : <Empty>{t("empty.no_playbooks_generated_yet")}</Empty>}
       </Card>
     </div>
   );

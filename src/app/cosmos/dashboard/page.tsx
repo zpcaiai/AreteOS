@@ -46,9 +46,9 @@ export default async function WorldviewDashboard() {
       {meaning && (
         <Card title={t("card.meaning_profile")}>
           <div className="mt-1 space-y-2">
-            <ScoreBar label="Work" value={meaning.work} /><ScoreBar label="Learning" value={meaning.learning} />
-            <ScoreBar label="Relationships" value={meaning.relationships} /><ScoreBar label="Contribution" value={meaning.contribution} />
-            <ScoreBar label="Mastery" value={meaning.mastery} /><ScoreBar label="Legacy" value={meaning.legacy} />
+            <ScoreBar label={t("score.work")} value={meaning.work} /><ScoreBar label={t("score.learning")} value={meaning.learning} />
+            <ScoreBar label={t("score.relationships")} value={meaning.relationships} /><ScoreBar label={t("score.contribution")} value={meaning.contribution} />
+            <ScoreBar label={t("score.mastery")} value={meaning.mastery} /><ScoreBar label={t("score.legacy")} value={meaning.legacy} />
           </div>
         </Card>
       )}
@@ -62,15 +62,15 @@ export default async function WorldviewDashboard() {
               {c.resolution && <div className="text-xs text-emerald-400">Resolve: {c.resolution}</div>}
             </li>
           ))}</ul>
-        ) : <Empty>No conflicts recorded.</Empty>}
+        ) : <Empty>{t("empty.no_conflicts_recorded")}</Empty>}
       </Card>
 
       <Card title={t("card.personal_principles")}>
-        {principles.length ? <ul className="space-y-1 text-sm text-slate-300">{principles.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.principle}</li>)}</ul> : <Empty>No principles distilled yet.</Empty>}
+        {principles.length ? <ul className="space-y-1 text-sm text-slate-300">{principles.map((p) => <li key={p.id} className="border-t border-slate-800 pt-1">{p.principle}</li>)}</ul> : <Empty>{t("empty.no_principles_distilled_yet")}</Empty>}
       </Card>
 
       <Card title={t("card.evolution_timeline")}>
-        {timeline.length ? <ul className="space-y-1 text-sm text-slate-300">{timeline.map((t) => <li key={t.id} className="flex justify-between border-t border-slate-800 pt-1"><span>{String(t.stage).replace(/_/g," ")} · {t.note}</span><span className="text-xs text-slate-600">{new Date(t.createdAt).toLocaleDateString()}</span></li>)}</ul> : <Empty>No evolution entries yet.</Empty>}
+        {timeline.length ? <ul className="space-y-1 text-sm text-slate-300">{timeline.map((t) => <li key={t.id} className="flex justify-between border-t border-slate-800 pt-1"><span>{String(t.stage).replace(/_/g," ")} · {t.note}</span><span className="text-xs text-slate-600">{new Date(t.createdAt).toLocaleDateString()}</span></li>)}</ul> : <Empty>{t("empty.no_evolution_entries_yet")}</Empty>}
       </Card>
     </div>
   );
