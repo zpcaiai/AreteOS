@@ -11,6 +11,7 @@ import type { DictKey } from "@/lib/i18n/dictionaries";
 const GROUPS: { title: string; titleKey?: DictKey; items: { href: string; label: string; labelKey?: DictKey }[] }[] = [
   { title: "", items: [
     { href: "/dashboard", label: "Dashboard", labelKey: "nav.dashboard" },
+    { href: "/growth-map", label: "Growth Map" },
     { href: "/coach", label: "AI Coach", labelKey: "nav.coach" },
   ]},
   { title: "Childhood", titleKey: "nav.childhood", items: [
@@ -41,6 +42,7 @@ const GROUPS: { title: string; titleKey?: DictKey; items: { href: string; label:
     { href: "/habits", label: "Habits" },
     { href: "/mastery", label: "Mastery" },
     { href: "/reflection", label: "Reflection" },
+    { href: "/memory-deck", label: "Memory Deck" },
     { href: "/legacy", label: "Legacy" },
   ]},
   { title: "Organization", titleKey: "nav.organization", items: [

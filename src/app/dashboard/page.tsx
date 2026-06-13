@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { computeScoresCached } from "@/lib/analytics";
 import { Card, ScoreBar, PageHeader } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
+import GrowthPlanet from "@/components/GrowthPlanet";
 
 export const metadata = { title: "Dashboard" };
 
@@ -23,6 +24,10 @@ export default async function DashboardPage() {
   return (
     <div>
       <PageHeader title={t("dashboard.title")} subtitle={t("dashboard.subtitle")} />
+
+      <div className="mb-5">
+        <GrowthPlanet />
+      </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title={t("dashboard.globalScore")}>
