@@ -6,6 +6,7 @@ import { getDict } from "@/lib/i18n/server";
 import GrowthPlanet from "@/components/GrowthPlanet";
 import JourneyTiles from "@/components/JourneyTiles";
 import WeeklyCardBanner from "@/components/WeeklyCardBanner";
+import NextActionBanner from "@/components/NextActionBanner";
 
 export const metadata = { title: "Dashboard" };
 
@@ -26,6 +27,10 @@ export default async function DashboardPage() {
   return (
     <div>
       <PageHeader title={t("dashboard.title")} subtitle={t("dashboard.subtitle")} />
+
+      <div className="mb-5">
+        <NextActionBanner />
+      </div>
 
       <div className="mb-5">
         <WeeklyCardBanner />
