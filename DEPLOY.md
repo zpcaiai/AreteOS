@@ -130,3 +130,23 @@ Put the resulting `https://<ui>.vercel.app` into the Space's `APP_CORS_ORIGINS`,
 - **R2DBC + Neon**: use the **direct** (non-pooler) host and keep `?sslMode=require`.
 - **HF cold start**: free Spaces sleep; first request after idle is slow.
 - **AI**: `AI_PROVIDER=mock` runs the whole Arete app with no API keys; switch to `openai`/`anthropic` + key to go live.
+
+## Weekly growth cards (server crontab)
+
+The weekly growth-card push runs over HTTP via the secret-protected endpoint
+`POST /api/cron/weekly` (auth: `CRON_SECRET`), so it works regardless of the local
+toolchain and shares logic with `npm run weekly`.
+
+Setup (on the machine/host that runs or can reach the app):
+
+1. `.env` already has a generated `CRON_SECRET`; set `APP_URL` to your running app's
+   base URL (defaults to `http://localhost:3000`). The app must be running/reachable.
+2. Test the trigger manually: `scripts/weekly-cron.sh` — it prints the JSON
+   `{ ranAt, users, generated, failed }`.
+3. Install the weekly cron (Mondays 09:00 local), secrets stay in `.env`:
+
+   ```
+   ( crontab -l 2>/dev/null; echo '0 9 * * 1 /Users/stephen/Documents/Projects/python/emotions/AreteOS/scripts/weekly-cron.sh >> /tmp/areteos-weekly.log 2>&1' ) | crontab -
+   ```
+
+Logs go to `/tmp/areteos-weekly.log`. To verify it's installed: `crontab -l`.

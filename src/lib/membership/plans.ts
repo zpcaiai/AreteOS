@@ -30,6 +30,15 @@ export const FEATURES: Record<string, number> = {
   digital_twin: 2, excellence_adapt: 2, knowledge_graph: 2, nightly_reports: 2, quarterly_review: 2,
   sfm: 2, leadership: 2, management: 2, cognitive: 2, child: 2,
   naval: 2,
+  // Innovation engines (2026-06)
+  council: 2, future_self: 2, graph_path: 2,
+  narrative: 1, evidence: 1, experiments: 1,
+  // Orchestration engines (2026-06)
+  bottleneck: 1, prescription: 1, growth_protocol: 1, boardroom: 2,
+  identity_tree: 1, asset_growth: 1, life_capital: 1, personal_os: 2,
+  // Skills Library (2026-06): 20 engines
+  skill_specific_knowledge: 1, skill_principle_centered_life: 1, skill_deliberate_practice: 1, skill_double_loop_learning: 1, skill_flow_state: 1, skill_intrinsic_motivation: 1, skill_deep_work: 1, skill_growth_mindset: 1, skill_behavior_design: 1, skill_identity_based_habit: 1, skill_mastery_learning: 1, skill_experiential_learning: 1,
+  skill_archetype_identity: 2, skill_cognitive_bias: 2, skill_antifragile_life: 2, skill_ooda_adaptive_action: 2, skill_design_thinking: 2, skill_creativity_capability: 2, skill_learning_organization: 2, skill_psychological_safety: 2,
 };
 
 export function hasFeature(tier: Tier, featureKey: string): boolean {

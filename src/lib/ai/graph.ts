@@ -74,6 +74,19 @@ export const dailyWorkflow: Workflow = {
   ],
 };
 
+/** First-run hero path: a fast, deep first artifact ending in your first
+ * identity-behavior gap (Shadow), instead of dropping new users into 14 engines. */
+export const firstRunWorkflow: Workflow = {
+  name: "first-run",
+  description: "Worldview → Mission → Identity → Shadow (your first identity-behavior gap)",
+  steps: [
+    { agent: "WorldviewCoach", as: "worldview", input: (c) => ({ answers: (c.answers as { question: string; answer: string }[]) ?? [] }) },
+    { agent: "MissionCoach", as: "mission", input: (c) => ({ reflections: (c.reflections as string[]) ?? [], lifeThemes: (c.lifeThemes as string[]) ?? [] }) },
+    { agent: "IdentityCoach", as: "identity", input: (c) => ({ mission: (c.mission as { missionStatement?: string })?.missionStatement, currentIdentities: (c.currentIdentities as string[]) ?? [], recentBehaviors: (c.recentBehaviors as string[]) ?? [] }) },
+    { agent: "ShadowDetector", as: "shadow", input: (c) => ({ recentBehaviors: ((c.identity as { gaps?: string[] })?.gaps ?? (c.recentBehaviors as string[]) ?? ["reviewed nothing this week"]) }) },
+  ],
+};
+
 // ── Graph workflows: conditional edges + bounded loops ─────────────
 // A LangGraph-style state graph without the dependency: each node runs an
 // agent, stores its output, then picks the next node from the updated context
@@ -175,6 +188,7 @@ export const WORKFLOWS: Record<string, Workflow> = {
   onboarding: onboardingWorkflow,
   decision: decisionWorkflow,
   daily: dailyWorkflow,
+  "first-run": firstRunWorkflow,
 };
 
 export const GRAPH_WORKFLOWS: Record<string, GraphWorkflow> = {

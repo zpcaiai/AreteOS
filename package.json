@@ -26,7 +26,8 @@
     "postinstall": "prisma generate",
     "vercel-build": "prisma generate && next build",
     "analyze": "ANALYZE=true next build",
-    "db:seed:naval": "tsx prisma/seed-naval.ts"
+    "db:seed:naval": "tsx prisma/seed-naval.ts",
+    "weekly": "tsx scripts/weekly.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",

@@ -11,6 +11,7 @@
 import { writeFileSync } from "node:fs";
 import { AGENTS } from "../src/lib/agents/registry";
 import { getProvider } from "../src/lib/ai/provider";
+import { gradeOutput, isSafetySensitive } from "../src/lib/eval/rubric";
 
 interface Row {
   agent: string;
@@ -18,6 +19,8 @@ interface Row {
   ms: number;
   judgeScore?: number;
   judgeReason?: string;
+  rubricScore?: number;
+  rubricFlags?: string[];
   error?: string;
 }
 
@@ -52,7 +55,8 @@ async function main() {
     try {
       const output = await agent.run(agent.spec.example.input as never);
       agent.spec.outputSchema.parse(output);
-      const row: Row = { agent: agent.name, ok: true, ms: Date.now() - started };
+      const rubric = gradeOutput(output, isSafetySensitive(agent.name));
+      const row: Row = { agent: agent.name, ok: true, ms: Date.now() - started, rubricScore: Number(rubric.score.toFixed(3)), rubricFlags: rubric.flags };
       if (useJudge) {
         const verdict = await judge(agent.name, agent.spec.example.input, agent.spec.example.output, output);
         if (verdict) {
@@ -75,6 +79,9 @@ async function main() {
     ranAt: new Date().toISOString(),
     provider: getProvider().name,
     judged: judged.length,
+    avgRubricScore: rows.filter((r) => typeof r.rubricScore === "number").length
+      ? rows.reduce((sum, r) => sum + (r.rubricScore ?? 0), 0) / rows.filter((r) => typeof r.rubricScore === "number").length
+      : null,
     avgJudgeScore: judged.length ? judged.reduce((s, r) => s + (r.judgeScore ?? 0), 0) / judged.length : null,
     passed: rows.length - failed.length,
     failed: failed.length,

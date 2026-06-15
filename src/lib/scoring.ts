@@ -134,3 +134,50 @@ export function growthScore(factors: {
   const logSum = vals.reduce((acc, v) => acc + Math.log(Math.max(v, eps)), 0);
   return clamp01(Math.exp(logSum / vals.length));
 }
+
+// ── Measurement validity: confidence + uncertainty ────────────────────────────
+// The scores above are point estimates, often from thin, self-reported evidence.
+// These helpers attach honest uncertainty so the UI can show "73% ±12% (n=4)"
+// instead of false precision. All pure, all in [0,1]. (Additive — no existing
+// signature changes.)
+
+/** Wilson score interval for a proportion (k successes of n). Robust at small n. */
+export function wilsonInterval(k: number, n: number, z = 1.96): { low: number; mid: number; high: number } {
+  if (n <= 0) return { low: 0, mid: 0, high: 1 };
+  const p = clamp01(k / n);
+  const z2 = z * z;
+  const denom = 1 + z2 / n;
+  const center = (p + z2 / (2 * n)) / denom;
+  const margin = (z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n))) / denom;
+  return { low: clamp01(center - margin), mid: clamp01(center), high: clamp01(center + margin) };
+}
+
+/** Confidence from sample size: 0 at n=0, → 1 as n grows (half at n=k). */
+export function sampleConfidence(n: number, k = 10): number {
+  if (n <= 0) return 0;
+  return clamp01(n / (n + k));
+}
+
+export interface ScoreWithConfidence {
+  value: number;
+  confidence: number;
+  low: number;
+  high: number;
+  samples: number;
+}
+
+/** Wrap a score with a confidence band that widens when evidence is thin. */
+export function withConfidence(value: number, samples: number, k = 10): ScoreWithConfidence {
+  const v = clamp01(value);
+  const confidence = sampleConfidence(samples, k);
+  const halfWidth = (1 - confidence) * 0.5; // up to ±0.5 when there is no evidence
+  return { value: v, confidence, low: clamp01(v - halfWidth), high: clamp01(v + halfWidth), samples };
+}
+
+/** Confidence of a geometric-mean composite = geometric mean of its parts' confidence. */
+export function compositeConfidence(confidences: number[]): number {
+  if (confidences.length === 0) return 0;
+  const eps = 1e-6;
+  const logSum = confidences.reduce((a, c) => a + Math.log(Math.max(clamp01(c), eps)), 0);
+  return clamp01(Math.exp(logSum / confidences.length));
+}

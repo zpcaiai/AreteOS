@@ -4,6 +4,8 @@ import { computeScoresCached } from "@/lib/analytics";
 import { Card, ScoreBar, PageHeader } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 import GrowthPlanet from "@/components/GrowthPlanet";
+import JourneyTiles from "@/components/JourneyTiles";
+import WeeklyCardBanner from "@/components/WeeklyCardBanner";
 
 export const metadata = { title: "Dashboard" };
 
@@ -24,6 +26,14 @@ export default async function DashboardPage() {
   return (
     <div>
       <PageHeader title={t("dashboard.title")} subtitle={t("dashboard.subtitle")} />
+
+      <div className="mb-5">
+        <WeeklyCardBanner />
+      </div>
+
+      <div className="mb-5">
+        <JourneyTiles />
+      </div>
 
       <div className="mb-5">
         <GrowthPlanet />

@@ -346,3 +346,71 @@ Builds on the engines with persistence and a guided flow:
 
 New v2 service logic lives in `src/lib/naval/plan.ts`; v2 routes under
 `/api/naval/{goals,onboarding,plan/save,plan/active,plan/task,twin/auto,decision-journal/due}`.
+
+## Innovation upgrades (2026-06) — depth, evidence & a mentor council
+
+Six product innovations + four quality upgrades, all **additive** (no existing
+signature changed), persisted via the existing `domain_events` event store (no new
+Prisma models / migrations), with the pure math factored into dependency-light
+`*-math` modules so it is exhaustively unit-tested.
+
+### Creative engines
+- **Mentor Council (`POST /api/council`)** — a panel of five thinking lenses
+  (latticework / contribution / leverage / principles / first-principles) **debate**
+  one question; the engine measures how much they actually agree (`consensusMetrics`:
+  pairwise recommendation overlap + confidence polarization) before `CouncilModerator`
+  synthesizes. The disagreement is the product. `src/lib/council*.ts`, 6 new agents.
+- **Future-Self Monte Carlo (`POST /api/future-self`)** — projects a *distribution*
+  of growth trajectories (p10/p50/p90 + "probability you beat today") under a
+  sustained policy and volatility, then `FutureSelfAgent` writes a grounded letter
+  from your future self. Deterministic & seeded. `src/lib/future-self*.ts`.
+- **Growth Narrative (`POST /api/narrative`)** — turns your event-sourced history
+  into the story of who you are becoming: trajectory, turning points, momentum and
+  stage transitions (`assembleNarrativeSignals`) rendered by `GrowthNarrator`.
+- **Evidence-driven measurement (`POST/GET /api/evidence`)** — ingests behavioral
+  signals and contrasts **enacted** (decay-weighted) behavior with **stated** scores
+  to expose the **identity-behavior gap** + an integrity score. `EvidenceInterpreter`
+  proposes the cheapest test to close it. `src/lib/evidence*.ts`.
+- **N-of-1 experiments (`/api/experiments`, `/:id`, `/:id/observe`)** — event-sourced
+  hypothesis → baseline/intervention observations → causal readout (Cohen's d,
+  Welch's t, approx p, plain-language verdict). Turns advice into personal science.
+- **Knowledge-graph moat (`GET /api/graph/path`)** — graph-native queries over the
+  mental-model latticework, Postgres-first: shortest learning path between two models,
+  **emergent (predicted) connections** via common-neighbour link prediction, and the
+  most central models. `src/lib/graph-path*.ts`.
+
+### Quality upgrades
+- **Measurement validity** — `scoring.ts` gains `wilsonInterval`, `sampleConfidence`,
+  `withConfidence`, `compositeConfidence`: scores can now be shown as "73% ±12% (n=4)"
+  instead of false precision.
+- **Offline AI rubric** — `src/lib/eval/rubric.ts` grades agent outputs for
+  specificity / concreteness / brevity / safety with no LLM (runs in CI under mock);
+  wired into `npm run eval:agents` (adds `rubricScore` + `avgRubricScore`).
+- **Trust architecture** — `GET /api/explain` (transparent Growth-Score breakdown:
+  which layer drags it down and which single layer moves it most) and
+  `GET /api/account/export` (portable JSON export of your own data).
+- **Depth-first hero path** — `/start` page + `first-run` workflow
+  (Worldview → Mission → Identity → first identity-behavior gap) so new users get one
+  deep artifact instead of 14 engines at once.
+
+### Testing
+9 new Vitest suites (`test/{council,future-self,narrative,evidence,experiments,
+graph-path,scoring-confidence,eval-rubric,explain}.test.ts`) cover every pure
+function (consensus, Monte Carlo, narrative signals, decay/gap, graph algorithms,
+Wilson/confidence, Welch/effect-size, rubric, geometric-mean leverage).
+`npx tsc --noEmit` passes clean.
+
+## UI pages + membership gates for the innovation engines (2026-06)
+
+Each new engine now has a client page (React Query data layer, graceful 402 →
+upgrade prompt via `src/components/UpgradeGate.tsx`), linked from a new **Innovation**
+sidebar group:
+- `/council` · `/future-self` · `/narrative` · `/evidence` · `/experiments` ·
+  `/graph` · `/account` (transparency + data export).
+
+Membership gates (`requireFeature`, `src/lib/membership/plans.ts`):
+- **Pro (tier 2):** `council`, `future_self`, `graph_path`.
+- **Plus (tier 1):** `narrative`, `evidence`, `experiments`.
+- **Ungated by design:** `/api/explain` and `/api/account/export` — explainability and
+  data portability are trust features, never paywalled. Experiment *reads* (list +
+  readout) stay open; only create/observe are gated.

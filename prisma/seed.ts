@@ -14,6 +14,14 @@ async function main() {
     create: { id: userId, email: `${userId}@mission.local`, name: "Demo User", passwordHash: hashPassword("mission1234") },
   });
 
+  // Demo convenience: give the demo user a PRO membership so every Pro/Plus
+  // feature (council, future-self, knowledge graph, naval, …) is usable locally.
+  await prisma.membership.upsert({
+    where: { userId },
+    update: { tier: "PRO", status: "ACTIVE", period: "ANNUAL", expiresAt: new Date(Date.now() + 3650 * 24 * 3600 * 1000) },
+    create: { userId, tier: "PRO", status: "ACTIVE", period: "ANNUAL", expiresAt: new Date(Date.now() + 3650 * 24 * 3600 * 1000) },
+  });
+
   await prisma.personalityState.upsert({
     where: { userId },
     update: {},
