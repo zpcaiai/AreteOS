@@ -4,3 +4,6 @@ node_modules
 .env.local
 dist
 *.tsbuildinfo
+.env.production
+.env.production.local
+.env*.local
