@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/lib/i18n/client";
 
 type Product = { slug: string; name: string; description: string; kind: string; kindLabel: string; price: number; owned: boolean };
 
 export default function EmporionClient({ products }: { products: Product[] }) {
   const router = useRouter();
+  const T = useT();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [done, setDone] = useState("");
@@ -18,14 +20,14 @@ export default function EmporionClient({ products }: { products: Product[] }) {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ slug, quantity: 1 }),
       }).then((r) => r.json());
-      if (!co.order) throw new Error(co.error || "下单失败");
+      if (!co.order) throw new Error(co.error || T("下单失败", "Checkout failed"));
       // 2) 支付 → 即时发货完成(生产环境此步由支付网关回调完成)
       const pay = await fetch("/api/emporion/pay", {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ orderId: co.order.id }),
       }).then((r) => r.json());
-      if (!pay.order) throw new Error(pay.error || "支付失败");
-      setDone(pay.order.deliveryNote || "已完成");
+      if (!pay.order) throw new Error(pay.error || T("支付失败", "Payment failed"));
+      setDone(pay.order.deliveryNote || T("已完成", "Done"));
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -53,7 +55,7 @@ export default function EmporionClient({ products }: { products: Product[] }) {
                 onClick={() => buy(p.slug)}
                 className={`rounded-lg px-4 py-1.5 text-sm font-medium ${p.owned ? "cursor-default bg-slate-800 text-slate-500" : "bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50"}`}
               >
-                {p.owned ? "已拥有" : busy === p.slug ? "处理中…" : "立即购买"}
+                {p.owned ? T("已拥有", "Owned") : busy === p.slug ? T("处理中…", "Processing…") : T("立即购买", "Buy now")}
               </button>
             </div>
           </div>
