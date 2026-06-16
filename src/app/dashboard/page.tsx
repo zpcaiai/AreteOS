@@ -50,7 +50,7 @@ export default async function DashboardPage() {
             <div className="text-5xl font-bold tabular-nums">{growthPct}</div>
             <div className="pb-2 text-sm text-slate-400">{t("dashboard.globalScoreHint")}</div>
           </div>
-          <Sparkline values={timeline.map((t) => t.value)} />
+          <Sparkline values={timeline.map((t) => t.value)} emptyLabel={t("dashboard.notEnoughHistory")} />
         </Card>
 
         <Card title={t("dashboard.stage")}>
@@ -95,8 +95,8 @@ export default async function DashboardPage() {
   );
 }
 
-function Sparkline({ values }: { values: number[] }) {
-  if (values.length < 2) return <p className="mt-3 text-xs text-slate-500">Not enough history yet.</p>;
+function Sparkline({ values, emptyLabel }: { values: number[]; emptyLabel: string }) {
+  if (values.length < 2) return <p className="mt-3 text-xs text-slate-500">{emptyLabel}</p>;
   const w = 280, h = 48, max = 1, min = 0;
   const pts = values
     .map((v, i) => {
