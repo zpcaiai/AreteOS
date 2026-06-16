@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n/client";
 
 type Book = { id: string; title: string; author: string; relatedModule: string; inspiredByNote: string; sourceType: string; isPublicDomain: boolean };
 type Progress = Record<string, { percent: number; completed: boolean }>;
 
 export default function AudiobookShelf({ books, progress }: { books: Book[]; progress: Progress }) {
+  const T = useT();
   const [active, setActive] = useState<Book | null>(null);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,8 +29,8 @@ export default function AudiobookShelf({ books, progress }: { books: Book[]; pro
     try {
       const res = await fetch(`/api/mnemosyne/book/${b.id}`);
       const json = await res.json();
-      setText(json.spokenText || json.book?.summary || "No readable text available for this entry.");
-    } catch { setText("Could not load this book."); }
+      setText(json.spokenText || json.book?.summary || T("该条目暂无可朗读的文本。", "No readable text available for this entry."));
+    } catch { setText(T("无法加载这本书。", "Could not load this book.")); }
     finally { setLoading(false); }
   }
 
@@ -66,19 +68,19 @@ export default function AudiobookShelf({ books, progress }: { books: Book[]; pro
               <div className="font-semibold text-slate-100">▶ {active.title}</div>
               <div className="text-xs text-slate-400">{active.author} · {active.relatedModule}</div>
             </div>
-            <button onClick={() => { stop(); setActive(null); }} className="text-xs text-slate-500 hover:text-slate-300">close</button>
+            <button onClick={() => { stop(); setActive(null); }} className="text-xs text-slate-500 hover:text-slate-300">{T("关闭", "close")}</button>
           </div>
-          {!supported && <p className="mt-2 text-xs text-rose-400">Your browser doesn't support read-aloud (Web Speech API).</p>}
-          {loading ? <p className="mt-2 text-sm text-slate-400">Loading…</p> : (
+          {!supported && <p className="mt-2 text-xs text-rose-400">{T("你的浏览器不支持朗读(Web Speech API)。", "Your browser doesn't support read-aloud (Web Speech API).")}</p>}
+          {loading ? <p className="mt-2 text-sm text-slate-400">{T("加载中…", "Loading…")}</p> : (
             <>
               <div className="mt-3 flex items-center gap-2">
                 {!speaking || paused ? (
-                  <button onClick={() => (paused ? resume() : play())} disabled={!supported} className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium disabled:opacity-50">{paused ? "Resume" : "▶ Play"}</button>
+                  <button onClick={() => (paused ? resume() : play())} disabled={!supported} className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium disabled:opacity-50">{paused ? T("继续", "Resume") : `▶ ${T("播放", "Play")}`}</button>
                 ) : (
-                  <button onClick={pause} className="rounded-lg bg-slate-700 px-4 py-1.5 text-sm font-medium">⏸ Pause</button>
+                  <button onClick={pause} className="rounded-lg bg-slate-700 px-4 py-1.5 text-sm font-medium">{`⏸ ${T("暂停", "Pause")}`}</button>
                 )}
-                <button onClick={stop} disabled={!speaking} className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm disabled:opacity-50">⏹ Stop</button>
-                <label className="ml-2 text-xs text-slate-400">Speed
+                <button onClick={stop} disabled={!speaking} className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm disabled:opacity-50">{`⏹ ${T("停止", "Stop")}`}</button>
+                <label className="ml-2 text-xs text-slate-400">{T("语速", "Speed")}
                   <select value={rate} onChange={(e) => setRate(parseFloat(e.target.value))} className="ml-1 rounded border border-slate-700 bg-slate-800 px-1 py-0.5 text-xs">
                     {[0.8, 1, 1.2, 1.5, 2].map((r) => <option key={r} value={r}>{r}×</option>)}
                   </select>
@@ -100,12 +102,12 @@ export default function AudiobookShelf({ books, progress }: { books: Book[]; pro
                 <button key={b.id} onClick={() => open(b)} className="rounded-xl border border-slate-800 p-3 text-left hover:border-indigo-700">
                   <div className="flex items-start justify-between gap-2">
                     <div className="font-medium text-slate-100">{b.title}</div>
-                    {b.isPublicDomain ? <span className="shrink-0 rounded bg-emerald-950/60 px-1.5 py-0.5 text-[10px] text-emerald-300">public domain</span>
-                      : <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">summary</span>}
+                    {b.isPublicDomain ? <span className="shrink-0 rounded bg-emerald-950/60 px-1.5 py-0.5 text-[10px] text-emerald-300">{T("公有领域", "public domain")}</span>
+                      : <span className="shrink-0 rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">{T("摘要", "summary")}</span>}
                   </div>
                   <div className="text-xs text-slate-500">{b.author}</div>
                   <div className="mt-1 text-xs text-slate-400">{b.inspiredByNote}</div>
-                  {p?.completed && <div className="mt-1 text-[10px] text-emerald-400">✓ listened</div>}
+                  {p?.completed && <div className="mt-1 text-[10px] text-emerald-400">{`✓ ${T("已听", "listened")}`}</div>}
                 </button>
               );
             })}

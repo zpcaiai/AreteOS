@@ -5,8 +5,10 @@ import ShareCardModal from "@/components/ShareCardModal";
 import VirtualList from "@/components/VirtualList";
 import { addMemoryCard, deckStats, getDeck, getDueCards, nextDueLabel, removeMemoryCard, reviewCard, type MemoryCard } from "@/lib/client/memory-deck";
 import { useDraft } from "@/lib/client/useDraft";
+import { useT } from "@/lib/i18n/client";
 
 export default function MemoryDeckClient() {
+  const T = useT();
   const [tick, setTick] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [mode, setMode] = useState<"review" | "all" | "new">("review");
@@ -44,28 +46,28 @@ export default function MemoryDeckClient() {
     <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
       <aside className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
         <div className="grid grid-cols-3 gap-2 text-center text-sm">
-          <Stat label="Cards" value={stats.total} />
-          <Stat label="Due" value={stats.due} tone="text-amber-300" />
-          <Stat label="Mature" value={stats.mature} tone="text-emerald-300" />
+          <Stat label={T("卡片", "Cards")} value={stats.total} />
+          <Stat label={T("待复习", "Due")} value={stats.due} tone="text-amber-300" />
+          <Stat label={T("已掌握", "Mature")} value={stats.mature} tone="text-emerald-300" />
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Tab active={mode === "review"} onClick={() => setMode("review")}>Review</Tab>
-          <Tab active={mode === "all"} onClick={() => setMode("all")}>Deck</Tab>
-          <Tab active={mode === "new"} onClick={() => setMode("new")}>New</Tab>
+          <Tab active={mode === "review"} onClick={() => setMode("review")}>{T("复习", "Review")}</Tab>
+          <Tab active={mode === "all"} onClick={() => setMode("all")}>{T("卡组", "Deck")}</Tab>
+          <Tab active={mode === "new"} onClick={() => setMode("new")}>{T("新建", "New")}</Tab>
         </div>
         <p className="mt-4 text-sm leading-6 text-slate-400">
-          用来记住 Arete 中真正值得内化的原则：复盘教训、决策规则、身份证明、长期游戏约束。
+          {T("用来记住 Arete 中真正值得内化的原则:复盘教训、决策规则、身份证明、长期游戏约束。", "Remember what is worth internalizing in Arete: review lessons, decision rules, identity proofs, long-term game constraints.")}
         </p>
       </aside>
 
       <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
         {mode === "review" && (
           <div>
-            {!stats.total && <Empty title="No cards yet" body="Add one principle or lesson to begin spaced repetition." />}
-            {stats.total > 0 && !current && <Empty title="All reviews are done" body="No card is due right now. Add a new lesson or come back later." />}
+            {!stats.total && <Empty title={T("还没有卡片", "No cards yet")} body={T("添加一条原则或教训,开始间隔重复。", "Add one principle or lesson to begin spaced repetition.")} />}
+            {stats.total > 0 && !current && <Empty title={T("今天复习都完成了", "All reviews are done")} body={T("当前没有到期的卡片。新增一条教训,或稍后再来。", "No card is due right now. Add a new lesson or come back later.")} />}
             {current && (
               <div>
-                <p className="mb-3 text-center text-sm text-slate-500">Due now: {due.length}</p>
+                <p className="mb-3 text-center text-sm text-slate-500">{T("待复习", "Due now")}: {due.length}</p>
                 <button
                   onClick={() => setFlipped((value) => !value)}
                   className="min-h-64 w-full rounded-xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 to-emerald-500/10 p-6 text-center">
@@ -73,19 +75,19 @@ export default function MemoryDeckClient() {
                   {flipped ? (
                     <p className="mx-auto mt-5 max-w-2xl whitespace-pre-wrap text-base leading-8 text-slate-100">{current.content}</p>
                   ) : (
-                    <p className="mt-5 text-sm text-slate-500">Recall the principle first, then flip the card.</p>
+                    <p className="mt-5 text-sm text-slate-500">{T("先回忆这条原则,再翻开卡片。", "Recall the principle first, then flip the card.")}</p>
                   )}
                   {current.source && <p className="mt-5 text-xs uppercase tracking-wide text-slate-500">{current.source}</p>}
                 </button>
                 {!flipped ? (
                   <button onClick={() => setFlipped(true)} className="mt-3 w-full rounded-lg border border-slate-700 px-4 py-3 text-sm text-slate-200 hover:bg-slate-800">
-                    Flip
+                    {T("翻开", "Flip")}
                   </button>
                 ) : (
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                    <GradeButton label="Forgot" detail="10 min" onClick={() => grade(1)} tone="rose" />
-                    <GradeButton label="Hard" detail="short interval" onClick={() => grade(3)} tone="amber" />
-                    <GradeButton label="Easy" detail="long interval" onClick={() => grade(5)} tone="emerald" />
+                    <GradeButton label={T("忘记了", "Forgot")} detail={T("10 分钟", "10 min")} onClick={() => grade(1)} tone="rose" />
+                    <GradeButton label={T("有点难", "Hard")} detail={T("短间隔", "short interval")} onClick={() => grade(3)} tone="amber" />
+                    <GradeButton label={T("容易", "Easy")} detail={T("长间隔", "long interval")} onClick={() => grade(5)} tone="emerald" />
                   </div>
                 )}
               </div>
@@ -95,7 +97,7 @@ export default function MemoryDeckClient() {
 
         {mode === "all" && (
           <div>
-            {!all.length && <Empty title="Deck is empty" body="Create a card from a reflection lesson or decision rule." />}
+            {!all.length && <Empty title={T("卡组是空的", "Deck is empty")} body={T("从一条复盘教训或决策规则创建卡片。", "Create a card from a reflection lesson or decision rule.")} />}
             <div className="space-y-2">
               <VirtualList
                 items={all}
@@ -110,8 +112,8 @@ export default function MemoryDeckClient() {
                       </div>
                       <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-400">{card.content}</p>
                     </div>
-                    <button onClick={() => setShareCard(card)} className="h-9 rounded-lg border border-slate-700 px-3 text-xs text-slate-200 hover:bg-slate-800">Share</button>
-                    <button onClick={() => { removeMemoryCard(card.id); refresh(); }} className="h-9 rounded-lg border border-slate-700 px-3 text-xs text-rose-300 hover:bg-slate-800">Delete</button>
+                    <button onClick={() => setShareCard(card)} className="h-9 rounded-lg border border-slate-700 px-3 text-xs text-slate-200 hover:bg-slate-800">{T("分享", "Share")}</button>
+                    <button onClick={() => { removeMemoryCard(card.id); refresh(); }} className="h-9 rounded-lg border border-slate-700 px-3 text-xs text-rose-300 hover:bg-slate-800">{T("删除", "Delete")}</button>
                   </div>
                 )}
               />
@@ -121,7 +123,7 @@ export default function MemoryDeckClient() {
 
         {mode === "new" && (
           <div className="mx-auto max-w-2xl">
-            <label className="block text-sm font-medium text-slate-300" htmlFor="memory-title">Title</label>
+            <label className="block text-sm font-medium text-slate-300" htmlFor="memory-title">{T("标题", "Title")}</label>
             <input
               id="memory-title"
               value={draft.title}
@@ -129,7 +131,7 @@ export default function MemoryDeckClient() {
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
               maxLength={120}
             />
-            <label className="mt-4 block text-sm font-medium text-slate-300" htmlFor="memory-content">Principle or lesson</label>
+            <label className="mt-4 block text-sm font-medium text-slate-300" htmlFor="memory-content">{T("原则或教训", "Principle or lesson")}</label>
             <textarea
               id="memory-content"
               value={draft.content}
@@ -137,19 +139,19 @@ export default function MemoryDeckClient() {
               className="mt-1 min-h-40 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm leading-6 text-slate-100"
               maxLength={2000}
             />
-            <label className="mt-4 block text-sm font-medium text-slate-300" htmlFor="memory-source">Source</label>
+            <label className="mt-4 block text-sm font-medium text-slate-300" htmlFor="memory-source">{T("来源", "Source")}</label>
             <input
               id="memory-source"
               value={draft.source}
               onChange={(e) => setDraft({ ...draft, source: e.target.value })}
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
               maxLength={160}
-              placeholder="Reflection, decision review, book, coach session..."
+              placeholder={T("复盘、决策回顾、书籍、教练对话……", "Reflection, decision review, book, coach session...")}
             />
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-xs text-slate-500" aria-live="polite">{savedHint ? "Draft saved" : ""}</span>
+              <span className="text-xs text-slate-500" aria-live="polite">{savedHint ? T("草稿已保存", "Draft saved") : ""}</span>
               <button onClick={createCard} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">
-                Add card
+                {T("添加卡片", "Add card")}
               </button>
             </div>
           </div>

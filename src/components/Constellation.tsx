@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n/client";
 
 /* Dependency-free 3D constellation (inspired by emotion-sphere's react-three-fiber
    sphere, rebuilt in pure SVG so it needs no three.js). Nodes sit on a sphere,
@@ -41,6 +42,7 @@ export default function Constellation({
   nodes, size = 460, title,
 }: { nodes: ConsNode[]; size?: number; title?: string }) {
   const angles = distribute(nodes);
+  const T = useT();
   const [rotY, setRotY] = useState(0.4);
   const [selected, setSelected] = useState<ConsNode | null>(null);
   const dragging = useRef<{ x: number; startRot: number } | null>(null);
@@ -130,14 +132,14 @@ export default function Constellation({
               <div className="mt-1 text-lg font-bold">{selected.label}</div>
               {selected.blurb ? <p className="mt-2 text-sm text-slate-400">{selected.blurb}</p> : null}
               {selected.href ? (
-                <a href={selected.href} className="mt-3 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">Open →</a>
+                <a href={selected.href} className="mt-3 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">{T("打开 →", "Open →")}</a>
               ) : null}
               <button onClick={() => { setSelected(null); spin.current = true; }}
-                className="mt-3 block text-xs text-slate-500 hover:text-slate-300">Resume spin</button>
+                className="mt-3 block text-xs text-slate-500 hover:text-slate-300">{T("继续旋转", "Resume spin")}</button>
             </div>
           ) : (
             <div className="rounded-xl border border-slate-800 bg-slate-950/30 p-4 text-sm text-slate-400">
-              Drag to spin · click a node to inspect. Each node is a part of your development system.
+              {T("拖动旋转 · 点击节点查看详情。每个节点都是你成长系统的一部分。", "Drag to spin · click a node to inspect. Each node is a part of your development system.")}
             </div>
           )}
         </div>
