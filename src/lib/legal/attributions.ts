@@ -5,6 +5,9 @@
 export const DISCLAIMER_SHORT =
   "An original system inspired by widely-taught ideas. Not affiliated with, endorsed by, or licensed from any author or rights-holder. Figures shown are factual case studies and do not endorse this product.";
 
+export const DISCLAIMER_SHORT_ZH =
+  "一套受广为流传的思想启发的原创系统。与任何作者或版权方均无隶属、背书或授权关系。所示人物为事实性案例研究,并不为本产品背书。";
+
 export const DISCLAIMER_LONG =
   "This product is an original software system. It is inspired by general, widely-described concepts in human development, management, cognitive science and strategy — concepts and methods are not protected by copyright. It reproduces no copyrighted text, diagrams, or tables from any book. It is not affiliated with, endorsed by, sponsored by, or licensed from any author, estate, publisher, company, or rights-holder. Real people referenced in the libraries are presented as factual, educational case studies and do not endorse, and are not associated with, this product. Method and book names are referenced descriptively only, to credit the ideas that inspired the work, and remain the property of their respective owners.";
 

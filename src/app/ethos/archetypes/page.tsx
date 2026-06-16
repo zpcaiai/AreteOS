@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function ArchetypesPage({ searchParams }: { searchParams: Promise<{ family?: string }> }) {
+  const { locale } = await getDict();
+  const en = locale === "en";
   const { family } = await searchParams;
   const archetypes = await prisma.identityArchetype.findMany({
     where: family ? { family: { slug: family } } : undefined,
@@ -13,7 +16,9 @@ export default async function ArchetypesPage({ searchParams }: { searchParams: P
   });
   return (
     <div>
-      <PageHeader title={family ? `Identities · ${archetypes[0]?.family.name ?? family}` : "All Identities"} subtitle="Each archetype is a full blueprint: mission, values, beliefs, models, rules, habits, shadows." />
+      <PageHeader
+        title={family ? `${en ? "Identities" : "身份"} · ${archetypes[0]?.family.name ?? family}` : (en ? "All Identities" : "全部身份")}
+        subtitle={en ? "Each archetype is a full blueprint: mission, values, beliefs, models, rules, habits, shadows." : "每个原型都是一份完整蓝图:使命、价值观、信念、思维模型、规则、习惯、阴影。"} />
       {archetypes.length ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {archetypes.map((a) => (
@@ -25,7 +30,7 @@ export default async function ArchetypesPage({ searchParams }: { searchParams: P
             </Link>
           ))}
         </div>
-      ) : <Empty>No archetypes found. Run <code>npm run db:seed</code>.</Empty>}
+      ) : <Empty>{en ? <>No archetypes found. Run <code>npm run db:seed</code>.</> : <>未找到原型。请运行 <code>npm run db:seed</code>。</>}</Empty>}
     </div>
   );
 }
