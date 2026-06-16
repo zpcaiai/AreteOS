@@ -1,12 +1,14 @@
 import GrowthPlanet from "@/components/GrowthPlanet";
 import { PageHeader } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Growth Map" };
 
-export default function GrowthMapPage() {
+export default async function GrowthMapPage() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title="Growth Map" subtitle="A path-based navigation layer adapted from bible3dsphere's planet home architecture." />
+      <PageHeader title={t("growthMap.title")} subtitle={t("growthMap.subtitle")} />
       <GrowthPlanet />
     </div>
   );

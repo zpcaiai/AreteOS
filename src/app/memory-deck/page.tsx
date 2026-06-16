@@ -1,12 +1,14 @@
 import MemoryDeckClient from "@/components/MemoryDeckClient";
 import { PageHeader } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
 
 export const metadata = { title: "Memory Deck" };
 
-export default function MemoryDeckPage() {
+export default async function MemoryDeckPage() {
+  const { t } = await getDict();
   return (
     <div>
-      <PageHeader title="Memory Deck" subtitle="Spaced repetition for principles, lessons, decision rules and identity proofs." />
+      <PageHeader title={t("memoryDeck.title")} subtitle={t("memoryDeck.subtitle")} />
       <MemoryDeckClient />
     </div>
   );

@@ -113,6 +113,10 @@ const zh = {
 
   "dashboard.title": "总览",
   "dashboard.notEnoughHistory": "历史数据还不够。",
+  "growthMap.title": "成长地图",
+  "growthMap.subtitle": "基于路径的导航层,改编自 bible3dsphere 的星球主页架构。",
+  "memoryDeck.title": "记忆卡组",
+  "memoryDeck.subtitle": "用间隔重复巩固原则、教训、决策规则与身份证据。",
   "dashboard.subtitle": "使命 → 身份 → 价值观 → 决策 → 习惯 → 品格 → 结果",
   "dashboard.globalScore": "全局成长分",
   "dashboard.globalScoreHint": "/ 100(几何平均 —— 每一层都算数)",
@@ -1034,6 +1038,10 @@ const en: Dict = {
 
   "dashboard.title": "Dashboard",
   "dashboard.notEnoughHistory": "Not enough history yet.",
+  "growthMap.title": "Growth Map",
+  "growthMap.subtitle": "A path-based navigation layer adapted from bible3dsphere's planet home architecture.",
+  "memoryDeck.title": "Memory Deck",
+  "memoryDeck.subtitle": "Spaced repetition for principles, lessons, decision rules and identity proofs.",
   "dashboard.subtitle": "Mission → Identity → Values → Decisions → Habits → Character → Outcomes",
   "dashboard.globalScore": "Global Growth Score",
   "dashboard.globalScoreHint": "/ 100 (geometric mean — every layer counts)",
