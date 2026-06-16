@@ -167,3 +167,22 @@ npx prisma db execute --file prisma/sql/engine_projections.sql --schema prisma/s
 The model lives in `prisma/schema/projections.prisma` (`EngineProjection` →
 `engine_projections`). Reads use a two-tier cache: in-process 20s → DB projection
 120s → recompute + persist. No code change is needed after migrating.
+
+## Deploy to Vercel (turnkey)
+
+This repo is Vercel-native (Next.js; middleware is Edge-safe; no Dockerfile needed).
+
+1. **Env vars** (Project → Settings → Environment Variables): `DATABASE_URL` (Neon
+   **pooled** string), `AUTH_SECRET`, `AI_PROVIDER` (+ provider key, or `mock`),
+   `CRON_SECRET`; optional `NEO4J_HTTP_URL`, Sentry DSN, `ADMIN_EMAILS`, payment keys.
+   For real auth set `AUTH_REQUIRED=true` and do **not** set `DEV_USER_ID`.
+2. **Migrations run on deploy** — `vercel-build` is `prisma generate && prisma migrate
+   deploy && next build`, so each deploy applies pending migrations (incl.
+   `engine_projections`). Requires `DATABASE_URL` to be set for the Build step (it is,
+   by default). To migrate manually instead, drop `prisma migrate deploy` from the script.
+3. **Weekly cron** — `vercel.json` schedules `GET /api/cron/weekly` at `0 9 * * 1`
+   (**UTC**; adjust for your timezone). When `CRON_SECRET` is set, Vercel sends it as
+   `Authorization: Bearer <CRON_SECRET>`, which the endpoint verifies. (Weekly cron is
+   within Hobby-plan limits; if user count grows, move the job to a queue to avoid
+   function-timeout.)
+3. **Push, then import the repo in Vercel** (or it auto-builds on push if already linked).
