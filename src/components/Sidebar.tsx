@@ -139,6 +139,7 @@ export default function Sidebar() {
         </button>
         <Logo size={24} />
         <span className="text-base font-bold tracking-wide font-serif">ARETE</span>
+        <LanguageSwitcher className="ml-auto" />
       </div>
 
       {mobileOpen && <div onClick={() => setMobileOpen(false)} className="fixed inset-0 z-30 bg-black/50 lg:hidden" />}

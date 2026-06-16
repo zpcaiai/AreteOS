@@ -37,24 +37,33 @@ export function useTx() {
   return txFor(locale);
 }
 
+const LOCALE_LABELS: Record<Locale, string> = { zh: "中文", en: "EN" };
+
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const { locale, t } = useI18n();
   const router = useRouter();
 
   function setLocale(next: Locale) {
+    if (next === locale) return;
     document.cookie = `locale=${next}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
     router.refresh();
   }
 
   return (
-    <div className={`flex items-center gap-1 ${className}`} role="group" aria-label={t("common.language")}>
+    <div
+      className={`inline-flex items-center rounded-full border border-slate-700 bg-slate-800/60 p-0.5 ${className}`}
+      role="group"
+      aria-label={t("common.language")}>
       {(["zh", "en"] as Locale[]).map((l) => (
         <button
           key={l}
+          type="button"
           onClick={() => setLocale(l)}
           aria-pressed={locale === l}
-          className={`rounded px-2 py-0.5 text-[11px] uppercase tracking-wide ${locale === l ? "bg-slate-700 text-white" : "text-slate-500 hover:text-slate-300"}`}>
-          {l}
+          className={`rounded-full px-2.5 py-1 text-xs font-medium leading-none transition-colors ${
+            locale === l ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-white"
+          }`}>
+          {LOCALE_LABELS[l]}
         </button>
       ))}
     </div>
