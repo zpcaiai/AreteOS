@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { deckStats } from "@/lib/client/memory-deck";
 import { useDraft } from "@/lib/client/useDraft";
+import { useT } from "@/lib/i18n/client";
 
 const POS_KEY = "arete-floating-coach-pos";
 const BOX = 72;
@@ -30,6 +31,7 @@ function loadPos() {
 
 export default function FloatingCoachWidget() {
   const pathname = usePathname();
+  const T = useT();
   const [expanded, setExpanded] = useState(false);
   const [tab, setTab] = useState<"coach" | "checkin" | "memory">("coach");
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
@@ -98,59 +100,59 @@ export default function FloatingCoachWidget() {
             <div className="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-sm font-bold text-white">A</div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-slate-100">Arete Coach</p>
-              <p className="text-xs text-slate-500">Companion, not a substitute for professional help</p>
+              <p className="text-xs text-slate-500">{T("陪伴工具,不能替代专业帮助", "Companion, not a substitute for professional help")}</p>
             </div>
-            <button onClick={() => setExpanded(false)} className="rounded-lg px-2 py-1 text-slate-500 hover:bg-slate-800" aria-label="Collapse coach">-</button>
+            <button onClick={() => setExpanded(false)} className="rounded-lg px-2 py-1 text-slate-500 hover:bg-slate-800" aria-label={T("收起教练", "Collapse coach")}>–</button>
           </header>
 
           <div className="grid grid-cols-3 gap-1 border-b border-slate-800 p-2">
-            <PanelTab active={tab === "coach"} onClick={() => setTab("coach")}>Coach</PanelTab>
-            <PanelTab active={tab === "checkin"} onClick={() => setTab("checkin")}>Check-in</PanelTab>
-            <PanelTab active={tab === "memory"} onClick={() => { setMemoryStats(deckStats()); setTab("memory"); }}>Memory</PanelTab>
+            <PanelTab active={tab === "coach"} onClick={() => setTab("coach")}>{T("教练", "Coach")}</PanelTab>
+            <PanelTab active={tab === "checkin"} onClick={() => setTab("checkin")}>{T("签到", "Check-in")}</PanelTab>
+            <PanelTab active={tab === "memory"} onClick={() => { setMemoryStats(deckStats()); setTab("memory"); }}>{T("记忆", "Memory")}</PanelTab>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto p-4">
             {tab === "coach" && (
               <div>
-                <h3 className="text-sm font-semibold text-slate-100">Next useful step</h3>
+                <h3 className="text-sm font-semibold text-slate-100">{T("下一步该做什么", "Next useful step")}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-400">
-                  Open a focused coaching session when you need multi-turn support with decisions, habits, reflection, or Naval planning.
+                  {T("当你需要在决策、习惯、复盘或 Naval 规划上获得多轮支持时,开启一次专注的教练对话。", "Open a focused coaching session when you need multi-turn support with decisions, habits, reflection, or Naval planning.")}
                 </p>
                 <div className="mt-4 grid gap-2">
-                  <QuickLink href="/coach" label="Open AI Coach" />
-                  <QuickLink href="/growth-map" label="Choose a growth path" />
-                  <QuickLink href="/naval/plan" label="Review 90-day plan" />
+                  <QuickLink href="/coach" label={T("打开 AI 教练", "Open AI Coach")} />
+                  <QuickLink href="/growth-map" label={T("选择一条成长路径", "Choose a growth path")} />
+                  <QuickLink href="/naval/plan" label={T("查看 90 天计划", "Review 90-day plan")} />
                 </div>
               </div>
             )}
             {tab === "checkin" && (
               <div>
-                <label htmlFor="floating-checkin" className="text-sm font-semibold text-slate-100">Quick check-in</label>
+                <label htmlFor="floating-checkin" className="text-sm font-semibold text-slate-100">{T("快速签到", "Quick check-in")}</label>
                 <textarea
                   id="floating-checkin"
                   value={checkin}
                   onChange={(e) => setCheckin(e.target.value)}
                   className="mt-2 min-h-40 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm leading-6 text-slate-100"
-                  placeholder="What is happening, what are you avoiding, and what is the next honest action?"
+                  placeholder={T("现在发生了什么?你在回避什么?下一个诚实的行动是什么?", "What is happening, what are you avoiding, and what is the next honest action?")}
                   maxLength={1600}
                 />
                 <div className="mt-2 flex items-center justify-between">
-                  <span className="text-xs text-slate-500" aria-live="polite">{savedHint ? "Draft saved" : ""}</span>
-                  <button onClick={() => { setCheckin(""); clearDraft(); }} className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800">Clear</button>
+                  <span className="text-xs text-slate-500" aria-live="polite">{savedHint ? T("草稿已保存", "Draft saved") : ""}</span>
+                  <button onClick={() => { setCheckin(""); clearDraft(); }} className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800">{T("清空", "Clear")}</button>
                 </div>
               </div>
             )}
             {tab === "memory" && (
               <div>
-                <h3 className="text-sm font-semibold text-slate-100">Memory deck</h3>
+                <h3 className="text-sm font-semibold text-slate-100">{T("记忆卡组", "Memory deck")}</h3>
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                  <Metric label="Cards" value={memoryStats.total} />
-                  <Metric label="Due" value={memoryStats.due} />
-                  <Metric label="Mature" value={memoryStats.mature} />
+                  <Metric label={T("卡片", "Cards")} value={memoryStats.total} />
+                  <Metric label={T("待复习", "Due")} value={memoryStats.due} />
+                  <Metric label={T("已掌握", "Mature")} value={memoryStats.mature} />
                 </div>
-                <p className="mt-3 text-sm leading-6 text-slate-400">Turn high-signal lessons into cards so they become available under pressure.</p>
+                <p className="mt-3 text-sm leading-6 text-slate-400">{T("把高价值的经验做成卡片,让它们在压力下也能随时取用。", "Turn high-signal lessons into cards so they become available under pressure.")}</p>
                 <div className="mt-4">
-                  <QuickLink href="/memory-deck" label="Open memory deck" />
+                  <QuickLink href="/memory-deck" label={T("打开记忆卡组", "Open memory deck")} />
                 </div>
               </div>
             )}
@@ -160,7 +162,7 @@ export default function FloatingCoachWidget() {
 
       <button
         type="button"
-        aria-label="Open Arete Coach"
+        aria-label={T("打开 Arete 教练", "Open Arete Coach")}
         onClick={() => {
           if (movedRef.current) {
             movedRef.current = false;
