@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import type { EngineConfig } from "./config";
 import { PORTFOLIO_AREAS } from "./config";
+import { useT } from "@/lib/i18n/client";
 
 /* Generic interactive panel for one Naval engine: renders the input fields from
    config, POSTs to the assess endpoint, and pretty-prints the JSON result. Also
@@ -21,6 +22,7 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
 }
 
 function Value({ k, v }: { k: string; v: unknown }) {
+  const T = useT();
   if (v == null || v === "") return null;
   if (typeof v === "number") {
     if (/score/i.test(k) && v > 1) return <div><span className="text-2xl font-bold tabular-nums">{Math.round(v)}</span><span className="ml-1 text-xs text-slate-500">/100</span></div>;
@@ -28,7 +30,7 @@ function Value({ k, v }: { k: string; v: unknown }) {
     return <div className="text-sm tabular-nums">{v}</div>;
   }
   if (typeof v === "string") return <p className="text-sm text-slate-300">{v}</p>;
-  if (typeof v === "boolean") return <span className="text-sm">{v ? "yes" : "no"}</span>;
+  if (typeof v === "boolean") return <span className="text-sm">{v ? T("是", "yes") : T("否", "no")}</span>;
   if (Array.isArray(v)) {
     if (!v.length) return null;
     return (
@@ -71,6 +73,7 @@ export default function EngineStudio({ config }: { config: EngineConfig }) {
   const [error, setError] = useState("");
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [existing, setExisting] = useState<Record<string, unknown> | null>(null);
+  const T = useT();
 
   useEffect(() => {
     if (!config.profileEndpoint) return;
@@ -96,7 +99,7 @@ export default function EngineStudio({ config }: { config: EngineConfig }) {
     try {
       const res = await fetch(config.assessEndpoint, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(buildBody()) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Request failed");
+      if (!res.ok) throw new Error(data.error || T("请求失败", "Request failed"));
       setResult(data);
       setExisting(null);
     } catch (e) {
@@ -109,7 +112,7 @@ export default function EngineStudio({ config }: { config: EngineConfig }) {
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-        <h2 className="mb-3 text-sm font-semibold">Run</h2>
+        <h2 className="mb-3 text-sm font-semibold">{T("运行", "Run")}</h2>
         <div className="space-y-3">
           {config.fields.map((f) => (
             <div key={f.name}>
@@ -136,14 +139,14 @@ export default function EngineStudio({ config }: { config: EngineConfig }) {
         </div>
         {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
         <button onClick={run} disabled={busy} className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium disabled:opacity-50">
-          {busy ? "Working…" : config.button}
+          {busy ? T("处理中…", "Working…") : config.button}
         </button>
-        <p className="mt-2 text-[11px] text-slate-600">Requires a Plus membership. Educational only — not financial, legal, or medical advice.</p>
+        <p className="mt-2 text-[11px] text-slate-600">{T("需要 Plus 会员。仅供学习参考——不构成财务、法律或医疗建议。", "Requires a Plus membership. Educational only — not financial, legal, or medical advice.")}</p>
       </div>
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-        <h2 className="mb-3 text-sm font-semibold">{result ? "Result" : existing ? "Latest saved" : "Output"}</h2>
-        {result ? <Obj o={result} /> : existing ? <Obj o={existing} /> : <p className="text-sm text-slate-500">Run the engine to see your result here.</p>}
+        <h2 className="mb-3 text-sm font-semibold">{result ? T("结果", "Result") : existing ? T("最近保存", "Latest saved") : T("输出", "Output")}</h2>
+        {result ? <Obj o={result} /> : existing ? <Obj o={existing} /> : <p className="text-sm text-slate-500">{T("运行引擎后,结果会显示在这里。", "Run the engine to see your result here.")}</p>}
       </div>
     </div>
   );
