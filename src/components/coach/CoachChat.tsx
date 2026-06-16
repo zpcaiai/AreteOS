@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CoachMessageSchema, firstIssue } from "@/lib/schemas";
 import type { DictKey } from "@/lib/i18n/dictionaries";
-import { useI18n } from "@/lib/i18n/client";
+import { useI18n, useT } from "@/lib/i18n/client";
 
 interface Msg { id: string; role: string; content: string; toolCalls?: { tool: string }[] | null; createdAt: string }
 interface Session { id: string; title: string; focus: string; updatedAt: string }
@@ -18,6 +18,7 @@ const FOCUSES: { value: string; labelKey: DictKey }[] = [
 
 export default function CoachChat() {
   const { t } = useI18n();
+  const T = useT();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [active, setActive] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -48,7 +49,7 @@ export default function CoachChat() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ focus }),
     });
-    if (!r.ok) { setError("Could not start a session"); return; }
+    if (!r.ok) { setError(T("无法创建会话", "Could not start a session")); return; }
     const { session } = await r.json();
     await loadSessions();
     setActive(session.id);
@@ -74,7 +75,7 @@ export default function CoachChat() {
       });
       if (!r.ok || !r.body) {
         const d = await r.json().catch(() => ({}));
-        throw new Error((d as { error?: string }).error || "Coach failed to reply");
+        throw new Error((d as { error?: string }).error || T("教练未能回复", "Coach failed to reply"));
       }
 
       // Parse the SSE stream: thinking / tool events update the activity line;
@@ -98,7 +99,7 @@ export default function CoachChat() {
           if (event === "thinking") setActivity(t("ui.coach.thinking"));
           if (event === "tool" && data.tool) setActivity(`${t("ui.coach.checking")} ${data.tool.replaceAll("_", " ")}…`);
           if (event === "complete" && data.message) setMessages((m) => [...m, data.message as Msg]);
-          if (event === "error") throw new Error(data.error || "Coach failed to reply");
+          if (event === "error") throw new Error(data.error || T("教练未能回复", "Coach failed to reply"));
         }
       }
       loadSessions();
@@ -114,12 +115,12 @@ export default function CoachChat() {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
-      <aside className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3" aria-label="Coaching sessions">
+      <aside className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3" aria-label={T("教练会话", "Coaching sessions")}>
         <div className="mb-2 flex items-center gap-2">
           <select
             value={focus}
             onChange={(e) => setFocus(e.target.value)}
-            aria-label="Session focus"
+            aria-label={T("会话焦点", "Session focus")}
             className="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-200">
             {FOCUSES.map((f) => <option key={f.value} value={f.value}>{t(f.labelKey)}</option>)}
           </select>
@@ -139,7 +140,7 @@ export default function CoachChat() {
         </ul>
       </aside>
 
-      <section className="flex min-h-[60vh] flex-col rounded-2xl border border-slate-800 bg-slate-900/60" aria-label="Coach conversation">
+      <section className="flex min-h-[60vh] flex-col rounded-2xl border border-slate-800 bg-slate-900/60" aria-label={T("教练对话", "Coach conversation")}>
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
           {!active && <p className="text-sm text-slate-500">{t("ui.coach.intro")}</p>}
           {messages.map((m) => (
@@ -172,7 +173,7 @@ export default function CoachChat() {
             onChange={(e) => setInput(e.target.value)}
             disabled={!active || busy}
             placeholder={active ? t("ui.coach.placeholder") : t("ui.coach.startFirst")}
-            aria-label="Message to coach"
+            aria-label={T("发送给教练的消息", "Message to coach")}
             maxLength={4000}
             className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-indigo-500 focus:outline-none"
           />
