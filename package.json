@@ -24,7 +24,7 @@
     "db:seed:audiobooks": "tsx prisma/seed-audiobooks.ts",
     "db:seed:emporion": "tsx prisma/seed-emporion.ts",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && (prisma migrate deploy || echo \"migrate skipped — set DATABASE_URL in Vercel to enable\") && next build",
     "analyze": "ANALYZE=true next build",
     "db:seed:naval": "tsx prisma/seed-naval.ts",
     "weekly": "tsx scripts/weekly.ts"
