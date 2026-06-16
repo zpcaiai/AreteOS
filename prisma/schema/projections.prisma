@@ -1,0 +1,12 @@
+// Read-model projection store for the event-sourced engines (see src/lib/projections.ts).
+// Cheap upserted snapshots so high-traffic reads (journey/dashboard) don't replay the
+// event log per request. Standalone (no relations) to keep the migration trivial.
+model EngineProjection {
+  userId    String   @map("user_id")
+  kind      String
+  payload   Json
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@id([userId, kind])
+  @@map("engine_projections")
+}

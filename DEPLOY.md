@@ -150,3 +150,20 @@ Setup (on the machine/host that runs or can reach the app):
    ```
 
 Logs go to `/tmp/areteos-weekly.log`. To verify it's installed: `crontab -l`.
+
+## Read-model projections (engine_projections)
+
+The event-sourced engines (journey/dashboard overview, etc.) can serve a cheap
+upserted projection instead of replaying the event log per request. Code is already
+in place (`src/lib/projections.ts`, used by `journeyOverview`) and **degrades
+gracefully until the table exists** — so you can apply this any time, online:
+
+```
+npx prisma migrate dev --name engine_projections   # creates the table + regenerates the client
+# or, without a migration:
+npx prisma db execute --file prisma/sql/engine_projections.sql --schema prisma/schema
+```
+
+The model lives in `prisma/schema/projections.prisma` (`EngineProjection` →
+`engine_projections`). Reads use a two-tier cache: in-process 20s → DB projection
+120s → recompute + persist. No code change is needed after migrating.

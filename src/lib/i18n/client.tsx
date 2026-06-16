@@ -24,6 +24,13 @@ export function useI18n() {
   return useContext(I18nContext);
 }
 
+/** Bilingual helper bound to the current locale: T("中文", "English"). Centralizes
+ *  the inline closure the 2026 engine pages each redefined. */
+export function useT() {
+  const { locale } = useContext(I18nContext);
+  return (zh: string, en: string) => (locale === "en" ? en : zh);
+}
+
 /** Translate by ENGLISH dictionary value (identity for unknown strings). */
 export function useTx() {
   const { locale } = useContext(I18nContext);
