@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -5,7 +6,7 @@ import { computeIdentityProfile } from "@/lib/ethos/service";
 import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Identity Library" };
+export const generateMetadata = titleMeta("身份库", "Identity Library");
 
 export const dynamic = "force-dynamic";
 

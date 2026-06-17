@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeScoresCached } from "@/lib/analytics";
@@ -8,7 +9,7 @@ import JourneyTiles from "@/components/JourneyTiles";
 import WeeklyCardBanner from "@/components/WeeklyCardBanner";
 import NextActionBanner from "@/components/NextActionBanner";
 
-export const metadata = { title: "Dashboard" };
+export const generateMetadata = titleMeta("总览", "Dashboard");
 
 export const dynamic = "force-dynamic";
 

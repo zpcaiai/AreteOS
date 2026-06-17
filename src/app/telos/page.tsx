@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Mission" };
+export const generateMetadata = titleMeta("使命", "Mission");
 export const dynamic = "force-dynamic";
 
 export default async function MissionPage() {

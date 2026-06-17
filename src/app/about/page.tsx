@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Card } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "About Arete" };
+export const generateMetadata = titleMeta("关于 Arete", "About Arete");
 
 const SUBBRANDS: { name: string; greek: string; meaning: string; meaningZh: string; module: string }[] = [
   { name: "Cosmos", greek: "κόσμος", meaning: "the ordered world — how you interpret reality", meaningZh: "有序的世界——你如何解读现实", module: "Worldview OS" },

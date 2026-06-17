@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { overview } from "@/lib/admin/service";
 import { Card, PageHeader, StatGrid, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "总览" };
+export const generateMetadata = titleMeta("总览", "Overview");
 
 export const dynamic = "force-dynamic";
 

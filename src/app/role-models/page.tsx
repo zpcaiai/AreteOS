@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Role Models" };
+export const generateMetadata = titleMeta("榜样人物", "Role Models");
 export const dynamic = "force-dynamic";
 
 export default async function RoleModelsPage() {

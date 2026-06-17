@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui";
 import { ProductsAdmin } from "../AdminClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "商品" };
+export const generateMetadata = titleMeta("商品", "Products");
 
 export const dynamic = "force-dynamic";
 

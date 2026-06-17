@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -7,7 +8,7 @@ import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import ManagementStudio from "./ManagementStudio";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Management OS" };
+export const generateMetadata = titleMeta("管理 OS", "Management OS");
 
 export const dynamic = "force-dynamic";
 

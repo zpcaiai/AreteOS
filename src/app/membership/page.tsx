@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { getActiveMembership } from "@/lib/membership/service";
 import { PageHeader } from "@/components/ui";
 import MembershipClient from "./MembershipClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Membership" };
+export const generateMetadata = titleMeta("会员", "Membership");
 
 export const dynamic = "force-dynamic";
 

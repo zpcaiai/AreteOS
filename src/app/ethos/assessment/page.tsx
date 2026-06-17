@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { PageHeader } from "@/components/ui";
 import { AssessmentTool } from "../IdentityClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Identity Assessment" };
+export const generateMetadata = titleMeta("身份评估", "Identity Assessment");
 
 export const dynamic = "force-dynamic";
 

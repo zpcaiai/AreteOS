@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -6,7 +7,7 @@ import { Card, ScoreBar, PageHeader, Empty } from "@/components/ui";
 import SfmStudio from "./SfmStudio";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Business Scaling Engine (SFM)" };
+export const generateMetadata = titleMeta("业务规模化引擎(SFM)", "Business Scaling Engine (SFM)");
 
 export const dynamic = "force-dynamic";
 

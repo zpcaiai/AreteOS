@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import AnalyzeBox from "@/components/AnalyzeBox";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Beliefs" };
+export const generateMetadata = titleMeta("信念", "Beliefs");
 export const dynamic = "force-dynamic";
 
 export default async function BeliefsPage() {

@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { StackTool } from "../IdentityClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Identity Stack" };
+export const generateMetadata = titleMeta("身份栈", "Identity Stack");
 
 export const dynamic = "force-dynamic";
 

@@ -14,23 +14,25 @@ const serif = EB_Garamond({ subsets: ["latin"], display: "swap", weight: ["500",
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://arete.app";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: { default: "Arete — 人类发展操作系统", template: "%s · Arete" },
-  description: "Arete —— 一套帮助人与组织走向卓越(arete)的操作系统。成为你本来所是的样子。",
-  applicationName: "Arete",
-  keywords: ["Arete", "人类发展", "成长", "认知", "领导力", "Human Development OS"],
-  openGraph: {
-    title: "Arete — 人类发展操作系统",
-    description: "成为你本来所是的样子。",
-    siteName: "Arete",
-    type: "website",
-    url: SITE_URL,
-  },
-  twitter: { card: "summary", title: "Arete", description: "成为你本来所是的样子。" },
-  robots: { index: true, follow: true },
-  manifest: "/manifest.webmanifest",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await getDict();
+  const en = locale === "en";
+  const brand = en ? "Arete — Human Development OS" : "Arete — 人类发展操作系统";
+  const tagline = en ? "Become who you are." : "成为你本来所是的样子。";
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: brand, template: "%s · Arete" },
+    description: en
+      ? "Arete — an operating system that helps people and the organizations they build move from potential to realized excellence (arete). Become who you are."
+      : "Arete —— 一套帮助人与组织走向卓越(arete)的操作系统。成为你本来所是的样子。",
+    applicationName: "Arete",
+    keywords: ["Arete", "人类发展", "成长", "认知", "领导力", "Human Development OS"],
+    openGraph: { title: brand, description: tagline, siteName: "Arete", type: "website", url: SITE_URL },
+    twitter: { card: "summary", title: "Arete", description: tagline },
+    robots: { index: true, follow: true },
+    manifest: "/manifest.webmanifest",
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",

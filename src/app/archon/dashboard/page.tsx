@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeLeadership } from "@/lib/archon/service";
 import { Card, ScoreBar, PageHeader, Line, Empty, Scoreboard } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Leadership Dashboard" };
+export const generateMetadata = titleMeta("领导力仪表盘", "Leadership Dashboard");
 
 export const dynamic = "force-dynamic";
 

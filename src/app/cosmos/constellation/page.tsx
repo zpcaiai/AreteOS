@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { PageHeader } from "@/components/ui";
 import ConstellationCanvas from "@/components/ConstellationCanvas";
 import type { ConsNode } from "@/components/Constellation";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Constellation" };
+export const generateMetadata = titleMeta("星座图", "Constellation");
 
 // The Arete development system as a navigable sphere (engines + sample values).
 const NODES: ConsNode[] = [

@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import ReviewGenerator from "@/components/ReviewGenerator";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Reviews" };
+export const generateMetadata = titleMeta("回顾", "Reviews");
 export const dynamic = "force-dynamic";
 
 export default async function ReviewsPage() {

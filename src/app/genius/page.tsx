@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -6,7 +7,7 @@ import { SIX_CAPABILITIES } from "@/lib/genius/constants";
 import { ChildCreateForm } from "./ChildClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Genius Kids OS" };
+export const generateMetadata = titleMeta("天才儿童 OS", "Genius Kids OS");
 
 export const dynamic = "force-dynamic";
 

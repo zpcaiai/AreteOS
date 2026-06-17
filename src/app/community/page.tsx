@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader, Empty } from "@/components/ui";
@@ -5,7 +6,7 @@ import { Composer, CommentForm } from "@/components/CommunityClient";
 import { statusLabel } from "@/lib/community/statuses";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Community" };
+export const generateMetadata = titleMeta("社区", "Community");
 export const dynamic = "force-dynamic";
 
 function who(u: { name: string | null; email: string }) {

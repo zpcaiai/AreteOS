@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, Line } from "@/components/ui";
@@ -5,7 +6,7 @@ import { EVOLUTION_STAGES } from "@/lib/domain/enums";
 import GrowthReplay from "@/components/GrowthReplay";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Growth Timeline" };
+export const generateMetadata = titleMeta("成长时间线", "Growth Timeline");
 export const dynamic = "force-dynamic";
 
 const TRACK_KINDS = [

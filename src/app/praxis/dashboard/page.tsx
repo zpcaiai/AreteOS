@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeOrgHealth } from "@/lib/praxis/service";
 import { Card, ScoreBar, PageHeader, Line, Empty, Scoreboard } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Organizational Health Dashboard" };
+export const generateMetadata = titleMeta("组织健康仪表盘", "Organizational Health Dashboard");
 
 export const dynamic = "force-dynamic";
 

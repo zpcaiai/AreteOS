@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { DeleteButton } from "../AdminClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "社区审核" };
+export const generateMetadata = titleMeta("社区审核", "Community Review");
 
 export const dynamic = "force-dynamic";
 

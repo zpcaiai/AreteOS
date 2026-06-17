@@ -1,8 +1,9 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { PageHeader } from "@/components/ui";
 import CoachChat from "@/components/coach/CoachChat";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "AI Coach" };
+export const generateMetadata = titleMeta("AI 教练", "AI Coach");
 export const dynamic = "force-dynamic";
 
 export default async function CoachPage() {

@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getEntitlements } from "@/lib/emporion/service";
@@ -5,7 +6,7 @@ import { Card, PageHeader, Empty, StatGrid } from "@/components/ui";
 import EmporionClient from "./EmporionClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Emporion · 商店" };
+export const generateMetadata = titleMeta("Emporion · 商店", "Emporion · Store");
 
 export const dynamic = "force-dynamic";
 

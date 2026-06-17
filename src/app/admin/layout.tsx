@@ -1,8 +1,9 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { requireAdminPage } from "@/lib/admin/auth";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Arete 管理后台" };
+export const generateMetadata = titleMeta("Arete 管理后台", "Arete Admin");
 
 const NAV: [string, string][] = [
   ["/admin", "总览"], ["/admin/users", "用户"], ["/admin/orders", "订单"],

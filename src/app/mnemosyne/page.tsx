@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader, Card } from "@/components/ui";
@@ -5,7 +6,7 @@ import Disclaimer from "@/components/Disclaimer";
 import AudiobookShelf from "./AudiobookShelf";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "听书成长 · Listen to Grow" };
+export const generateMetadata = titleMeta("听书成长", "Listen to Grow");
 
 export const dynamic = "force-dynamic";
 

@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui";
 import GeniusStudio from "@/components/GeniusStudio";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Genius Strategies" };
+export const generateMetadata = titleMeta("天才策略", "Genius Strategies");
 export const dynamic = "force-dynamic";
 
 export default async function GeniusPage() {

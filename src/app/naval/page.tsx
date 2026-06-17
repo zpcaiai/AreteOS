@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { computeNavalDashboard } from "@/lib/naval/service";
@@ -6,7 +7,7 @@ import EngineStudio from "@/components/naval/EngineStudio";
 import { ENGINES, ENGINE_ORDER } from "@/components/naval/config";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Naval Life OS" };
+export const generateMetadata = titleMeta("Naval 人生 OS", "Naval Life OS");
 export const dynamic = "force-dynamic";
 
 export default async function NavalHome() {

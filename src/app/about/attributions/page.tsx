@@ -1,8 +1,9 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { PageHeader, Card } from "@/components/ui";
 import { DISCLAIMER_LONG, INSPIRATIONS } from "@/lib/legal/attributions";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Attributions & Legal" };
+export const generateMetadata = titleMeta("致谢与法律声明", "Attributions & Legal");
 
 export default async function AttributionsPage() {
   const { t } = await getDict();

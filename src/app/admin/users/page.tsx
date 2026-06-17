@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { GrantInline } from "../AdminClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "用户" };
+export const generateMetadata = titleMeta("用户", "Users");
 
 export const dynamic = "force-dynamic";
 

@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { PageHeader } from "@/components/ui";
 import EngineStudio from "@/components/naval/EngineStudio";
 import { ENGINES } from "@/components/naval/config";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Wealth Creation" };
+export const generateMetadata = titleMeta("财富创造", "Wealth Creation");
 export const dynamic = "force-dynamic";
 
 const config = ENGINES["wealth"];

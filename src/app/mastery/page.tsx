@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
 import { masteryScore } from "@/lib/scoring";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Mastery" };
+export const generateMetadata = titleMeta("精通", "Mastery");
 export const dynamic = "force-dynamic";
 
 export default async function MasteryPage() {

@@ -1,8 +1,9 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Mental Model Library" };
+export const generateMetadata = titleMeta("思维模型库", "Mental Model Library");
 
 export const dynamic = "force-dynamic";
 

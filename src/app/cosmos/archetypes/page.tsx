@@ -1,8 +1,9 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Worldview Archetypes" };
+export const generateMetadata = titleMeta("世界观原型", "Worldview Archetypes");
 
 export const dynamic = "force-dynamic";
 

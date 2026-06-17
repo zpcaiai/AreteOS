@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
 import { StepToggle } from "@/components/ExcellenceClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Excellence Learning Loop" };
+export const generateMetadata = titleMeta("卓越学习闭环", "Excellence Learning Loop");
 export const dynamic = "force-dynamic";
 
 export default async function LearningPathPage() {

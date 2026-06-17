@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Genius Library" };
+export const generateMetadata = titleMeta("天才库", "Genius Library");
 export const dynamic = "force-dynamic";
 
 export default async function ModelsPage() {

@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeScoresCached } from "@/lib/analytics";
@@ -6,7 +7,7 @@ import AnalyzeBox from "@/components/AnalyzeBox";
 import WhatIfSimulator from "@/components/WhatIfSimulator";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Digital Twin" };
+export const generateMetadata = titleMeta("数字孪生", "Digital Twin");
 export const dynamic = "force-dynamic";
 
 export default async function TwinPage() {

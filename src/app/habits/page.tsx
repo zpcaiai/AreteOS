@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
 import { habitConsistencyScore } from "@/lib/scoring";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Habits" };
+export const generateMetadata = titleMeta("习惯", "Habits");
 export const dynamic = "force-dynamic";
 
 export default async function HabitsPage() {

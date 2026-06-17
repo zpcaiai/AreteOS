@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getOptionalUserId } from "@/lib/auth";
 import { PageHeader, Card } from "@/components/ui";
 import { GrantForm } from "../AdminClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "会员发放" };
+export const generateMetadata = titleMeta("会员发放", "Grant Membership");
 
 export const dynamic = "force-dynamic";
 

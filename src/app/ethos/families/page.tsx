@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Identity Families" };
+export const generateMetadata = titleMeta("身份家族", "Identity Families");
 
 export const dynamic = "force-dynamic";
 

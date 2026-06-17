@@ -1,10 +1,11 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeWorldview } from "@/lib/cosmos/service";
 import { Card, ScoreBar, PageHeader, Empty, Scoreboard } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Worldview Dashboard" };
+export const generateMetadata = titleMeta("世界观仪表盘", "Worldview Dashboard");
 
 export const dynamic = "force-dynamic";
 

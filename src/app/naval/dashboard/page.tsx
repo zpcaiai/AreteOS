@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { computeNavalDashboard, snapshotTrend } from "@/lib/naval/service";
@@ -6,7 +7,7 @@ import Radar from "@/components/naval/Radar";
 import PlanButton from "@/components/naval/PlanButton";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Naval Dashboard" };
+export const generateMetadata = titleMeta("Naval 仪表盘", "Naval Dashboard");
 export const dynamic = "force-dynamic";
 
 export default async function NavalDashboard() {

@@ -1,7 +1,8 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { PageHeader, Card } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Start Here" };
+export const generateMetadata = titleMeta("从这里开始", "Start Here");
 
 export default async function StartHerePage() {
   const { t } = await getDict();

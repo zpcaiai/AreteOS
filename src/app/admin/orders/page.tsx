@@ -1,9 +1,10 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty } from "@/components/ui";
 import { RefundButton } from "../AdminClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "订单" };
+export const generateMetadata = titleMeta("订单", "Orders");
 
 export const dynamic = "force-dynamic";
 

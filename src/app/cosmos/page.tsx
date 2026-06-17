@@ -1,3 +1,4 @@
+import { titleMeta } from "@/lib/i18n/metadata";
 import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -7,7 +8,7 @@ import AnalyzeBox from "@/components/AnalyzeBox";
 import WorldviewStudio from "./WorldviewStudio";
 import { getDict } from "@/lib/i18n/server";
 
-export const metadata = { title: "Worldview OS" };
+export const generateMetadata = titleMeta("世界观 OS", "Worldview OS");
 
 export const dynamic = "force-dynamic";
 
