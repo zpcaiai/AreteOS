@@ -236,7 +236,7 @@ export default function Sidebar() {
                       aria-expanded={groupOpen}
                       className={`flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors hover:text-slate-200 ${hasActive ? "text-indigo-300" : "text-slate-500"}`}>
                       <span>{T(g.zh, g.en)}</span>
-                      <span className="text-slate-600">{groupOpen ? "▾" : "▸"}</span>
+                      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${groupOpen ? "rotate-90" : ""}`}><path d="m9 6 6 6-6 6" /></svg>
                     </button>
                     {groupOpen && (
                       <div className="mt-0.5 space-y-0.5">
