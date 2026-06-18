@@ -1,0 +1,100 @@
+/* Companion sprite & widget animations (pure CSS, no framer-motion).
+   Ported from an earlier floating-companion sprite and made theme-neutral.
+   States: idle | listening | comforting | focus | celebrating | resting */
+
+@keyframes companion-breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.05) translateY(-2px); }
+}
+@keyframes companion-glow-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.12); }
+}
+@keyframes companion-nod {
+  0%, 100% { transform: scale(1.04) translateY(-3px) rotate(0deg); }
+  30% { transform: scale(1.04) translateY(-3px) rotate(3deg); }
+  60% { transform: scale(1.04) translateY(-3px) rotate(-1deg); }
+}
+@keyframes companion-comfort-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1.1); }
+  50% { opacity: 0.85; transform: scale(1.35); }
+}
+@keyframes companion-celebrate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-6deg); }
+  60% { transform: scale(1.1) rotate(6deg); }
+}
+@keyframes companion-rest {
+  0%, 100% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(0.98); opacity: 0.78; }
+}
+@keyframes companion-sparkle {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--gx), var(--gy)) scale(0.4); opacity: 0; }
+}
+@keyframes companion-panel-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.companion-body { transform-origin: 50% 100%; }
+.companion-body--idle { animation: companion-breathe 3s ease-in-out infinite; }
+.companion-body--listening { animation: companion-nod 1.6s ease-in-out infinite; }
+.companion-body--comforting { animation: companion-breathe 2.2s ease-in-out infinite; }
+.companion-body--focus { transform: scale(0.96) translateY(3px); transition: transform 1s; }
+.companion-body--celebrating { animation: companion-celebrate 0.9s ease-in-out infinite; }
+.companion-body--resting { animation: companion-rest 5s ease-in-out infinite; }
+
+.companion-glow {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: #ffc2da; filter: blur(14px);
+}
+.companion-glow--idle { animation: companion-glow-pulse 3s ease-in-out infinite; }
+.companion-glow--listening { opacity: 0.5; transform: scale(1.05); }
+.companion-glow--comforting { animation: companion-comfort-glow 2.2s ease-in-out infinite; }
+.companion-glow--focus { opacity: 0.3; transform: scale(0.95); }
+.companion-glow--celebrating { animation: companion-comfort-glow 0.9s ease-in-out infinite; }
+.companion-glow--resting { opacity: 0.15; animation: companion-glow-pulse 5s ease-in-out infinite; }
+
+.companion-sparkle {
+  position: absolute; left: 50%; top: 50%;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #ffd1e6;
+  animation: companion-sparkle 1.1s ease-out infinite;
+}
+
+.companion-panel { animation: companion-panel-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.05); }
+
+/* halo / dust ring */
+@keyframes companion-halo-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+@keyframes companion-ring-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.companion-halo {
+  transform-box: fill-box; transform-origin: center;
+  animation: companion-halo-breathe 3.6s ease-in-out infinite;
+}
+.companion-ring {
+  transform-box: view-box; transform-origin: 36px 38px;
+  animation: companion-ring-spin 16s linear infinite;
+}
+.companion-body--resting .companion-ring { animation-play-state: paused; opacity: 0.15; }
+.companion-body--focus .companion-ring { animation-duration: 30s; }
+.companion-body--celebrating .companion-ring { animation-duration: 5s; }
+.companion-body--comforting .companion-halo { animation-duration: 2.2s; }
+
+/* breathing exercise circle */
+@keyframes companion-breath-cycle {
+  0%, 100% { transform: scale(0.7); opacity: 0.6; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+.companion-breath-orb { animation: companion-breath-cycle 8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-body, .companion-glow, .companion-halo, .companion-ring,
+  .companion-sparkle, .companion-panel, .companion-breath-orb { animation: none !important; }
+}
