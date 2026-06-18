@@ -23,11 +23,13 @@ export async function POST(req: Request) {
       include: { identityPatterns: true, decisionPatterns: true, habitPatterns: true },
     });
     // Seed the latticework with the model's mental models.
-    for (const name of bp.mentalModels) {
-      await prisma.mentalModel.upsert({
-        where: { userId_name: { userId, name } }, update: {}, create: { userId, name },
-      });
-    }
+    await prisma.$transaction(
+      bp.mentalModels.map((name) =>
+        prisma.mentalModel.upsert({
+          where: { userId_name: { userId, name } }, update: {}, create: { userId, name },
+        }),
+      ),
+    );
     projectRoleModel({ userId, person: body.person, mentalModels: bp.mentalModels }).catch(() => null);
     return created({ roleModel, blueprint: bp });
   });
