@@ -8,8 +8,26 @@ import { prisma } from "./db";
 
 interface ProjRow { payload: unknown; updated_at: Date | string }
 
+// Self-heal: create the cache table on first use so projections work on any
+// Postgres (pooled DATABASE_URL) without depending on DIRECT_URL / migrations.
+// Runs at most once per server instance.
+let tableEnsured = false;
+async function ensureTable(): Promise<void> {
+  if (tableEnsured) return;
+  await prisma.$executeRaw`
+    CREATE TABLE IF NOT EXISTS engine_projections (
+      user_id    text        NOT NULL,
+      kind       text        NOT NULL,
+      payload    jsonb       NOT NULL,
+      updated_at timestamptz NOT NULL DEFAULT now(),
+      PRIMARY KEY (user_id, kind)
+    )`;
+  tableEnsured = true;
+}
+
 /** Read a projection if it exists and is fresher than maxAgeMs; else null. */
 export async function readProjection<T>(userId: string, kind: string, maxAgeMs: number): Promise<T | null> {
+  await ensureTable();
   const rows = await prisma.$queryRaw<ProjRow[]>`
     SELECT payload, updated_at FROM engine_projections WHERE user_id = ${userId} AND kind = ${kind} LIMIT 1`;
   const row = rows[0];
@@ -20,6 +38,7 @@ export async function readProjection<T>(userId: string, kind: string, maxAgeMs: 
 
 /** Upsert a projection (last-writer-wins, updated_at = now). */
 export async function writeProjection(userId: string, kind: string, payload: unknown): Promise<void> {
+  await ensureTable();
   await prisma.$executeRaw`
     INSERT INTO engine_projections (user_id, kind, payload, updated_at)
     VALUES (${userId}, ${kind}, ${JSON.stringify(payload)}::jsonb, now())
