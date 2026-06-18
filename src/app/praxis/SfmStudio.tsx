@@ -53,7 +53,7 @@ export default function SfmStudio() {
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-lg font-bold">SFM Studio</h2>
+      <h2 className="text-lg font-bold">{T("SFM 工作室", "SFM Studio")}</h2>
       <p className="mt-1 text-sm text-slate-400">{T("逐个模块运行:为创始人建模、提取成功要素、生成可复制的操作手册。(Pro 功能——可离线用 mock AI 运行。)", "Run each module to model the founder, extract success factors, and generate the replication playbook. (Pro feature — runs offline on mock AI.)")}</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
 

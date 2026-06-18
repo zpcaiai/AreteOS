@@ -12,7 +12,8 @@ export const generateMetadata = titleMeta("认知 OS", "Cognitive OS");
 export const dynamic = "force-dynamic";
 
 export default async function CognitivePage() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const [h, graph] = await Promise.all([
     computeCognitive(userId),
@@ -36,7 +37,7 @@ export default async function CognitivePage() {
           <ScoreBar label={t("score.reflection")} value={h.reflection} />
           <ScoreBar label={t("score.wisdom")} value={h.wisdom} />
           <div className="mt-3 flex gap-2 text-xs">
-            <Link href="/phronesis/models" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Model library</Link>
+            <Link href="/phronesis/models" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">{en ? "Model library" : "模型库"}</Link>
             <Link href="/phronesis/dashboard" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Dashboard</Link>
           </div>
         </Card>

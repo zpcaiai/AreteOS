@@ -11,7 +11,8 @@ export const generateMetadata = titleMeta("Naval 人生 OS", "Naval Life OS");
 export const dynamic = "force-dynamic";
 
 export default async function NavalHome() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const d = await computeNavalDashboard(userId);
 
@@ -55,7 +56,7 @@ export default async function NavalHome() {
 
       <div className="mt-8">
         <h2 className="mb-1 text-sm font-semibold text-slate-300">Start here — Specific Knowledge</h2>
-        <p className="mb-3 text-xs text-slate-500">Answer the prompts to seed your Naval Life OS, then explore the other engines.</p>
+        <p className="mb-3 text-xs text-slate-500">{en ? "Answer the prompts to seed your Naval Life OS, then explore the other engines." : "回答这些提示来初始化你的 Naval 人生 OS,然后探索其他引擎。"}</p>
         <EngineStudio config={ENGINES["specific-knowledge"]} />
       </div>
     </div>

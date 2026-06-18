@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 const SYS: Record<string, string> = { V: "Visual", A: "Auditory", K: "Kinesthetic", Ad: "Self-talk" };
 
 export default async function ModelDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   await getUserId();
   const { id } = await params;
   const genius = await prisma.genius.findUnique({ where: { id }, include: { strategies: { orderBy: { createdAt: "asc" } } } });
@@ -21,7 +22,7 @@ export default async function ModelDetail({ params }: { params: Promise<{ id: st
     <div>
       <Link href="/models" className="text-sm text-indigo-400">← Library</Link>
       <PageHeader title={genius.name} subtitle={[genius.era, genius.domain].filter(Boolean).join(" · ")} />
-      {!s ? <p className="text-sm text-slate-500">No blueprint yet.</p> : (
+      {!s ? <p className="text-sm text-slate-500">{en ? "No blueprint yet." : "还没有蓝图。"}</p> : (
         <div className="space-y-4">
           <Card title={`Strategy · ${s.name}`}><p className="text-sm text-slate-300">{s.description}</p></Card>
 

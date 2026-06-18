@@ -13,7 +13,8 @@ export const generateMetadata = titleMeta("领导力杠杆引擎", "Leadership L
 export const dynamic = "force-dynamic";
 
 export default async function LeadershipPage() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const [health, leverage, vision] = await Promise.all([
     computeLeadership(userId),
@@ -50,7 +51,7 @@ export default async function LeadershipPage() {
         <div className="mt-2 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-xs uppercase text-slate-500">
-              <tr><th className="py-1 pr-3">Lvl</th><th className="px-3">Level</th><th className="px-3">Question</th><th className="px-3">Role</th><th className="px-3">Leverage</th><th className="px-3">Your focus</th></tr>
+              <tr><th className="py-1 pr-3">{en ? "Lvl" : "级"}</th><th className="px-3">{en ? "Level" : "层级"}</th><th className="px-3">{en ? "Question" : "问题"}</th><th className="px-3">{en ? "Role" : "角色"}</th><th className="px-3">{en ? "Leverage" : "杠杆"}</th><th className="px-3">{en ? "Your focus" : "你的重点"}</th></tr>
             </thead>
             <tbody>
               {LEVELS.map((l) => (

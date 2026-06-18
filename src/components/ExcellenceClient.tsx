@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTx } from "@/lib/i18n/client";
+import { useT, useTx } from "@/lib/i18n/client";
 
 export function AdaptForm({ strategyId }: { strategyId: string }) {
   const tx = useTx();
+  const T = useT();
   const router = useRouter();
   const [f, setF] = useState({ currentIdentity: "", goals: "", strengths: "", weaknesses: "" });
   const [busy, setBusy] = useState(false);
@@ -20,7 +21,7 @@ export function AdaptForm({ strategyId }: { strategyId: string }) {
   }
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-      <div className="mb-2 text-sm font-semibold">Adapt this blueprint to me</div>
+      <div className="mb-2 text-sm font-semibold">{T("把这套蓝图改编给我", "Adapt this blueprint to me")}</div>
       <div className="grid gap-2 sm:grid-cols-2">
         <input className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" placeholder={tx("My current identity / role")} value={f.currentIdentity} onChange={(e) => set("currentIdentity", e.target.value)} />
         <input className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" placeholder={tx("My goal")} value={f.goals} onChange={(e) => set("goals", e.target.value)} />
@@ -35,6 +36,7 @@ export function AdaptForm({ strategyId }: { strategyId: string }) {
 
 export function GeneratePathButton({ adaptationId }: { adaptationId: string }) {
   const tx = useTx();
+  const T = useT();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   async function gen() {
@@ -47,6 +49,7 @@ export function GeneratePathButton({ adaptationId }: { adaptationId: string }) {
 
 export function StepToggle({ stepId, done }: { stepId: string; done: boolean }) {
   const tx = useTx();
+  const T = useT();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   async function toggle() {

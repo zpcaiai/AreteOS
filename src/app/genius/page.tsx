@@ -12,14 +12,15 @@ export const generateMetadata = titleMeta("天才儿童 OS", "Genius Kids OS");
 export const dynamic = "force-dynamic";
 
 export default async function ChildHub() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const children = await prisma.childProfile.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
   return (
     <div>
       <PageHeader title={t("page.genius.title")} subtitle={t("page.genius.subtitle")} />
       <Card title={t("card.why_this_exists")}>
-        <p className="text-sm text-slate-300">We optimize for the six capabilities that predict long-term flourishing far better than test scores:</p>
+        <p className="text-sm text-slate-300">{en ? "We optimize for the six capabilities that predict long-term flourishing far better than test scores:" : "我们优化的是六项能力——它们比考试分数更能预测长期的蓬勃发展:"}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {SIX_CAPABILITIES.map((c) => <span key={c} className="rounded-full bg-indigo-950/50 px-3 py-1 text-xs text-indigo-200">{c}</span>)}
         </div>

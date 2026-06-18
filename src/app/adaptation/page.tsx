@@ -9,7 +9,8 @@ export const generateMetadata = titleMeta("改编蓝图", "Adapted Blueprints");
 export const dynamic = "force-dynamic";
 
 export default async function AdaptationPage() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const adaptations = await prisma.blueprintAdaptation.findMany({
     where: { userId }, orderBy: { createdAt: "desc" }, include: { strategy: { include: { genius: true } }, paths: true },
@@ -28,7 +29,7 @@ export default async function AdaptationPage() {
                 <div className="rounded-lg bg-slate-800/60 p-2"><span className="text-xs uppercase text-slate-500">Beliefs</span><p>{a.beliefs}</p></div>
               </div>
               {Array.isArray(a.decisionRules) && (a.decisionRules as string[]).length > 0 && (
-                <div className="mt-2"><span className="text-xs uppercase text-slate-500">Decision rules</span><ul className="list-disc pl-5 text-sm">{(a.decisionRules as string[]).map((r, i) => <li key={i}>{r}</li>)}</ul></div>
+                <div className="mt-2"><span className="text-xs uppercase text-slate-500">{en ? "Decision rules" : "决策规则"}</span><ul className="list-disc pl-5 text-sm">{(a.decisionRules as string[]).map((r, i) => <li key={i}>{r}</li>)}</ul></div>
               )}
               {Array.isArray(a.habits) && (a.habits as string[]).length > 0 && (
                 <div className="mt-2"><span className="text-xs uppercase text-slate-500">Habits</span><ul className="list-disc pl-5 text-sm">{(a.habits as string[]).map((h, i) => <li key={i}>{h}</li>)}</ul></div>

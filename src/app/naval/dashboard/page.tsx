@@ -11,7 +11,8 @@ export const generateMetadata = titleMeta("Naval 仪表盘", "Naval Dashboard");
 export const dynamic = "force-dynamic";
 
 export default async function NavalDashboard() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const [d, trend] = await Promise.all([computeNavalDashboard(userId), snapshotTrend(userId)]);
   const s = d.scores;
@@ -45,7 +46,7 @@ export default async function NavalDashboard() {
         <Card title={t("card.seven_drivers")}><Radar points={radar} /></Card>
         <Card title={t("card.recommended_next_action")}>
           <p className="text-sm text-slate-300">{d.recommendedNextAction}</p>
-          {trend.length > 1 && <div className="mt-4"><div className="mb-1 text-xs text-slate-500">Global score trend</div><Line values={trend.map((t) => t.global / 100)} /></div>}
+          {trend.length > 1 && <div className="mt-4"><div className="mb-1 text-xs text-slate-500">{en ? "Global score trend" : "全局分趋势"}</div><Line values={trend.map((t) => t.global / 100)} /></div>}
         </Card>
       </div>
 
@@ -60,7 +61,7 @@ export default async function NavalDashboard() {
                 </li>
               ))}
             </ul>
-          ) : <Empty>No long-term games chosen yet. <Link href="/naval/long-term-games" className="text-indigo-400">Assess one →</Link></Empty>}
+          ) : <Empty>{en ? "No long-term games chosen yet. " : "还没有选择长期游戏。"}<Link href="/naval/long-term-games" className="text-indigo-400">{en ? "Assess one →" : "去评估一个 →"}</Link></Empty>}
         </Card>
       </div>
 
