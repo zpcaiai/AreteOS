@@ -8,7 +8,7 @@
 #   docker compose down         # stop (data persists in the named volume)
 services:
   db:
-    image: postgres:16
+    image: pgvector/pgvector:pg16  # postgres:16 + pgvector (PersonalMemory.embedding needs the 'vector' type)
     container_name: mission-os-db
     restart: unless-stopped
     environment:
