@@ -1,4 +1,5 @@
 import { titleMeta } from "@/lib/i18n/metadata";
+import CounterpartBanner from "@/components/healing/CounterpartBanner";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, Line } from "@/components/ui";
@@ -36,6 +37,7 @@ export default async function TimelinePage() {
 
   return (
     <div>
+      <CounterpartBanner href="/healing-timeline" tone="clinical" zh="想看疗愈干预的进展?查看「疗愈时间线」" en="Tracking healing-intervention progress? See the Healing Timeline" />
       <PageHeader title={t("page.timeline.title")} subtitle={t("page.timeline.subtitle")} />
 
       <div className="grid gap-5 lg:grid-cols-2">

@@ -1,4 +1,5 @@
 import { titleMeta } from "@/lib/i18n/metadata";
+import CounterpartBanner from "@/components/healing/CounterpartBanner";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, PageHeader, Empty, ScoreBar } from "@/components/ui";
@@ -13,6 +14,7 @@ export default async function IdentityPage() {
   const identities = await prisma.identity.findMany({ where: { userId }, include: { roles: true, scores: { orderBy: { date: "desc" }, take: 1 } } });
   return (
     <div>
+      <CounterpartBanner href="/identity-rebuild" tone="clinical" zh="在困扰/危机中重建身份?用临床版「身份重建」(先做安全分流)" en="Rebuilding identity amid distress? Use the clinical Identity Rebuild (triage first)" />
       <PageHeader title={t("page.identity.title")} subtitle={t("page.identity.subtitle")} />
       <div className="grid gap-5 lg:grid-cols-2">
         {identities.length ? identities.map((i) => (
