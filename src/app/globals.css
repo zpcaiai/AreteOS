@@ -63,9 +63,9 @@ html[data-theme="light"] .text-white { color: #0f172a; }
 html[data-theme="light"] .text-slate-300 { color: #1e293b; }
 html[data-theme="light"] .text-slate-400 { color: #475569; }
 html[data-theme="light"] .text-slate-500 { color: #64748b; }
-html[data-theme="light"] .text-slate-600 { color: #94a3b8; }
+html[data-theme="light"] .text-slate-500 { color: #94a3b8; }
 
-html[data-theme="light"] .placeholder\:text-slate-600::placeholder { color: #94a3b8; }
+html[data-theme="light"] .placeholder\:text-slate-500::placeholder { color: #94a3b8; }
 
 /* Keep primary action buttons readable in both themes. */
 html[data-theme="light"] .bg-indigo-600,

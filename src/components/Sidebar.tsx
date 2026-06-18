@@ -120,6 +120,12 @@ export default function Sidebar() {
   const { t } = useI18n();
   const T = useT();
   const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [ready, setReady] = useState(false);
@@ -202,7 +208,7 @@ export default function Sidebar() {
             onChange={(e) => setQ(e.target.value)}
             placeholder={T("筛选页面…", "Filter pages…")}
             aria-label={T("筛选页面", "Filter pages")}
-            className="w-full rounded-lg border border-slate-700 bg-slate-950/60 py-1.5 pl-8 pr-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500 focus:outline-none"
+            className="w-full rounded-lg border border-slate-700 bg-slate-950/60 py-1.5 pl-8 pr-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
           />
         </div>
 

@@ -147,7 +147,7 @@ export default function EngineStudio({ config }: { config: EngineConfig }) {
         <button onClick={run} disabled={busy} className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium disabled:opacity-50">
           {busy ? T("处理中…", "Working…") : tr(config.button)}
         </button>
-        <p className="mt-2 text-[11px] text-slate-600">{T("需要 Plus 会员。仅供学习参考——不构成财务、法律或医疗建议。", "Requires a Plus membership. Educational only — not financial, legal, or medical advice.")}</p>
+        <p className="mt-2 text-[11px] text-slate-500">{T("需要 Plus 会员。仅供学习参考——不构成财务、法律或医疗建议。", "Requires a Plus membership. Educational only — not financial, legal, or medical advice.")}</p>
       </div>
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">

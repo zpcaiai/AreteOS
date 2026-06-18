@@ -30,7 +30,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
               {T("错误已记录。可以重试,或清除运行时缓存后重新加载。", "The error has been recorded. Try again, or clear the runtime cache and reload.")}
             </p>
             {error.digest && (
-              <p className="mt-3 font-mono text-[11px] text-slate-600">{T("错误编号", "Error ID")}: {error.digest}</p>
+              <p className="mt-3 font-mono text-[11px] text-slate-500">{T("错误编号", "Error ID")}: {error.digest}</p>
             )}
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
               <button onClick={reset} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500">

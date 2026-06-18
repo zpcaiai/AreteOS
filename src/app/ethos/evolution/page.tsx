@@ -64,7 +64,7 @@ export default async function EvolutionPage() {
             {p.snapshots.map((s) => (
               <li key={s.id} className="flex justify-between border-t border-slate-800 pt-1">
                 <span>{s.archetypeSlug} · <span className="text-slate-500">{s.stage}</span></span>
-                <span className="text-xs text-slate-600">{new Date(s.createdAt).toLocaleDateString()}</span>
+                <span className="text-xs text-slate-500">{new Date(s.createdAt).toLocaleDateString()}</span>
               </li>
             ))}
           </ul>

@@ -175,7 +175,7 @@ export default function CoachChat() {
             placeholder={active ? t("ui.coach.placeholder") : t("ui.coach.startFirst")}
             aria-label={T("发送给教练的消息", "Message to coach")}
             maxLength={4000}
-            className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-indigo-500 focus:outline-none"
+            className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
           />
           <button type="submit" disabled={!active || busy || !input.trim()} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50">
             {t("ui.coach.send")}

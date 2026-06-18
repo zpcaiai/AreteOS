@@ -80,7 +80,7 @@ export default function PlanBoard() {
               {plan.tasks.filter((t) => t.month === m.month).map((t) => (
                 <li key={t.id} className="flex items-start gap-2 text-sm">
                   <input type="checkbox" checked={t.done} onChange={() => toggle(t)} className="mt-1 h-4 w-4 accent-indigo-500" />
-                  <span className={t.done ? "text-slate-500 line-through" : "text-slate-300"}>{t.task}<span className="block text-[11px] text-slate-600">{t.engine}</span></span>
+                  <span className={t.done ? "text-slate-500 line-through" : "text-slate-300"}>{t.task}<span className="block text-[11px] text-slate-500">{t.engine}</span></span>
                 </li>
               ))}
             </ul>

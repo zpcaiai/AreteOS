@@ -61,7 +61,7 @@ export default async function LeadershipPage() {
                   <td className="px-3 text-xs text-slate-400">{l.question}</td>
                   <td className="px-3 text-indigo-300">{l.role}</td>
                   <td className="px-3 text-xs text-slate-400">{l.leverage}</td>
-                  <td className="px-3">{dist ? <span className="tabular-nums">{Math.round((dist as Record<string, number>)[l.level] * 100)}</span> : <span className="text-slate-600">—</span>}</td>
+                  <td className="px-3">{dist ? <span className="tabular-nums">{Math.round((dist as Record<string, number>)[l.level] * 100)}</span> : <span className="text-slate-500">—</span>}</td>
                 </tr>
               ))}
             </tbody>

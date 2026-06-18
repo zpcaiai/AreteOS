@@ -55,7 +55,7 @@ export default async function TimelinePage() {
             {EVOLUTION_STAGES.map((s, i) => (
               <div key={s} className="flex items-center gap-2">
                 <span className={`rounded-full px-3 py-1 text-xs ${i <= currentIdx ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-400"}`}>{s}</span>
-                {i < EVOLUTION_STAGES.length - 1 && <span className="text-slate-600">→</span>}
+                {i < EVOLUTION_STAGES.length - 1 && <span className="text-slate-500">→</span>}
               </div>
             ))}
           </div>

@@ -71,7 +71,7 @@ export default async function WorldviewDashboard() {
       </Card>
 
       <Card title={t("card.evolution_timeline")}>
-        {timeline.length ? <ul className="space-y-1 text-sm text-slate-300">{timeline.map((t) => <li key={t.id} className="flex justify-between border-t border-slate-800 pt-1"><span>{String(t.stage).replace(/_/g," ")} · {t.note}</span><span className="text-xs text-slate-600">{new Date(t.createdAt).toLocaleDateString()}</span></li>)}</ul> : <Empty>{t("empty.no_evolution_entries_yet")}</Empty>}
+        {timeline.length ? <ul className="space-y-1 text-sm text-slate-300">{timeline.map((t) => <li key={t.id} className="flex justify-between border-t border-slate-800 pt-1"><span>{String(t.stage).replace(/_/g," ")} · {t.note}</span><span className="text-xs text-slate-500">{new Date(t.createdAt).toLocaleDateString()}</span></li>)}</ul> : <Empty>{t("empty.no_evolution_entries_yet")}</Empty>}
       </Card>
     </div>
   );

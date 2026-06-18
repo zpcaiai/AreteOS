@@ -19,7 +19,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           {T("这个页面暂时没能加载。可以重试,或返回总览。", "This page didn't load. Try again, or head back to the dashboard.")}
         </p>
         {error.digest && (
-          <p className="mt-3 font-mono text-[11px] text-slate-600">{T("错误编号", "Error ID")}: {error.digest}</p>
+          <p className="mt-3 font-mono text-[11px] text-slate-500">{T("错误编号", "Error ID")}: {error.digest}</p>
         )}
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <button onClick={reset} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500">

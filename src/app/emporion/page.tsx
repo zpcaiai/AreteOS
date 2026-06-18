@@ -63,7 +63,7 @@ export default async function EmporionPage() {
                         : <span className="text-slate-500">{o.status}</span>}
                     </td>
                     <td className="px-3 text-xs text-slate-400">{o.deliveryNote || "—"}</td>
-                    <td className="px-3 text-xs text-slate-600">{new Date(o.createdAt).toLocaleString()}</td>
+                    <td className="px-3 text-xs text-slate-500">{new Date(o.createdAt).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>

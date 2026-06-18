@@ -105,6 +105,12 @@ export default function ShareCardModal({
     document.fonts?.ready.then(repaint).catch(() => undefined);
   }, [repaint]);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   function download() {
     const canvas = canvasRef.current;
     if (!canvas) return;

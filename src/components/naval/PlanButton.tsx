@@ -40,7 +40,7 @@ export default function PlanButton() {
                 <div className="mb-2 text-xs text-slate-500">{m.focus}</div>
                 <ul className="space-y-2 text-sm text-slate-300">
                   {m.tasks.map((t, i) => (
-                    <li key={i} className="border-t border-slate-800 pt-2">{t.task}<div className="text-[11px] text-slate-600">{t.engine}</div></li>
+                    <li key={i} className="border-t border-slate-800 pt-2">{t.task}<div className="text-[11px] text-slate-500">{t.engine}</div></li>
                   ))}
                 </ul>
               </div>
