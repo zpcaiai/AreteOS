@@ -105,7 +105,7 @@ export default function DeepWorkPage() {
             <p className="mt-1 text-xs text-slate-500">{T("每格一天,越绿=深度工作越多;折线=每日分钟趋势。", "One cell per day; greener = more; the line is daily-minutes trend.")}</p>
           </Card>
           <Card title={T("每周汇总", "Weekly summary")}>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto"><table className="w-full text-sm">
               <thead><tr className="text-xs text-slate-500"><th className="text-left font-normal">{T("周起", "Week of")}</th><th className="text-right font-normal">{T("分钟", "Minutes")}</th><th className="text-right font-normal">{T("会话", "Sessions")}</th><th className="text-right font-normal">{T("均分", "Avg score")}</th></tr></thead>
               <tbody>
                 {d.weekly.map((w) => (
@@ -117,7 +117,7 @@ export default function DeepWorkPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           </Card>
         </div>
       )}
