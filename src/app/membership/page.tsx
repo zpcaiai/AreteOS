@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/ui";
 import MembershipClient from "./MembershipClient";
 import { getDict } from "@/lib/i18n/server";
 
-export const generateMetadata = titleMeta("会员", "Membership");
+export const generateMetadata = titleMeta("会员", "Membership", "Arete 会员:解锁全部 AI 教练、数字孪生、知识图谱与深度引擎。", "Arete membership: unlock all AI coaches, the digital twin, knowledge graph and deep engines.");
 
 export const dynamic = "force-dynamic";
 

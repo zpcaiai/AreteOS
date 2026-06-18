@@ -8,7 +8,7 @@ import JourneyTiles from "@/components/JourneyTiles";
 import WeeklyCardBanner from "@/components/WeeklyCardBanner";
 import NextActionBanner from "@/components/NextActionBanner";
 
-export const generateMetadata = titleMeta("总览", "Dashboard");
+export const generateMetadata = titleMeta("总览", "Dashboard", "你的成长指挥中心:下一步行动、各引擎闭环状态、成长分与阶段一览。", "Your growth command center: the next action, engine-loop status, scores and stage at a glance.");
 
 export const dynamic = "force-dynamic";
 

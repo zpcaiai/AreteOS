@@ -7,7 +7,7 @@ import EngineStudio from "@/components/naval/EngineStudio";
 import { ENGINES, ENGINE_ORDER } from "@/components/naval/config";
 import { getDict } from "@/lib/i18n/server";
 
-export const generateMetadata = titleMeta("Naval 人生 OS", "Naval Life OS");
+export const generateMetadata = titleMeta("Naval 人生 OS", "Naval Life OS", "Naval 人生 OS:围绕专属知识、杠杆、判断力、财富与自由的长期复利系统。", "Naval Life OS: a long-term compounding system for specific knowledge, leverage, judgment, wealth and freedom.");
 export const dynamic = "force-dynamic";
 
 export default async function NavalHome() {

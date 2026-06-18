@@ -7,7 +7,7 @@ import AnalyzeBox from "@/components/AnalyzeBox";
 import WorldviewStudio from "./WorldviewStudio";
 import { getDict } from "@/lib/i18n/server";
 
-export const generateMetadata = titleMeta("世界观 OS", "Worldview OS");
+export const generateMetadata = titleMeta("世界观 OS", "Worldview OS", "世界观 OS:厘清你解读现实的底层假设,提升清晰度、连贯性与意义。", "Worldview OS: surface the assumptions behind how you read reality; raise clarity, coherence and meaning.");
 
 export const dynamic = "force-dynamic";
 

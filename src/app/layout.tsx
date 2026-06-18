@@ -49,6 +49,29 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale === "zh" ? "zh-CN" : "en"} data-theme={theme} className={`${sans.variable} ${serif.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                { "@type": "Organization", "@id": `${SITE_URL}/#org`, name: "Arete", url: SITE_URL, logo: `${SITE_URL}/icon-512.png` },
+                { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: "Arete", url: SITE_URL, publisher: { "@id": `${SITE_URL}/#org` }, inLanguage: locale === "zh" ? "zh-CN" : "en" },
+                {
+                  "@type": "SoftwareApplication",
+                  name: "Arete",
+                  applicationCategory: "LifestyleApplication",
+                  operatingSystem: "Web",
+                  url: SITE_URL,
+                  description: en
+                    ? "A human development OS — diagnose, prescribe, practice and compound toward excellence (arete)."
+                    : "一套人类发展操作系统——诊断、处方、练习、复利,走向卓越(arete)。",
+                  offers: { "@type": "Offer", price: "0", priceCurrency: "CNY" },
+                },
+              ],
+            }),
+          }}
+        />
         <a href="#main" className="skip-link">{en ? "Skip to content" : "跳到主要内容"}</a>
         <ServiceWorker />
         <Providers>

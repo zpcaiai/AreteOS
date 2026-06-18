@@ -4,7 +4,7 @@ import Logo from "@/components/Logo";
 import { Card } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 
-export const generateMetadata = titleMeta("关于 Arete", "About Arete");
+export const generateMetadata = titleMeta("关于 Arete", "About Arete", "了解 Arete —— 一套帮助人与组织走向卓越的人类发展操作系统,以及它背后的设计哲学。", "About Arete — a human development OS that helps people and organizations move toward excellence, and the philosophy behind it.");
 
 const SUBBRANDS: { name: string; greek: string; meaning: string; meaningZh: string; module: string }[] = [
   { name: "Cosmos", greek: "κόσμος", meaning: "the ordered world — how you interpret reality", meaningZh: "有序的世界——你如何解读现实", module: "Worldview OS" },
