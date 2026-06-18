@@ -11,7 +11,8 @@ export const generateMetadata = titleMeta("身份库", "Identity Library");
 export const dynamic = "force-dynamic";
 
 export default async function IdentityLibraryPage() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const [profile, families] = await Promise.all([
     computeIdentityProfile(userId),
@@ -34,9 +35,9 @@ export default async function IdentityLibraryPage() {
         </Card>
         <Card title={t("card.get_started")}>
           <div className="flex flex-col gap-2 text-sm">
-            <Link href="/ethos/assessment" className="rounded-lg bg-indigo-600 px-3 py-1.5 text-center font-medium">Assess my identity</Link>
-            <Link href="/ethos/stack" className="rounded-lg bg-slate-800 px-3 py-1.5 text-center hover:bg-slate-700">Build my stack</Link>
-            <Link href="/ethos/evolution" className="rounded-lg bg-slate-800 px-3 py-1.5 text-center hover:bg-slate-700">Track evolution</Link>
+            <Link href="/ethos/assessment" className="rounded-lg bg-indigo-600 px-3 py-1.5 text-center font-medium">{en ? "Assess my identity" : "评估我的身份"}</Link>
+            <Link href="/ethos/stack" className="rounded-lg bg-slate-800 px-3 py-1.5 text-center hover:bg-slate-700">{en ? "Build my stack" : "构建我的身份栈"}</Link>
+            <Link href="/ethos/evolution" className="rounded-lg bg-slate-800 px-3 py-1.5 text-center hover:bg-slate-700">{en ? "Track evolution" : "追踪进化"}</Link>
           </div>
         </Card>
       </div>

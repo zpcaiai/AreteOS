@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTx } from "@/lib/i18n/client";
+import { useT, useTx } from "@/lib/i18n/client";
 
 const SYS_LABEL: Record<string, string> = { V: "Visual", A: "Auditory", K: "Kinesthetic", Ad: "Self-talk" };
 
@@ -17,6 +17,7 @@ type Adoption = { id: string; strategyId: string; status: string };
 
 export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius[]; adoptions: Adoption[] }) {
   const tx = useTx();
+  const T = useT();
   const router = useRouter();
   const adoptedByStrategy = new Map(adoptions.map((a) => [a.strategyId, a]));
   const [name, setName] = useState("");
@@ -42,7 +43,7 @@ export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-        <div className="mb-2 text-sm font-semibold">Model a genius</div>
+        <div className="mb-2 text-sm font-semibold">{T("为一位天才建模", "Model a genius")}</div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder={tx("Genius (e.g. Da Vinci, Tesla, Mozart)")}
             className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
@@ -53,7 +54,7 @@ export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius
           </button>
         </div>
         {err && <p className="mt-2 text-sm text-rose-400">{err}</p>}
-        <p className="mt-2 text-xs text-slate-500">Builds an NLP system model: logical levels + representational-system sequence + T.O.T.E. + install protocol.</p>
+        <p className="mt-2 text-xs text-slate-500">{T("构建一套 NLP 系统模型:逻辑层级 + 表征系统序列 + T.O.T.E. + 安装协议。", "Builds an NLP system model: logical levels + representational-system sequence + T.O.T.E. + install protocol.")}</p>
       </div>
 
       {geniuses.map((g) => (
@@ -69,21 +70,21 @@ export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius
                     <div className="font-medium">{s.name}</div>
                     <button onClick={() => adopt(s.id)} disabled={!!adopted}
                       className={`rounded-lg px-3 py-1 text-xs ${adopted ? "bg-emerald-700/60 text-emerald-200" : "bg-indigo-600"}`}>
-                      {adopted ? `Adopted · ${adopted.status}` : "Adopt"}
+                      {adopted ? `${T("已采纳", "Adopted")} · ${adopted.status}` : T("采纳", "Adopt")}
                     </button>
                   </div>
                   {s.description && <p className="mt-1 text-sm text-slate-300">{s.description}</p>}
 
                   <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-                    <Level label="Identity" value={s.identity} />
-                    <Level label="Beliefs" value={s.beliefs} />
-                    <Level label="Values" value={s.values} />
-                    <Level label="Capabilities" value={s.capabilities} />
+                    <Level label={T("身份", "Identity")} value={s.identity} />
+                    <Level label={T("信念", "Beliefs")} value={s.beliefs} />
+                    <Level label={T("价值观", "Values")} value={s.values} />
+                    <Level label={T("能力", "Capabilities")} value={s.capabilities} />
                   </div>
 
                   {s.repSequence?.length ? (
                     <div className="mt-3">
-                      <div className="text-xs uppercase text-slate-500">Strategy sequence</div>
+                      <div className="text-xs uppercase text-slate-500">{T("策略序列", "Strategy sequence")}</div>
                       <ol className="mt-1 space-y-1">
                         {s.repSequence.map((st) => (
                           <li key={st.step} className="text-sm">
@@ -101,11 +102,11 @@ export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius
                     </div>
                   ) : null}
 
-                  {s.highLeverage && <p className="mt-2 text-xs text-amber-300">High-leverage: {s.highLeverage}</p>}
+                  {s.highLeverage && <p className="mt-2 text-xs text-amber-300">{T("高杠杆", "High-leverage")}: {s.highLeverage}</p>}
 
                   {s.installProtocol?.length ? (
                     <div className="mt-3">
-                      <div className="text-xs uppercase text-slate-500">Install protocol</div>
+                      <div className="text-xs uppercase text-slate-500">{T("安装协议", "Install protocol")}</div>
                       <ul className="mt-1 list-disc pl-5 text-sm">{s.installProtocol.map((p, i) => <li key={i}>{p}</li>)}</ul>
                     </div>
                   ) : null}
@@ -114,7 +115,7 @@ export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius
                 </div>
               );
             })}
-            {g.strategies.length === 0 && <p className="text-sm text-slate-500">No strategy modeled yet.</p>}
+            {g.strategies.length === 0 && <p className="text-sm text-slate-500">{T("还没有建模任何策略。", "No strategy modeled yet.")}</p>}
           </div>
         </div>
       ))}
@@ -124,12 +125,14 @@ export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius
 
 function Level({ label, value }: { label: string; value: string }) {
   const tx = useTx();
+  const T = useT();
   if (!value) return null;
   return <div className="rounded-lg bg-slate-900/60 p-2"><span className="text-xs uppercase text-slate-500">{label}: </span><span>{value}</span></div>;
 }
 
 function PracticeBox({ adoptionId, onDone }: { adoptionId: string; onDone: () => void }) {
   const tx = useTx();
+  const T = useT();
   const [open, setOpen] = useState(false);
   const [reflection, setReflection] = useState("");
   const [fidelity, setFidelity] = useState(0.6);
@@ -139,12 +142,12 @@ function PracticeBox({ adoptionId, onDone }: { adoptionId: string; onDone: () =>
     await fetch("/api/genius-strategies/practice", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ adoptionId, reflection, fidelity }) });
     setBusy(false); setOpen(false); setReflection(""); onDone();
   }
-  if (!open) return <button onClick={() => setOpen(true)} className="mt-3 text-xs text-indigo-400">+ Log a practice</button>;
+  if (!open) return <button onClick={() => setOpen(true)} className="mt-3 text-xs text-indigo-400">{T("+ 记录一次练习", "+ Log a practice")}</button>;
   return (
     <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/60 p-3">
       <textarea value={reflection} onChange={(e) => setReflection(e.target.value)} rows={2} placeholder={tx("How faithfully did you reproduce the strategy? What happened?")}
         className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
-      <label className="mt-2 block text-xs text-slate-400">Fidelity: {Math.round(fidelity * 100)}%
+      <label className="mt-2 block text-xs text-slate-400">{T("保真度", "Fidelity")}: {Math.round(fidelity * 100)}%
         <input type="range" min={0} max={1} step={0.05} value={fidelity} onChange={(e) => setFidelity(Number(e.target.value))} className="mt-1 w-full" />
       </label>
       <button onClick={submit} disabled={busy} className="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm disabled:opacity-50">{busy ? tx("Saving…") : tx("Save practice")}</button>

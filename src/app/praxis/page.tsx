@@ -12,7 +12,8 @@ export const generateMetadata = titleMeta("业务规模化引擎(SFM)", "Busines
 export const dynamic = "force-dynamic";
 
 export default async function SfmPage() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const [health, founder, identity, factors, values, principles] = await Promise.all([
     computeOrgHealth(userId),
@@ -30,7 +31,7 @@ export default async function SfmPage() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title={t("card.replication_readiness")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.replicationReadiness * 100)}</div>
-          <p className="mt-1 text-xs text-slate-400">Can this succeed without the founder in the room?</p>
+          <p className="mt-1 text-xs text-slate-400">{en ? "Can this succeed without the founder in the room?" : "没有创始人在场,这件事还能成吗?"}</p>
           <div className="mt-3 space-y-2">
             <ScoreBar label={t("score.founder_independence")} value={1 - health.founderDependency} />
             <ScoreBar label={t("score.repeatability")} value={health.repeatability} />
@@ -50,7 +51,7 @@ export default async function SfmPage() {
             <ScoreBar label={t("score.leadership_maturity")} value={health.leadershipMaturity} />
             <ScoreBar label={t("score.resilience")} value={health.resilience} />
           </div>
-          <Link href="/praxis/dashboard" className="mt-4 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">Full dashboard →</Link>
+          <Link href="/praxis/dashboard" className="mt-4 inline-block rounded-lg bg-slate-800 px-3 py-1.5 text-xs hover:bg-slate-700">{en ? "Full dashboard →" : "完整仪表盘 →"}</Link>
         </Card>
       </div>
 
@@ -59,9 +60,9 @@ export default async function SfmPage() {
           {identity ? (
             <div className="space-y-1 text-sm text-slate-300">
               <p className="font-semibold text-white">{identity.identityStatement}</p>
-              <p><span className="text-slate-500">We win by:</span> {identity.strategicPosition}</p>
-              <p><span className="text-slate-500">We refuse to:</span> {identity.enemyToAvoid}</p>
-              <p><span className="text-slate-500">Customers trust us because:</span> {identity.promiseToCustomer}</p>
+              <p><span className="text-slate-500">{en ? "We win by:" : "我们靠什么取胜:"}</span> {identity.strategicPosition}</p>
+              <p><span className="text-slate-500">{en ? "We refuse to:" : "我们拒绝做:"}</span> {identity.enemyToAvoid}</p>
+              <p><span className="text-slate-500">{en ? "Customers trust us because:" : "客户信任我们,是因为:"}</span> {identity.promiseToCustomer}</p>
             </div>
           ) : <Empty>{t("empty.no_company_identity_yet_build_one")}</Empty>}
         </Card>
@@ -69,8 +70,8 @@ export default async function SfmPage() {
           {founder ? (
             <div className="space-y-1 text-sm text-slate-300">
               <p className="font-semibold text-white">{founder.founderIdentity}</p>
-              <p><span className="text-slate-500">Strengths:</span> {founder.strengths.join(", ")}</p>
-              <p><span className="text-slate-500">Shadow risks:</span> {founder.shadowRisks.join(", ")}</p>
+              <p><span className="text-slate-500">{en ? "Strengths:" : "优势:"}</span> {founder.strengths.join(", ")}</p>
+              <p><span className="text-slate-500">{en ? "Shadow risks:" : "阴影风险:"}</span> {founder.shadowRisks.join(", ")}</p>
             </div>
           ) : <Empty>{t("empty.no_founder_profile_yet_run_the")}</Empty>}
         </Card>
@@ -81,7 +82,7 @@ export default async function SfmPage() {
           <div className="mt-2 overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="text-xs uppercase text-slate-500">
-                <tr><th className="py-1 pr-3">Factor</th><th className="px-3">Repeat</th><th className="px-3">Scale</th><th className="px-3">Founder dep.</th><th className="px-3">Replication</th></tr>
+                <tr><th className="py-1 pr-3">{en ? "Factor" : "要素"}</th><th className="px-3">{en ? "Repeat" : "可重复"}</th><th className="px-3">{en ? "Scale" : "可规模化"}</th><th className="px-3">{en ? "Founder dep." : "创始人依赖"}</th><th className="px-3">{en ? "Replication" : "可复制"}</th></tr>
               </thead>
               <tbody>
                 {factors.map((f) => (
