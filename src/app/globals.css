@@ -63,10 +63,28 @@ html[data-theme="light"] .text-white { color: #0f172a; }
 html[data-theme="light"] .text-slate-300 { color: #1e293b; }
 html[data-theme="light"] .text-slate-400 { color: #475569; }
 html[data-theme="light"] .text-slate-500 { color: #64748b; }
-html[data-theme="light"] .text-slate-500 { color: #94a3b8; }
 
 html[data-theme="light"] .placeholder\:text-slate-500::placeholder { color: #94a3b8; }
 
 /* Keep primary action buttons readable in both themes. */
 html[data-theme="light"] .bg-indigo-600,
 html[data-theme="light"] .bg-indigo-600\/80 { color: #ffffff; }
+
+/* ───────────────────────── Motion ─────────────────────────
+   Subtle per-navigation content entrance; fully disabled for users who
+   prefer reduced motion. */
+@keyframes arete-page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.page-enter { animation: arete-page-enter 0.28s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

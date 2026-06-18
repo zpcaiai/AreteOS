@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, EB_Garamond } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import Disclaimer from "@/components/Disclaimer";
+import PageTransition from "@/components/PageTransition";
 import Providers from "@/components/Providers";
 import ServiceWorker from "@/components/ServiceWorker";
 import { cookies } from "next/headers";
@@ -56,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Sidebar />
               <main id="main" className="flex-1 overflow-y-auto p-5 lg:p-8">
                 <div className="mx-auto w-full max-w-6xl">
-                  {children}
+                  <PageTransition>{children}</PageTransition>
                   <Disclaimer />
                 </div>
               </main>
