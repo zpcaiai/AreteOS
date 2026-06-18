@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
-import { useTx } from "@/lib/i18n/client";
+import { useT, useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 const DIMS = ["reality","humanNature","meaning","success","failure","responsibility","time","change","risk","purpose"] as const;
+const DIM_ZH: Record<string, string> = { reality: "现实", humanNature: "人性", meaning: "意义", success: "成功", failure: "失败", responsibility: "责任", time: "时间", change: "变化", risk: "风险", purpose: "目的" };
 
 
 export default function WorldviewStudio() {
   const tx = useTx();
+  const T = useT();
   const { busy, error, note, run } = useAgentRun();
   const out = note;
   const [dims, setDims] = useState<Record<string, number>>(Object.fromEntries(DIMS.map((d) => [d, 0.5])));
@@ -22,15 +24,15 @@ export default function WorldviewStudio() {
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-lg font-bold">Worldview Studio</h2>
-      <p className="mt-1 text-sm text-slate-400">Score your ten dimensions, surface hidden assumptions, construct meaning, simulate worldviews, and distill a personal philosophy. (Runs offline on mock AI.)</p>
+      <h2 className="text-lg font-bold">{T("世界观工作室", "Worldview Studio")}</h2>
+      <p className="mt-1 text-sm text-slate-400">{T("为你的十个维度打分、揭示隐藏假设、构建意义、模拟世界观,并提炼个人哲学。(离线用 mock AI 运行。)", "Score your ten dimensions, surface hidden assumptions, construct meaning, simulate worldviews, and distill a personal philosophy. (Runs offline on mock AI.)")}</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
       {out && <p className="mt-2 rounded bg-indigo-950/40 px-3 py-1 text-sm text-indigo-200">{out}</p>}
 
       <StudioSection title="1 · Worldview Profile (10 dimensions)" hint="Rate the clarity/health of each stance, 0–1">
         <div className="grid grid-cols-2 gap-2">
           {DIMS.map((d) => (
-            <label key={d} className="text-xs text-slate-400">{d}
+            <label key={d} className="text-xs text-slate-400">{T(DIM_ZH[d] ?? d, d)}
               <input type="number" min={0} max={1} step={0.1} value={dims[d]} onChange={(e) => setDims({ ...dims, [d]: parseFloat(e.target.value) })} className={ta} />
             </label>
           ))}

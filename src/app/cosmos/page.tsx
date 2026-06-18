@@ -1,5 +1,4 @@
 import { titleMeta } from "@/lib/i18n/metadata";
-import Link from "next/link";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeWorldview } from "@/lib/cosmos/service";
@@ -13,7 +12,8 @@ export const generateMetadata = titleMeta("世界观 OS", "Worldview OS");
 export const dynamic = "force-dynamic";
 
 export default async function WorldviewPage() {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
+  const en = locale === "en";
   const userId = await getUserId();
   const [worldview, health, profile] = await Promise.all([
     prisma.worldview.findFirst({ where: { userId }, orderBy: { createdAt: "desc" }, include: { dimensions: true } }),
@@ -28,8 +28,8 @@ export default async function WorldviewPage() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title={t("card.global_worldview_score")}>
           <div className="text-4xl font-bold tabular-nums">{Math.round(health.globalWorldviewScore * 100)}</div>
-          <p className="mt-1 text-xs text-slate-400">Clarity × Coherence × Assumption-awareness × Meaning × Mission × Identity × Wisdom</p>
-          <p className="mt-2 text-sm text-indigo-300">Stage: {String(health.stage).replace(/_/g, " ")}</p>
+          <p className="mt-1 text-xs text-slate-400">{en ? "Clarity × Coherence × Assumption-awareness × Meaning × Mission × Identity × Wisdom" : "清晰度 × 连贯性 × 假设觉察 × 意义 × 使命 × 身份 × 智慧"}</p>
+          <p className="mt-2 text-sm text-indigo-300">{en ? "Stage" : "阶段"}: {String(health.stage).replace(/_/g, " ")}</p>
         </Card>
         <Card title={t("card.worldview_health")}>
           <ScoreBar label={t("score.clarity")} value={health.clarity} />
@@ -39,10 +39,6 @@ export default async function WorldviewPage() {
         <Card title={t("card.meaning_wisdom")}>
           <ScoreBar label={t("score.meaning")} value={health.meaningScore} />
           <ScoreBar label={t("score.wisdom")} value={health.wisdom} />
-          <div className="mt-3 flex gap-2 text-xs">
-            <Link href="/cosmos/archetypes" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Archetypes</Link>
-            <Link href="/cosmos/dashboard" className="rounded-lg bg-slate-800 px-3 py-1.5 hover:bg-slate-700">Dashboard</Link>
-          </div>
         </Card>
       </div>
 
@@ -50,7 +46,7 @@ export default async function WorldviewPage() {
 
       {worldview && (
         <Card title={t("card.worldview_profile_dimensions")}>
-          {worldview.summary && <p className="mb-3 text-sm text-slate-400">Hidden assumptions: {worldview.summary}</p>}
+          {worldview.summary && <p className="mb-3 text-sm text-slate-400">{en ? "Hidden assumptions" : "隐藏假设"}: {worldview.summary}</p>}
           <div className="grid gap-3 sm:grid-cols-2">
             {worldview.dimensions.map((d) => (
               <div key={d.id} className="rounded-lg bg-slate-800/60 p-3">
