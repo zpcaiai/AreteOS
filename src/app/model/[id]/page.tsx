@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { Card, PageHeader } from "@/components/ui";
+import { Card, Empty, PageHeader } from "@/components/ui";
 import { AdaptForm } from "@/components/ExcellenceClient";
 import { getDict } from "@/lib/i18n/server";
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function ModelDetail({ params }: { params: Promise<{ id: st
     <div>
       <Link href="/models" className="text-sm text-indigo-400">← Library</Link>
       <PageHeader title={genius.name} subtitle={[genius.era, genius.domain].filter(Boolean).join(" · ")} />
-      {!s ? <p className="text-sm text-slate-500">{en ? "No blueprint yet." : "还没有蓝图。"}</p> : (
+      {!s ? <Empty>{en ? "No blueprint yet." : "还没有蓝图。"}</Empty> : (
         <div className="space-y-4">
           <Card title={`Strategy · ${s.name}`}><p className="text-sm text-slate-300">{s.description}</p></Card>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, PageHeader, ScoreBar } from "@/components/ui";
+import { Card, Empty, PageHeader, ScoreBar } from "@/components/ui";
 import { useApi, useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
@@ -67,7 +67,7 @@ export default function AssetsPage() {
             )}
           </Card>
         ))}
-        {d && d.assets.length === 0 && <p className="text-sm text-slate-500">{T("还没有资产,创建第一个吧。", "No assets yet — create your first.")}</p>}
+        {d && d.assets.length === 0 && <Empty>{T("还没有资产,创建第一个吧。", "No assets yet — create your first.")}</Empty>}
       </div>
     </div>
   );

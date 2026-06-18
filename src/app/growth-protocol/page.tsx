@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, PageHeader, ScoreBar } from "@/components/ui";
+import { Card, Empty, PageHeader, ScoreBar } from "@/components/ui";
 import { useApi, useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
@@ -56,7 +56,7 @@ export default function GrowthProtocolPage() {
                 <div className="flex justify-between"><span className="font-medium text-slate-200">{r.title}</span><span className="tabular-nums text-slate-400">{Math.round(r.score)} · {r.progress}%</span></div>
               </button></li>
             ))}</ul>
-          ) : <p className="text-sm text-slate-500">{T("还没有运行。", "No runs yet.")}</p>}
+          ) : <Empty>{T("还没有运行。", "No runs yet.")}</Empty>}
         </Card>
       </div>
 
