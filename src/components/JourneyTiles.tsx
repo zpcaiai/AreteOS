@@ -47,7 +47,8 @@ export default function JourneyTiles() {
   const L = (b?: Bi | null) => (b ? (locale === "en" ? b.en : b.zh) : "—");
   const q = useApi<{ journey: Journey }>("/api/journey");
   const j = q.data?.journey;
-  if (!j) return <p className="text-sm text-slate-500">{T("加载全景中…", "Loading overview…")}</p>;
+  if (q.isError) return <p className="text-sm text-rose-400">{T("全景暂时加载失败 —— 引擎计算超时,请稍后重试。", "Overview failed to load — the engines timed out. Try again shortly.")}</p>;
+  if (!j) return <p className="text-sm text-slate-500">{T("正在汇总你的成长全景…", "Aggregating your overview…")}</p>;
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

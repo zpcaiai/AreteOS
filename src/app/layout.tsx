@@ -54,8 +54,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div className="flex min-h-screen">
               <Sidebar />
               <main id="main" className="flex-1 overflow-y-auto p-5 lg:p-8">
-                {children}
-                <Disclaimer />
+                <div className="mx-auto w-full max-w-6xl">
+                  {children}
+                  <Disclaimer />
+                </div>
               </main>
             </div>
           </I18nProvider>
