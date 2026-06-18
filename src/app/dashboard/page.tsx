@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import { computeScoresCached } from "@/lib/analytics";
 import { Card, ScoreBar, PageHeader } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
-import GrowthPlanet from "@/components/GrowthPlanet";
 import JourneyTiles from "@/components/JourneyTiles";
 import WeeklyCardBanner from "@/components/WeeklyCardBanner";
 import NextActionBanner from "@/components/NextActionBanner";
@@ -26,32 +25,20 @@ export default async function DashboardPage() {
   const growthPct = Math.round(scores.growth * 100);
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader title={t("dashboard.title")} subtitle={t("dashboard.subtitle")} />
 
-      <div className="mb-5">
-        <NextActionBanner />
-      </div>
+      {/* 1 — the one thing to do now */}
+      <NextActionBanner />
 
-      <div className="mb-5">
-        <WeeklyCardBanner />
-      </div>
-
-      <div className="mb-5">
-        <JourneyTiles />
-      </div>
-
-      <div className="mb-5">
-        <GrowthPlanet />
-      </div>
-
+      {/* 2 — status at a glance */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card title={t("dashboard.globalScore")}>
           <div className="flex items-end gap-3">
             <div className="text-5xl font-bold tabular-nums">{growthPct}</div>
             <div className="pb-2 text-sm text-slate-400">{t("dashboard.globalScoreHint")}</div>
           </div>
-          <Sparkline values={timeline.map((t) => t.value)} emptyLabel={t("dashboard.notEnoughHistory")} />
+          <Sparkline values={timeline.map((s) => s.value)} emptyLabel={t("dashboard.notEnoughHistory")} />
         </Card>
 
         <Card title={t("dashboard.stage")}>
@@ -74,7 +61,14 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+      {/* 3 — where each engine in the loop stands */}
+      <JourneyTiles />
+
+      {/* 4 — this week's shareable card */}
+      <WeeklyCardBanner />
+
+      {/* 5 — the detail, last */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card title={t("card.direction_thinking")}>
           <ScoreBar label={t("score.mission_alignment")} value={scores.missionAlignment} />
           <ScoreBar label={t("score.identity_alignment")} value={scores.identityAlignment} />
