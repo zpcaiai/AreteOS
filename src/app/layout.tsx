@@ -42,12 +42,13 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { locale, dict } = await getDict();
+  const en = locale === "en";
   const jar = await cookies();
   const theme = jar.get("theme")?.value === "light" ? "light" : "dark";
   return (
     <html lang={locale === "zh" ? "zh-CN" : "en"} data-theme={theme} className={`${sans.variable} ${serif.variable}`}>
       <body>
-        <a href="#main" className="skip-link">Skip to content</a>
+        <a href="#main" className="skip-link">{en ? "Skip to content" : "跳到主要内容"}</a>
         <ServiceWorker />
         <Providers>
           <I18nProvider locale={locale} dict={dict}>
