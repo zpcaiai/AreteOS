@@ -7,6 +7,7 @@ import PageTransition from "@/components/PageTransition";
 import CommandPalette from "@/components/CommandPalette";
 import Providers from "@/components/Providers";
 import ServiceWorker from "@/components/ServiceWorker";
+import WebVitals from "@/components/WebVitals";
 import { cookies } from "next/headers";
 import { getDict } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/client";
@@ -75,6 +76,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
         <a href="#main" className="skip-link">{en ? "Skip to content" : "跳到主要内容"}</a>
         <ServiceWorker />
+        <WebVitals />
         <Providers>
           <I18nProvider locale={locale} dict={dict}>
             <CommandPalette />

@@ -186,3 +186,24 @@ This repo is Vercel-native (Next.js; middleware is Edge-safe; no Dockerfile need
    within Hobby-plan limits; if user count grows, move the job to a queue to avoid
    function-timeout.)
 3. **Push, then import the repo in Vercel** (or it auto-builds on push if already linked).
+
+## Seed the demo account (one-time, optional)
+
+Fresh deploys start empty — `getUserId()` auto-creates a blank `DEV_USER_ID`
+user, so `/dashboard` shows the UNAWARE / 0 onboarding state. To make the demo
+render a coherent, fully-populated slice (PRO membership, mission/vision, values,
+habits + 12 logs, decisions, a 15-day growth timeline, etc.), seed the prod DB
+**once** from a machine that can reach it:
+
+```bash
+# .env / .env.production must point DATABASE_URL at the prod (Neon) DB.
+npm run db:seed:demo   # demo user only — fast; the slice the dashboard needs
+# — or —
+npm run db:seed        # demo user + all catalog seeds (genius/identity/.../naval, emporion products)
+```
+
+- **Demo login:** `usr_demo@mission.local` / `mission1234` (PRO tier).
+- **Re-runnable:** the seed is idempotent — the demo slice is created only when
+  it is missing, so re-running won't duplicate rows (it refreshes membership and
+  stage and exits). Safe to run after each deploy.
+- `/emporion` needs `npm run db:seed` (or `db:seed:emporion`) for its catalog.

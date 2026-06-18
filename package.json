@@ -27,7 +27,8 @@
     "vercel-build": "prisma generate && (prisma migrate deploy || echo \"migrate skipped — set DATABASE_URL in Vercel to enable\") && next build",
     "analyze": "ANALYZE=true next build",
     "db:seed:naval": "tsx prisma/seed-naval.ts",
-    "weekly": "tsx scripts/weekly.ts"
+    "weekly": "tsx scripts/weekly.ts",
+    "db:seed:demo": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",

@@ -28,6 +28,14 @@ async function main() {
     create: { userId, stage: "OPERATOR", progress: 0.4 },
   });
 
+  // Idempotency guard: the rich slice below uses create() (not upsert), so a
+  // re-run would duplicate missions, habit logs and the snapshot timeline.
+  // The upserts above always refresh; bail out here once the demo slice exists.
+  if (await prisma.mission.findFirst({ where: { userId } })) {
+    console.log(`[seed] ${userId} already seeded — skipping demo slice (idempotent).`);
+    return;
+  }
+
   // Mission + vision
   await prisma.mission.create({
     data: { userId, statement: "Compound and transfer understanding so others build faster than I did." },

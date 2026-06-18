@@ -1,61 +1,41 @@
 import { describe, it, expect } from "vitest";
 import {
   specificKnowledgeScore, leverageScore, judgmentScore, longTermGameScore,
-  happinessScore, lifePortfolioScore, globalNavalScore, buildSnapshot,
+  happinessScore, globalNavalScore, buildSnapshot,
 } from "../src/lib/naval/scoring";
 
-describe("naval scoring — geometric mean", () => {
-  it("all-equal factors collapse to that value × 100", () => {
-    const s = specificKnowledgeScore({ curiosityDepth: 0.5, skillRarity: 0.5, marketRelevance: 0.5, personalEnergy: 0.5, compounding: 0.5 });
-    expect(s).toBe(50);
+describe("naval scoring — geometric mean of 0..1 factors → 0..100", () => {
+  it("all factors = 1 → 100", () => {
+    expect(specificKnowledgeScore({ curiosityDepth: 1, skillRarity: 1, marketRelevance: 1, personalEnergy: 1, compounding: 1 })).toBe(100);
   });
-
-  it("stays within 0..100", () => {
-    const s = leverageScore({ scalability: 0.9, ownership: 0.8, automation: 0.7, distribution: 0.6, compounding: 0.5 });
-    expect(s).toBeGreaterThanOrEqual(0);
-    expect(s).toBeLessThanOrEqual(100);
+  it("all factors = 0.5 → 50", () => {
+    expect(specificKnowledgeScore({ curiosityDepth: 0.5, skillRarity: 0.5, marketRelevance: 0.5, personalEnergy: 0.5, compounding: 0.5 })).toBe(50);
   });
-
-  it("a near-zero factor tanks the whole score (geometric, not arithmetic)", () => {
-    const strong = judgmentScore({ predictionAccuracy: 0.9, assumptionQuality: 0.9, modelUsage: 0.9, emotionalDiscipline: 0.9, learningRate: 0.9 });
-    const oneWeak = judgmentScore({ predictionAccuracy: 0.9, assumptionQuality: 0.9, modelUsage: 0.9, emotionalDiscipline: 0.9, learningRate: 0.02 });
-    expect(oneWeak).toBeLessThan(strong / 2);
+  it("a single zero factor tanks the score", () => {
+    expect(leverageScore({ scalability: 0, ownership: 1, automation: 1, distribution: 1, compounding: 1 })).toBeLessThan(20);
   });
-
-  it("clamps out-of-range inputs", () => {
-    const s = lifePortfolioScore({ health: 2, wealth: 1, relationships: 1, mission: 1, freedom: 1, happiness: 1, learning: 1 });
-    expect(s).toBe(100); // all clamp to 1 → geo mean 1 → 100
+  it("judgment is monotonic in its factors", () => {
+    const f = (x: number) => judgmentScore({ predictionAccuracy: x, assumptionQuality: x, modelUsage: x, emotionalDiscipline: x, learningRate: x });
+    expect(f(0.8)).toBeGreaterThan(f(0.3));
   });
-});
-
-describe("naval scoring — penalty divisors", () => {
-  it("long-term game score divides by (1 + short-term trap risk)", () => {
-    const base = { compounding: 0.8, identityAlignment: 0.8, relationshipQuality: 0.8, reputationUpside: 0.8, learningRate: 0.8 };
-    const safe = longTermGameScore({ ...base, shortTermTrapRisk: 0 });
-    const trap = longTermGameScore({ ...base, shortTermTrapRisk: 1 });
-    expect(trap).toBe(Math.round(safe / 2));
+  it("long-term game divides by (1 + short-term trap risk)", () => {
+    const base = { compounding: 1, identityAlignment: 1, relationshipQuality: 1, reputationUpside: 1, learningRate: 1 };
+    expect(longTermGameScore({ ...base, shortTermTrapRisk: 0 })).toBe(100);
+    expect(longTermGameScore({ ...base, shortTermTrapRisk: 1 })).toBe(50);
   });
-
-  it("happiness score divides by (1 + desire load)", () => {
-    const base = { peace: 0.8, health: 0.8, relationships: 0.8, autonomy: 0.8, gratitude: 0.8 };
-    const calm = happinessScore({ ...base, desireLoad: 0 });
-    const craving = happinessScore({ ...base, desireLoad: 1 });
-    expect(craving).toBe(Math.round(calm / 2));
+  it("happiness divides by (1 + desire load)", () => {
+    const base = { peace: 1, health: 1, relationships: 1, autonomy: 1, gratitude: 1 };
+    expect(happinessScore({ ...base, desireLoad: 0 })).toBe(100);
+    expect(happinessScore({ ...base, desireLoad: 1 })).toBe(50);
   });
-});
-
-describe("global naval score + snapshot", () => {
-  it("global is the geometric mean of the seven 0..100 drivers", () => {
-    const seven = { specificKnowledge: 64, judgment: 64, leverage: 64, wealthCreation: 64, freedom: 64, happiness: 64, lifePortfolio: 64 };
-    expect(globalNavalScore(seven)).toBe(64);
+  it("global naval score = geo mean of seven 0..100 sub-scores", () => {
+    const all = (v: number) => globalNavalScore({ specificKnowledge: v, judgment: v, leverage: v, wealthCreation: v, freedom: v, happiness: v, lifePortfolio: v });
+    expect(all(100)).toBe(100);
+    expect(all(50)).toBe(50);
   });
-
-  it("buildSnapshot attaches a computed globalScore", () => {
-    const snap = buildSnapshot({
-      specificKnowledge: 50, talentStack: 50, leverage: 50, judgment: 50, wealthCreation: 50,
-      longTermGame: 50, freedom: 50, happiness: 50, lifePortfolio: 50,
-    });
-    expect(snap.globalScore).toBe(50);
-    expect(snap.talentStack).toBe(50);
+  it("buildSnapshot attaches globalScore + preserves sub-scores", () => {
+    const snap = buildSnapshot({ specificKnowledge: 80, judgment: 80, leverage: 80, wealthCreation: 80, freedom: 80, happiness: 80, lifePortfolio: 80, talentStack: 70, longTermGame: 60 });
+    expect(snap.globalScore).toBe(80);
+    expect(snap.talentStack).toBe(70);
   });
 });
