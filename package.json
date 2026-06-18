@@ -12,6 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:status": "prisma migrate status",
+    "db:reset:healing": "docker compose down -v && docker compose up -d --wait && prisma migrate dev --name add_healing_os --skip-seed",
     "db:seed": "tsx prisma/seed.ts && tsx prisma/seed-genius.ts && tsx prisma/seed-identity.ts && tsx prisma/seed-cognitive.ts && tsx prisma/seed-worldview.ts && tsx prisma/seed-audiobooks.ts && tsx prisma/seed-emporion.ts && tsx prisma/seed-naval.ts",
     "test": "vitest run",
     "test:e2e": "playwright test",
