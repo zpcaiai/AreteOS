@@ -39,8 +39,17 @@ export function PageHeader({ title, subtitle }: { title: string; subtitle?: stri
   );
 }
 
-export function Empty({ children }: { children: ReactNode }) {
-  return <p className="text-sm text-slate-500" role="status">{children}</p>;
+export function Empty({ children, cta }: { children: ReactNode; cta?: { href: string; label: string } }) {
+  return (
+    <div className="rounded-xl border border-dashed border-slate-700/70 bg-slate-900/30 px-6 py-8 text-center" role="status">
+      <p className="text-sm text-slate-400">{children}</p>
+      {cta && (
+        <a href={cta.href} className="mt-3 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500">
+          {cta.label}
+        </a>
+      )}
+    </div>
+  );
 }
 
 export function Line({ values, color = "#6366f1", height = 48, label }: { values: number[]; color?: string; height?: number; label?: string }) {

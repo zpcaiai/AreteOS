@@ -13,9 +13,9 @@ export default function NextActionBanner() {
   const T = useT();
   const q = useApi<{ next: NextAction }>("/api/next-action");
   const n = q.data?.next;
-  if (!n) return null;
+  if (q.isPending) return null;
 
-  if (!n.action) {
+  if (!n || !n.action) {
     return (
       <a href="/onboarding" className="block rounded-2xl border border-indigo-700/50 bg-indigo-950/30 p-4 transition hover:border-indigo-500">
         <div className="text-xs font-semibold text-indigo-300">{T("从这里开始", "Start here")}</div>
