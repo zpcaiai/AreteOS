@@ -2,7 +2,7 @@ import { titleMeta } from "@/lib/i18n/metadata";
 import { getUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeScoresCached } from "@/lib/analytics";
-import { Card, ScoreBar, PageHeader } from "@/components/ui";
+import { Card, ScoreBar, PageHeader, Sparkline } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 import JourneyTiles from "@/components/JourneyTiles";
 import WeeklyCardBanner from "@/components/WeeklyCardBanner";
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
             <div className="text-5xl font-bold tabular-nums">{growthPct}</div>
             <div className="pb-2 text-sm text-slate-400">{t("dashboard.globalScoreHint")}</div>
           </div>
-          <Sparkline values={timeline.map((s) => s.value)} emptyLabel={t("dashboard.notEnoughHistory")} />
+          {timeline.length >= 2 ? <Sparkline values={timeline.map((s) => s.value)} height={48} /> : <p className="mt-3 text-xs text-slate-500">{t("dashboard.notEnoughHistory")}</p>}
         </Card>
 
         <Card title={t("dashboard.stage")}>
@@ -90,19 +90,3 @@ export default async function DashboardPage() {
   );
 }
 
-function Sparkline({ values, emptyLabel }: { values: number[]; emptyLabel: string }) {
-  if (values.length < 2) return <p className="mt-3 text-xs text-slate-500">{emptyLabel}</p>;
-  const w = 280, h = 48, max = 1, min = 0;
-  const pts = values
-    .map((v, i) => {
-      const x = (i / (values.length - 1)) * w;
-      const y = h - ((v - min) / (max - min)) * h;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="mt-3 w-full">
-      <polyline points={pts} fill="none" stroke="#6366f1" strokeWidth="2" />
-    </svg>
-  );
-}

@@ -4,6 +4,7 @@
 // top of /dashboard as the default landing.
 
 import { useApi } from "@/lib/hooks";
+import { Sparkline } from "@/components/ui";
 import { useI18n, useT } from "@/lib/i18n/client";
 import type { Bi } from "@/lib/bottleneck-rules";
 
@@ -18,17 +19,6 @@ interface Journey {
   specificKnowledge: { moat: number | null; score: number | null; spark: number[] };
 }
 
-function Sparkline({ values, color = "#64748b" }: { values?: number[]; color?: string }) {
-  const v = (values ?? []).filter((x) => Number.isFinite(x));
-  if (v.length < 2) return <div className="mt-2 h-4" />;
-  const W = 120, H = 16, max = Math.max(1, ...v);
-  const pts = v.map((x, i) => `${((i / (v.length - 1)) * W).toFixed(1)},${(H - (x / max) * H).toFixed(1)}`).join(" ");
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 h-4 w-full" preserveAspectRatio="none" role="img" aria-label="trend">
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" />
-    </svg>
-  );
-}
 
 function Tile({ title, metric, sub, href, accent, spark }: { title: string; metric: string; sub: string; href: string; accent?: string; spark?: number[] }) {
   return (
@@ -36,7 +26,7 @@ function Tile({ title, metric, sub, href, accent, spark }: { title: string; metr
       <div className="text-xs font-semibold" style={accent ? { color: accent } : undefined}>{title}</div>
       <div className="mt-1 text-2xl font-bold tabular-nums text-slate-100">{metric}</div>
       <div className="mt-0.5 text-xs text-slate-500">{sub}</div>
-      <Sparkline values={spark} color={accent} />
+      <Sparkline values={spark} color={accent} height={22} />
     </a>
   );
 }

@@ -55,12 +55,34 @@ export function Empty({ children, cta }: { children: ReactNode; cta?: { href: st
 export function Line({ values, color = "#6366f1", height = 48, label }: { values: number[]; color?: string; height?: number; label?: string }) {
   if (values.length < 2) return <p className="text-xs text-slate-500">Not enough data.</p>;
   const w = 320;
-  const pts = values
-    .map((v, i) => `${((i / (values.length - 1)) * w).toFixed(1)},${(height - Math.max(0, Math.min(1, v)) * height).toFixed(1)}`)
-    .join(" ");
+  const y = (v: number) => height - Math.max(0, Math.min(1, v)) * (height - 2) - 1;
+  const line = values.map((v, i) => `${((i / (values.length - 1)) * w).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const id = `ln-${color.replace("#", "")}`;
   return (
-    <svg viewBox={`0 0 ${w} ${height}`} className="w-full" role="img" aria-label={label ?? "Trend line"}>
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="2" />
+    <svg viewBox={`0 0 ${w} ${height}`} className="w-full" preserveAspectRatio="none" role="img" aria-label={label ?? "Trend line"}>
+      <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity="0.22" /><stop offset="100%" stopColor={color} stopOpacity="0" /></linearGradient></defs>
+      <polygon points={`0,${height} ${line} ${w},${height}`} fill={`url(#${id})`} />
+      <polyline points={line} fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Canonical sparkline: auto-scales any series, subtle gradient area + line.
+ *  Use everywhere instead of bespoke inline SVGs for a consistent chart style. */
+export function Sparkline({ values, color = "#6366f1", height = 36, ariaLabel = "trend" }: { values?: number[]; color?: string; height?: number; ariaLabel?: string }) {
+  const v = (values ?? []).filter((x) => Number.isFinite(x));
+  if (v.length < 2) return <div style={{ height }} className="mt-2" aria-hidden="true" />;
+  const w = 160;
+  const max = Math.max(...v), min = Math.min(...v, 0);
+  const range = max - min || 1;
+  const y = (val: number) => height - ((val - min) / range) * (height - 4) - 2;
+  const line = v.map((val, i) => `${((i / (v.length - 1)) * w).toFixed(1)},${y(val).toFixed(1)}`).join(" ");
+  const id = `sp-${color.replace("#", "")}-${height}`;
+  return (
+    <svg viewBox={`0 0 ${w} ${height}`} className="mt-2 w-full" style={{ height }} preserveAspectRatio="none" role="img" aria-label={ariaLabel}>
+      <defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={color} stopOpacity="0.25" /><stop offset="100%" stopColor={color} stopOpacity="0" /></linearGradient></defs>
+      <polygon points={`0,${height} ${line} ${w},${height}`} fill={`url(#${id})`} />
+      <polyline points={line} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
