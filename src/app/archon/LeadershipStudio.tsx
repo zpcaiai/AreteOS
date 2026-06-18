@@ -2,13 +2,14 @@
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
 import { ROLES } from "@/lib/archon/levels";
-import { useTx } from "@/lib/i18n/client";
+import { useT, useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 
 
 export default function LeadershipStudio() {
   const tx = useTx();
+  const T = useT();
   const { busy, error, run } = useAgentRun();
   const [inputs, setInputs] = useState("");
   const [mission, setMission] = useState("");
@@ -24,7 +25,7 @@ export default function LeadershipStudio() {
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-lg font-bold">Leadership Studio</h2>
+      <h2 className="text-lg font-bold">{T("领导力工作室", "Leadership Studio")}</h2>
       <p className="mt-1 text-sm text-slate-400">Map your leverage, build a vision, sponsor identity, and develop future leaders. (Pro feature — runs offline on mock AI.)</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
 

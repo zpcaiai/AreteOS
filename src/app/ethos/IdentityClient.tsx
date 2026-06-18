@@ -3,12 +3,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { inputCls, lines } from "@/components/studio";
-import { useTx } from "@/lib/i18n/client";
+import { useT, useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 
 export function AssessmentTool() {
   const tx = useTx();
+  const T = useT();
   const router = useRouter();
   const [reflections, setReflections] = useState("");
   const [mission, setMission] = useState("");
@@ -33,8 +34,8 @@ export function AssessmentTool() {
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-lg font-bold">Identity Assessment</h2>
-      <p className="mt-1 text-sm text-slate-400">Reflect on how you actually spend attention and make decisions — one thought per line.</p>
+      <h2 className="text-lg font-bold">{T("身份评估", "Identity Assessment")}</h2>
+      <p className="mt-1 text-sm text-slate-400">{T("回顾你实际把注意力花在哪、如何做决定——每行一条想法。", "Reflect on how you actually spend attention and make decisions — one thought per line.")}</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
       <input value={mission} onChange={(e) => setMission(e.target.value)} placeholder={tx("Your mission (optional)")} className={`mt-3 ${ta}`} />
       <textarea value={reflections} onChange={(e) => setReflections(e.target.value)} rows={5} placeholder={tx("Reflections, one per line…")} className={`mt-2 ${ta}`} />
@@ -51,6 +52,7 @@ export function AssessmentTool() {
 
 export function StackTool() {
   const tx = useTx();
+  const T = useT();
   const router = useRouter();
   const [mission, setMission] = useState("");
   const [values, setValues] = useState("");
@@ -72,15 +74,15 @@ export function StackTool() {
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-lg font-bold">Build Your Identity Stack</h2>
-      <p className="mt-1 text-sm text-slate-400">Compose a primary, secondary, emerging and legacy identity — then detect conflicts and get recommendations.</p>
+      <h2 className="text-lg font-bold">{T("构建你的身份栈", "Build Your Identity Stack")}</h2>
+      <p className="mt-1 text-sm text-slate-400">{T("组合主要、次要、新兴与传承身份——再检测冲突并给出建议。", "Compose a primary, secondary, emerging and legacy identity — then detect conflicts and get recommendations.")}</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
-      <input value={mission} onChange={(e) => setMission(e.target.value)} placeholder="Mission" className={`mt-3 ${ta}`} />
-      <label className="mt-2 block text-xs text-slate-400">Values (one per line)</label>
+      <input value={mission} onChange={(e) => setMission(e.target.value)} placeholder={T("使命", "Mission")} className={`mt-3 ${ta}`} />
+      <label className="mt-2 block text-xs text-slate-400">{T("价值观(每行一项)", "Values (one per line)")}</label>
       <textarea value={values} onChange={(e) => setValues(e.target.value)} rows={2} className={ta} />
-      <label className="mt-2 block text-xs text-slate-400">Strengths (one per line)</label>
+      <label className="mt-2 block text-xs text-slate-400">{T("优势(每行一项)", "Strengths (one per line)")}</label>
       <textarea value={strengths} onChange={(e) => setStrengths(e.target.value)} rows={2} className={ta} />
-      <label className="mt-2 block text-xs text-slate-400">Current identities (one per line, optional)</label>
+      <label className="mt-2 block text-xs text-slate-400">{T("当前身份(每行一项,可选)", "Current identities (one per line, optional)")}</label>
       <textarea value={current} onChange={(e) => setCurrent(e.target.value)} rows={2} className={ta} />
       <div className="mt-2 flex flex-wrap gap-2">
         <button disabled={busy !== null} onClick={() => call("stack", "/api/ethos/stack", { mission, values: lines(values), strengths: lines(strengths), current: lines(current) })}
@@ -90,7 +92,7 @@ export function StackTool() {
         <button disabled={busy !== null} onClick={() => call("conf", "/api/ethos/conflicts", { identities: lines(current) })}
           className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm hover:bg-slate-700 disabled:opacity-50">{busy === "conf" ? "…" : tx("Detect conflicts")}</button>
       </div>
-      <p className="mt-3 text-xs text-slate-500">Results appear in the <Link href="/ethos/evolution" className="text-indigo-400">Evolution</Link> view.</p>
+      <p className="mt-3 text-xs text-slate-500">{T("结果会显示在", "Results appear in the")} <Link href="/ethos/evolution" className="text-indigo-400">{T("进化", "Evolution")}</Link> {T("视图中。", "view.")}</p>
     </div>
   );
 }

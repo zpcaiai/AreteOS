@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
-import { useTx } from "@/lib/i18n/client";
+import { useT, useTx } from "@/lib/i18n/client";
 
 const ta = inputCls;
 
 
 export default function ManagementStudio() {
   const tx = useTx();
+  const T = useT();
   const { busy, error, run } = useAgentRun();
   const [reflections, setReflections] = useState("");
   const [activities, setActivities] = useState("");
@@ -30,7 +31,7 @@ export default function ManagementStudio() {
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-lg font-bold">Management Studio</h2>
+      <h2 className="text-lg font-bold">{T("管理工作室", "Management Studio")}</h2>
       <p className="mt-1 text-sm text-slate-400">Assess maturity, redistribute leverage, capture knowledge, govern decisions, and stress-test resilience. (Pro feature — runs offline on mock AI.)</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
 
