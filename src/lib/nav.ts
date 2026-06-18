@@ -38,6 +38,19 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/future-self", label: "Future Self · Monte Carlo", labelKey: "nav.futureSelf" },
     { href: "/narrative", label: "Growth Narrative", labelKey: "nav.narrative" },
   ]},
+  { id: "healing", zh: "疗愈 OS · Healing", en: "Healing OS", items: [
+    { href: "/healing", label: "Healing Session · 疗愈会谈" },
+    { href: "/core-belief", label: "Core Belief · 核心信念" },
+    { href: "/cbt", label: "CBT · 认知行为" },
+    { href: "/emotion-regulation", label: "Emotion Regulation · 情绪调节" },
+    { href: "/stabilization", label: "Stabilization · 稳定化" },
+    { href: "/parts-work", label: "Parts Work · 内在部分" },
+    { href: "/exposure", label: "Exposure · 暴露训练" },
+    { href: "/identity-rebuild", label: "Identity Rebuild · 身份重建" },
+    { href: "/healing-timeline", label: "Healing Timeline · 疗愈时间线" },
+    { href: "/relapse-prevention", label: "Relapse Prevention · 复发预防" },
+    { href: "/safety", label: "Safety & Support · 安全与求助" },
+  ]},
   { id: "identity", zh: "身份与方向", en: "Identity & direction", items: [
     { href: "/personal-os", label: "Personal OS Compiler", labelKey: "nav.personalOs" },
     { href: "/identity-tree", label: "Identity Evolution Tree", labelKey: "nav.identityTree" },
@@ -48,6 +61,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/beliefs", label: "Beliefs", labelKey: "nav.beliefs" },
     { href: "/cosmos", label: "Cosmos · Worldview", labelKey: "nav.cosmos" },
     { href: "/cosmos/constellation", label: "Constellation", labelKey: "nav.constellation" },
+    { href: "/cosmos/emotions", label: "Emotion Planet", labelKey: "nav.emotions" },
   ]},
   { id: "execution", zh: "执行与精通", en: "Execution & mastery", items: [
     { href: "/deep-work", label: "Deep Work ★", labelKey: "nav.deepWork" },

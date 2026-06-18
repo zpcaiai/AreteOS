@@ -21,6 +21,16 @@ import * as assetGrowth from "./asset-growth";
 import * as capitalLedger from "./capital-ledger";
 import * as osCompiler from "./os-compiler";
 import * as deepWork from "./deep-work";
+import * as healing from "./healing";
+import * as healingCoreBelief from "./healing-core-belief";
+import * as healingCbt from "./healing-cbt";
+import * as healingEmotion from "./healing-emotion";
+import * as healingStab from "./healing-stabilization";
+import * as healingParts from "./healing-parts";
+import * as healingExposure from "./healing-exposure";
+import * as healingIdentity from "./healing-identity";
+import * as healingTimeline from "./healing-timeline";
+import * as healingRelapse from "./healing-relapse";
 
 // Re-export every agent so `import {{ X }} from "@/lib/agents/registry"` keeps working.
 export * from "./core";
@@ -45,6 +55,16 @@ export * from "./asset-growth";
 export * from "./capital-ledger";
 export * from "./os-compiler";
 export * from "./deep-work";
+export * from "./healing";
+export * from "./healing-core-belief";
+export * from "./healing-cbt";
+export * from "./healing-emotion";
+export * from "./healing-stabilization";
+export * from "./healing-parts";
+export * from "./healing-exposure";
+export * from "./healing-identity";
+export * from "./healing-timeline";
+export * from "./healing-relapse";
 
 export const AGENTS = {
   ...core,
@@ -69,6 +89,16 @@ export const AGENTS = {
   ...capitalLedger,
   ...osCompiler,
   ...deepWork,
+  ...healing,
+  ...healingCoreBelief,
+  ...healingCbt,
+  ...healingEmotion,
+  ...healingStab,
+  ...healingParts,
+  ...healingExposure,
+  ...healingIdentity,
+  ...healingTimeline,
+  ...healingRelapse,
 };
 
 export type AgentName = keyof typeof AGENTS;
