@@ -88,3 +88,26 @@ html[data-theme="light"] .bg-indigo-600\/80 { color: #ffffff; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ───────────────── Light theme: accent colors ─────────────────
+   Dark mode uses saturated dark tints (bg-*-950) and light pastels (text-*-300/400)
+   that don't read on a light surface. Remap them (substring selectors cover the
+   /opacity variants) so light mode is internally consistent. */
+html[data-theme="light"] [class*="bg-indigo-950"] { background-color: #eef2ff; }
+html[data-theme="light"] [class*="bg-emerald-950"] { background-color: #ecfdf5; }
+html[data-theme="light"] [class*="bg-rose-950"] { background-color: #fff1f2; }
+html[data-theme="light"] [class*="bg-amber-500/"] { background-color: #fffbeb; }
+html[data-theme="light"] [class*="bg-emerald-700"] { background-color: #d1fae5; color: #065f46; }
+html[data-theme="light"] .bg-slate-950\/50 { background-color: #ffffff; }
+
+html[data-theme="light"] [class*="text-indigo-300"],
+html[data-theme="light"] [class*="text-indigo-400"] { color: #4f46e5; }
+html[data-theme="light"] [class*="text-indigo-200"] { color: #4338ca; }
+html[data-theme="light"] [class*="text-emerald-300"],
+html[data-theme="light"] [class*="text-emerald-400"] { color: #059669; }
+html[data-theme="light"] [class*="text-emerald-200"] { color: #047857; }
+html[data-theme="light"] [class*="text-rose-300"],
+html[data-theme="light"] [class*="text-rose-400"] { color: #e11d48; }
+html[data-theme="light"] [class*="text-amber-300"] { color: #b45309; }
+html[data-theme="light"] [class*="text-sky-400"],
+html[data-theme="light"] [class*="text-sky-300"] { color: #0284c7; }
