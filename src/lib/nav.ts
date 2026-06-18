@@ -39,6 +39,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/narrative", label: "Growth Narrative", labelKey: "nav.narrative" },
   ]},
   { id: "healing", zh: "疗愈 OS · Healing", en: "Healing OS", items: [
+    { href: "/healing-os", label: "Journey Map · 旅程地图" },
     { href: "/healing", label: "Healing Session · 疗愈会谈" },
     { href: "/core-belief", label: "Core Belief · 核心信念" },
     { href: "/cbt", label: "CBT · 认知行为" },

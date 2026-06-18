@@ -15,6 +15,7 @@ import GroundingExerciseCard from "./GroundingExerciseCard";
 import DiltsMapCanvas from "./DiltsMapCanvas";
 import CaseFormulationCard from "./CaseFormulationCard";
 import InterventionPathCard from "./InterventionPathCard";
+import NextSkillLinks from "./NextSkillLinks";
 import type { SafetyTriageOutput, RiskLevel } from "@/lib/domain/risk";
 import type { MentalStateIntakeOutput } from "@/lib/domain/mental-state";
 import type { DiltsClinicalFormulationOutput } from "@/lib/domain/dilts";
@@ -169,6 +170,10 @@ export default function HealingSession() {
               {diltsResult.cautions.join(" ")}
             </p>
           )}
+          <NextSkillLinks
+            skills={diltsResult.recommendedInterventionPath.map((s) => s.skill)}
+            title={T("推荐的下一步（点击进入）", "Recommended next steps (tap to open)")}
+          />
         </div>
       )}
     </div>

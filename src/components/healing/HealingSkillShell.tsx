@@ -12,7 +12,14 @@ import { useT, useI18n } from "@/lib/i18n/client";
 import SafetyBanner from "./SafetyBanner";
 import CrisisSupportCard from "./CrisisSupportCard";
 import GroundingExerciseCard from "./GroundingExerciseCard";
+import NextSkillLinks from "./NextSkillLinks";
 import type { SafetyTriageOutput } from "@/lib/domain/risk";
+
+/** Most skill outputs carry nextRecommendedSkills; stabilization uses nextAllowedSkills. */
+function extractNextSkills(result: unknown): string[] {
+  const r = result as { nextRecommendedSkills?: string[]; nextAllowedSkills?: string[] };
+  return r?.nextRecommendedSkills ?? r?.nextAllowedSkills ?? [];
+}
 
 export default function HealingSkillShell<TResult>({
   title,
@@ -83,7 +90,12 @@ export default function HealingSkillShell<TResult>({
         </p>
       )}
 
-      {skill.data?.result && renderResult(skill.data.result)}
+      {skill.data?.result && (
+        <>
+          {renderResult(skill.data.result)}
+          <NextSkillLinks skills={extractNextSkills(skill.data.result)} />
+        </>
+      )}
     </div>
   );
 }
