@@ -27,6 +27,7 @@ npm run dev                 # http://localhost:3000
 ```
 
 ## What's implemented
+- ✅ **Project Foundry (`/project-foundry`)** — a universal, composable capability catalog: select a solution pack or individual modules, then forge an exportable project blueprint with prerequisites, MVP boundary, phased delivery plan, risks and release checklist. See `docs/PROJECT_FOUNDRY.md`.
 - ✅ Architecture (four layers, 14 engines) — `ARCHITECTURE.md`
 - ✅ Database: `prisma/schema.prisma` (PostgreSQL) + `prisma/neo4j.cypher`
 - ✅ Domain models: `src/lib/domain/`, `src/lib/scoring.ts`, personality state machine

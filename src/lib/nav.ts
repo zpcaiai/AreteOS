@@ -15,6 +15,7 @@ export const NAV_GROUPS: NavGroup[] = [
   { id: "start", zh: "开始", en: "Get started", items: [
     { href: "/start", label: "Start Here", labelKey: "nav.start" },
     { href: "/onboarding", label: "First Run · Full Loop", labelKey: "nav.onboarding" },
+    { href: "/project-foundry", label: "Project Foundry · 项目铸造厂" },
     { href: "/skills", label: "All 20 engines · search", labelKey: "nav.skillsAll" },
     { href: "/growth-map", label: "Growth Map", labelKey: "nav.growthMap" },
   ]},
