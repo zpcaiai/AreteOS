@@ -9,6 +9,7 @@ import { Card, PageHeader, ScoreBar } from "@/components/ui";
 import { useApi, useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
+import { SuggestionField } from "@/components/SuggestionField";
 import type { Bi, SkillEngine } from "@/lib/skills-catalog";
 
 interface Guidance { summary: string; keyInsight: string; topActions: string[]; risk: string }
@@ -50,8 +51,21 @@ export default function SkillEngineRunner({ engine }: { engine: SkillEngine }) {
             </div>
           ))}
         </div>
-        <textarea value={context} onChange={(e) => setContext(e.target.value)} placeholder={T("情境(可选):你正在面对的具体情况…", "Context (optional): the specific situation you're in…")}
-          rows={2} className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+        <div className="mt-3">
+          <SuggestionField
+            value={context}
+            onChange={setContext}
+            placeholder={T("情境(可选):你正在面对的具体情况…", "Context (optional): the specific situation you're in…")}
+            rows={2}
+            className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200"
+            chipLabel={T("情境备选", "Context options")}
+            suggestions={[
+              T("我正在推进一个重要项目，但缺少清晰的下一步。", "I am pushing an important project but lack a clear next step."),
+              T("我已经有经验积累，想把它变成可复制的方法。", "I have accumulated experience and want to turn it into a repeatable method."),
+              T("我需要在今天做一个可验证的小行动。", "I need to take one verifiable small action today."),
+            ]}
+          />
+        </div>
         <button onClick={assess} disabled={run.isPending}
           className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50">
           {run.isPending ? T("评估中…", "Assessing…") : T("评估", "Assess")}

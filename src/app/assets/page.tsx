@@ -6,6 +6,7 @@ import { useApi, useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
 import { ASSET_STAGES, ASSET_TYPES, type AssetStage } from "@/lib/asset-growth-math";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface Asset { id: string; name: string; type: string; stage: AssetStage; progress: number }
 interface Plan { objective: string; milestones: string[]; deepWorkBlocks: number; firstStep: string }
@@ -35,7 +36,21 @@ export default function AssetsPage() {
       <div className="mt-4">
         <Card title={T("新建资产", "New asset")}>
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder={T("资产名称", "asset name")} className="flex-1 rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200" />
+            <div className="min-w-64 flex-1">
+              <SuggestionField
+                as="input"
+                value={name}
+                onChange={setName}
+                placeholder={T("资产名称", "asset name")}
+                className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200"
+                chipLabel={T("资产备选", "Asset options")}
+                suggestions={[
+                  T("一页客户验证报告", "One-page customer validation report"),
+                  T("业务模板交付清单", "Business-template delivery checklist"),
+                  T("可发布的案例文章", "Publishable case article"),
+                ]}
+              />
+            </div>
             <select value={type} onChange={(e) => setType(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200">
               {ASSET_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>

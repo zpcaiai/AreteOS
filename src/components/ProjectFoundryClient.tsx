@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Card, PageHeader, ScoreBar, StatGrid } from "@/components/ui";
 import { useApi, useApiMutation } from "@/lib/hooks";
+import { SuggestionField } from "@/components/SuggestionField";
 import {
   FOUNDRY_CATEGORIES,
   FOUNDRY_FEATURES,
@@ -167,19 +168,63 @@ export default function ProjectFoundryClient() {
             {form.id && <button type="button" onClick={() => setForm({ ...form, id: undefined })} className="text-indigo-300 hover:text-indigo-200">{T("另存为新的工作区", "Save as a new workspace")}</button>}
           </div>
           <div className="grid gap-3 md:grid-cols-2">
-            <label className="text-sm text-slate-300">{T("工作区名称", "Workspace name")}
-              <input value={form.title} onChange={(event) => set({ title: event.target.value })} placeholder={T("例如：研究者的论文行动教练", "e.g. Paper-action coach for researchers")} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm" />
-            </label>
-            <label className="text-sm text-slate-300">{T("首批用户", "First users")}
-              <input value={form.audience} onChange={(event) => set({ audience: event.target.value })} placeholder={T("例如：正在写论文的硕博生", "e.g. Graduate students writing papers")} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm" />
-            </label>
+            <SuggestionField
+              as="input"
+              label={T("工作区名称", "Workspace name")}
+              value={form.title}
+              onChange={(value) => set({ title: value })}
+              placeholder={T("例如：研究者的论文行动教练", "e.g. Paper-action coach for researchers")}
+              chipLabel={T("命名备选", "Name options")}
+              suggestions={[
+                T("客户验证工作台", "Customer validation workspace"),
+                T("MVP 发布准备室", "MVP launch room"),
+                T("AI 业务增长实验台", "AI business growth lab"),
+              ]}
+            />
+            <SuggestionField
+              as="input"
+              label={T("首批用户", "First users")}
+              value={form.audience}
+              onChange={(value) => set({ audience: value })}
+              placeholder={T("例如：正在写论文的硕博生", "e.g. Graduate students writing papers")}
+              chipLabel={T("用户备选", "Audience options")}
+              suggestions={[
+                T("正在验证新业务方向的创始人", "Founders validating a new business direction"),
+                T("需要把服务产品化的小微企业主", "Small-business owners productizing a service"),
+                T("承担创新项目的一线业务负责人", "Business leads owning an innovation project"),
+              ]}
+            />
           </div>
-          <label className="mt-3 block text-sm text-slate-300">{T("他们在什么情境下遇到什么问题？", "What problem do they face, in what situation?")}
-            <textarea value={form.problem} onChange={(event) => set({ problem: event.target.value })} rows={3} placeholder={T("写下具体摩擦、现有替代方案和期待结果。", "Describe the friction, current workaround, and desired outcome.")} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm" />
-          </label>
-          <label className="mt-3 block text-sm text-slate-300">{T("边界与约束", "Constraints")}
-            <input value={form.constraints} onChange={(event) => set({ constraints: event.target.value })} placeholder={T("例如：两人团队、6 周、不能处理敏感医疗数据", "e.g. 2-person team, 6 weeks, no sensitive medical data")} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm" />
-          </label>
+          <div className="mt-3">
+            <SuggestionField
+              label={T("他们在什么情境下遇到什么问题？", "What problem do they face, in what situation?")}
+              value={form.problem}
+              onChange={(value) => set({ problem: value })}
+              rows={3}
+              placeholder={T("写下具体摩擦、现有替代方案和期待结果。", "Describe the friction, current workaround, and desired outcome.")}
+              chipLabel={T("问题备选", "Problem options")}
+              suggestions={[
+                T("用户愿意表达需求，但没有完成一次真实付费或交付验证。", "Users express interest, but no real payment or delivery validation has happened."),
+                T("团队有很多功能想法，却缺少一个可在两周内交付的 MVP 边界。", "The team has many feature ideas but lacks a two-week MVP boundary."),
+                T("业务流程依赖人工经验，无法沉淀证据、复盘和可复制交付。", "The workflow depends on tacit manual experience and lacks evidence, review, and repeatable delivery."),
+              ]}
+            />
+          </div>
+          <div className="mt-3">
+            <SuggestionField
+              as="input"
+              label={T("边界与约束", "Constraints")}
+              value={form.constraints}
+              onChange={(value) => set({ constraints: value })}
+              placeholder={T("例如：两人团队、6 周、不能处理敏感医疗数据", "e.g. 2-person team, 6 weeks, no sensitive medical data")}
+              chipLabel={T("约束备选", "Constraint options")}
+              suggestions={[
+                T("两人团队，6 周内上线，不处理敏感数据。", "Two-person team, ship in 6 weeks, no sensitive data."),
+                T("只能使用现有客户渠道，先验证付费意愿。", "Use existing customer channels only; validate willingness to pay first."),
+                T("必须保留人工复核，AI 只能做建议与草稿。", "Human review must remain; AI only suggests and drafts."),
+              ]}
+            />
+          </div>
         </Card>
 
         <Card title={T("保存并生成", "Save & forge")} accent="#38bdf8">

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import ShareCardModal from "@/components/ShareCardModal";
+import { SuggestionField } from "@/components/SuggestionField";
 import VirtualList from "@/components/VirtualList";
 import { addMemoryCard, deckStats, getDeck, getDueCards, nextDueLabel, removeMemoryCard, reviewCard, type MemoryCard } from "@/lib/client/memory-deck";
 import { useDraft } from "@/lib/client/useDraft";
@@ -123,31 +124,49 @@ export default function MemoryDeckClient() {
 
         {mode === "new" && (
           <div className="mx-auto max-w-2xl">
-            <label className="block text-sm font-medium text-slate-300" htmlFor="memory-title">{T("标题", "Title")}</label>
-            <input
-              id="memory-title"
+            <SuggestionField
+              as="input"
+              label={T("标题", "Title")}
               value={draft.title}
-              onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+              onChange={(value) => setDraft({ ...draft, title: value })}
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
               maxLength={120}
+              chipLabel={T("标题备选", "Title options")}
+              suggestions={[
+                T("一个可复用的决策规则", "A reusable decision rule"),
+                T("今天验证到的真实证据", "Real evidence validated today"),
+                T("下次遇到类似问题先做什么", "What to do first next time"),
+              ]}
             />
-            <label className="mt-4 block text-sm font-medium text-slate-300" htmlFor="memory-content">{T("原则或教训", "Principle or lesson")}</label>
-            <textarea
-              id="memory-content"
-              value={draft.content}
-              onChange={(e) => setDraft({ ...draft, content: e.target.value })}
-              className="mt-1 min-h-40 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm leading-6 text-slate-100"
-              maxLength={2000}
-            />
-            <label className="mt-4 block text-sm font-medium text-slate-300" htmlFor="memory-source">{T("来源", "Source")}</label>
-            <input
-              id="memory-source"
-              value={draft.source}
-              onChange={(e) => setDraft({ ...draft, source: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
-              maxLength={160}
-              placeholder={T("复盘、决策回顾、书籍、教练对话……", "Reflection, decision review, book, coach session...")}
-            />
+            <div className="mt-4">
+              <SuggestionField
+                label={T("原则或教训", "Principle or lesson")}
+                value={draft.content}
+                onChange={(value) => setDraft({ ...draft, content: value })}
+                rows={6}
+                className="mt-1 min-h-40 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm leading-6 text-slate-100"
+                maxLength={2000}
+                chipLabel={T("内容备选", "Content options")}
+                suggestions={[
+                  T("先完成一个可被用户验证的小结果，再继续扩展功能。", "Finish one user-verifiable small result before expanding features."),
+                  T("如果一个行动不能留下证据，它就不能作为主要进展叙事。", "If an action leaves no evidence, it should not be the main progress narrative."),
+                  T("把下一步缩小到 5/25/60 分钟之一，降低启动阻力。", "Shrink the next step to 5, 25, or 60 minutes to reduce activation friction."),
+                ]}
+              />
+            </div>
+            <div className="mt-4">
+              <SuggestionField
+                as="input"
+                label={T("来源", "Source")}
+                value={draft.source}
+                onChange={(value) => setDraft({ ...draft, source: value })}
+                className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                maxLength={160}
+                placeholder={T("复盘、决策回顾、书籍、教练对话……", "Reflection, decision review, book, coach session...")}
+                chipLabel={T("来源备选", "Source options")}
+                suggestions={[T("周复盘", "Weekly review"), T("教练对话", "Coach conversation"), T("用户验证", "User validation")]}
+              />
+            </div>
             <div className="mt-3 flex items-center justify-between">
               <span className="text-xs text-slate-500" aria-live="polite">{savedHint ? T("草稿已保存", "Draft saved") : ""}</span>
               <button onClick={createCard} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500">
@@ -209,4 +228,3 @@ function GradeButton({ label, detail, tone, onClick }: { label: string; detail: 
     </button>
   );
 }
-

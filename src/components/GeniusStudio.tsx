@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT, useTx } from "@/lib/i18n/client";
+import { SuggestionField } from "@/components/SuggestionField";
 
 const SYS_LABEL: Record<string, string> = { V: "Visual", A: "Auditory", K: "Kinesthetic", Ad: "Self-talk" };
 
@@ -45,10 +46,32 @@ export default function GeniusStudio({ geniuses, adoptions }: { geniuses: Genius
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
         <div className="mb-2 text-sm font-semibold">{T("为一位天才建模", "Model a genius")}</div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder={tx("Genius (e.g. Da Vinci, Tesla, Mozart)")}
-            className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
-          <input value={focus} onChange={(e) => setFocus(e.target.value)} placeholder={tx("Focus (optional)")}
-            className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
+          <div className="flex-1">
+            <SuggestionField
+              as="input"
+              value={name}
+              onChange={setName}
+              placeholder={tx("Genius (e.g. Da Vinci, Tesla, Mozart)")}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm"
+              chipLabel={T("人物备选", "Person options")}
+              suggestions={["Steve Jobs", "Elon Musk", "Da Vinci", "Warren Buffett"]}
+            />
+          </div>
+          <div className="flex-1">
+            <SuggestionField
+              as="input"
+              value={focus}
+              onChange={setFocus}
+              placeholder={tx("Focus (optional)")}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm"
+              chipLabel={T("建模焦点", "Focus options")}
+              suggestions={[
+                T("产品判断与减法", "Product judgment and subtraction"),
+                T("长期投资与决策纪律", "Long-term investing and decision discipline"),
+                T("跨学科创造力", "Cross-disciplinary creativity"),
+              ]}
+            />
+          </div>
           <button onClick={model} disabled={busy} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium disabled:opacity-50">
             {busy ? tx("Modeling…") : tx("Model")}
           </button>
@@ -145,8 +168,19 @@ function PracticeBox({ adoptionId, onDone }: { adoptionId: string; onDone: () =>
   if (!open) return <button onClick={() => setOpen(true)} className="mt-3 text-xs text-indigo-400">{T("+ 记录一次练习", "+ Log a practice")}</button>;
   return (
     <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/60 p-3">
-      <textarea value={reflection} onChange={(e) => setReflection(e.target.value)} rows={2} placeholder={tx("How faithfully did you reproduce the strategy? What happened?")}
-        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
+      <SuggestionField
+        value={reflection}
+        onChange={setReflection}
+        rows={2}
+        placeholder={tx("How faithfully did you reproduce the strategy? What happened?")}
+        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm"
+        chipLabel={T("练习记录备选", "Practice note options")}
+        suggestions={[
+          T("我按策略完成了一次小实验，结果是：", "I ran one small experiment with the strategy; the result was:"),
+          T("我偏离策略的地方是：下一次要修正：", "Where I drifted from the strategy: what to correct next time:"),
+          T("最有效的一个动作是：", "The most useful action was:"),
+        ]}
+      />
       <label className="mt-2 block text-xs text-slate-400">{T("保真度", "Fidelity")}: {Math.round(fidelity * 100)}%
         <input type="range" min={0} max={1} step={0.05} value={fidelity} onChange={(e) => setFidelity(Number(e.target.value))} className="mt-1 w-full" />
       </label>

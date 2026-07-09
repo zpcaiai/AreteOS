@@ -5,6 +5,7 @@ import { Card, PageHeader } from "@/components/ui";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
 import ShareCardModal from "@/components/ShareCardModal";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface OSResp { result: { template: string; version: number; os: { mission: string; identityStack: { primary: string; secondary: string; emerging: string; legacy: string } } } }
 interface RunResp { id: string }
@@ -54,10 +55,34 @@ export default function OnboardingPage() {
 
       {(phase === "idle" || phase === "error" || phase === "upgrade") && (
         <Card title={T("两个问题", "Two questions")}>
-          <label className="text-sm text-slate-400">{T("1. 你想成为谁?", "1. Who do you want to become?")}</label>
-          <textarea value={intent} onChange={(e) => setIntent(e.target.value)} rows={2} placeholder={T("例如:一名 AI 研究型创业者。", "e.g. an AI research entrepreneur.")} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
-          <label className="mt-3 block text-sm text-slate-400">{T("2. 现在最卡你的是什么?", "2. What's most blocking you right now?")}</label>
-          <textarea value={problem} onChange={(e) => setProblem(e.target.value)} rows={2} placeholder={T("例如:我读了很多却从不产出。", "e.g. I read a lot but never publish.")} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+          <SuggestionField
+            label={T("1. 你想成为谁?", "1. Who do you want to become?")}
+            value={intent}
+            onChange={setIntent}
+            rows={2}
+            placeholder={T("例如:一名 AI 研究型创业者。", "e.g. an AI research entrepreneur.")}
+            chipLabel={T("可直接采用", "Ready options")}
+            suggestions={[
+              T("一名能持续发布产品的 AI 创业者", "An AI founder who consistently ships products"),
+              T("一名把专业知识变成复利资产的研究者", "A researcher turning expertise into compounding assets"),
+              T("一名更稳定、更有判断力的团队负责人", "A steadier team lead with better judgment"),
+            ]}
+          />
+          <div className="mt-3">
+            <SuggestionField
+              label={T("2. 现在最卡你的是什么?", "2. What's most blocking you right now?")}
+              value={problem}
+              onChange={setProblem}
+              rows={2}
+              placeholder={T("例如:我读了很多却从不产出。", "e.g. I read a lot but never publish.")}
+              chipLabel={T("常见卡点", "Common blockers")}
+              suggestions={[
+                T("输入很多，但迟迟没有发布一个可验证成果。", "I consume a lot but rarely publish a verifiable output."),
+                T("目标太多，今天不知道该先做哪一个动作。", "Too many goals; I do not know the next action for today."),
+                T("知道应该行动，但缺少稳定节奏和反馈证据。", "I know what to do but lack rhythm and feedback evidence."),
+              ]}
+            />
+          </div>
           <button onClick={run} disabled={intent.trim().length < 5} className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold hover:bg-indigo-500 disabled:opacity-50">{T("⚡ 开始我的首跑", "⚡ Run my first loop")}</button>
           {phase === "error" && <p className="mt-2 text-sm text-rose-400" role="alert">{errMsg}</p>}
         </Card>

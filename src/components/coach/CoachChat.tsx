@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CoachMessageSchema, firstIssue } from "@/lib/schemas";
 import type { DictKey } from "@/lib/i18n/dictionaries";
 import { useI18n, useT } from "@/lib/i18n/client";
+import { SuggestionChips } from "@/components/SuggestionField";
 
 interface Msg { id: string; role: string; content: string; toolCalls?: { tool: string }[] | null; createdAt: string }
 interface Session { id: string; title: string; focus: string; updatedAt: string }
@@ -165,6 +166,20 @@ export default function CoachChat() {
           <div ref={bottomRef} />
         </div>
         {error && <p className="px-4 pb-1 text-sm text-rose-400" role="alert">{error}</p>}
+        {active && !busy && (
+          <div className="border-t border-slate-800 px-3 pt-2">
+            <SuggestionChips
+              suggestions={[
+                T("请只给我一个今天能完成的 25 分钟行动。", "Give me only one 25-minute action I can finish today."),
+                T("帮我把这个问题拆成假设、证据和下一步。", "Break this into assumption, evidence, and next step."),
+                T("追问我 3 个问题，直到我的目标足够具体。", "Ask me 3 questions until my goal is concrete enough."),
+              ]}
+              value={input}
+              onChange={setInput}
+              label={T("快捷提问", "Prompt starters")}
+            />
+          </div>
+        )}
         <form
           onSubmit={(e) => { e.preventDefault(); send(); }}
           className="flex gap-2 border-t border-slate-800 p-3">

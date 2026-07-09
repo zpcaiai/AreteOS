@@ -6,6 +6,7 @@ import { useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
 import { SIGNAL_RULES, BOTTLENECK_BY_KEY, type Bi } from "@/lib/bottleneck-rules";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface Ranked { key: string; name: Bi; question: Bi; score: number; confidence: number }
 interface Diagnosis { primaryBottleneck: string; secondaryBottlenecks: string[]; rootCause: string; confidence: number; recommendedNextEngine: string; recommendation: string }
@@ -27,9 +28,19 @@ export default function BottlenecksPage() {
     <div>
       <PageHeader title={T("瓶颈诊断", "Bottleneck Diagnosis")} subtitle={T("找到限制你成长的真正约束 —— 先诊断,再行动。", "Find the real constraint on your growth — diagnose before acting.")} />
       <Card title={T("你正在面对的成长问题", "Your current growth problem")}>
-        <textarea value={problem} onChange={(e) => setProblem(e.target.value)} rows={2}
+        <SuggestionField
+          value={problem}
+          onChange={setProblem}
+          rows={2}
           placeholder={T("例如:我读了很多,却从不产出任何东西。", "e.g. I read a lot but never publish anything.")}
-          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200"
+          chipLabel={T("问题备选", "Problem options")}
+          suggestions={[
+            T("我一直在学习和研究，但没有对外发布成果。", "I keep studying and researching but do not publish outputs."),
+            T("我每天很忙，但关键项目没有实质推进。", "I am busy every day, but the key project does not move."),
+            T("我知道方向，却总是在执行前反复犹豫。", "I know the direction but hesitate repeatedly before execution."),
+          ]}
+        />
         <div className="mt-3 text-xs text-slate-500">{T("勾选符合你的信号:", "Check the signals that fit you:")}</div>
         <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
           {SIGNAL_RULES.map((s) => (

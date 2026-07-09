@@ -5,6 +5,7 @@ import { Card, PageHeader, ScoreBar } from "@/components/ui";
 import { useApiMutation } from "@/lib/hooks";
 import { useI18n } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface Position { key: string; persona: string; stance: string; reasoning: string; keyRisk: string; recommendation: string; confidence: number }
 interface Metrics { members: number; meanConfidence: number; confidencePolarization: number; agreement: number; dominant: string }
@@ -29,10 +30,34 @@ export default function CouncilPage() {
     <div>
       <PageHeader title={t("innov.council.title")} subtitle={t("innov.council.subtitle")} />
       <Card title={t("innov.council.ask")}>
-        <textarea value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t("innov.council.qPlaceholder")}
-          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-3 text-sm text-slate-200" rows={3} />
-        <input value={options} onChange={(e) => setOptions(e.target.value)} placeholder={t("innov.council.optPlaceholder")}
-          className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+        <SuggestionField
+          value={question}
+          onChange={setQuestion}
+          placeholder={t("innov.council.qPlaceholder")}
+          rows={3}
+          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-3 text-sm text-slate-200"
+          chipLabel="问题备选"
+          suggestions={[
+            "我现在最应该聚焦哪一个成长协议？",
+            "我应该继续打磨当前产品，还是先做用户验证？",
+            "这个机会是否值得投入未来 30 天？",
+          ]}
+        />
+        <div className="mt-2">
+          <SuggestionField
+            as="input"
+            value={options}
+            onChange={setOptions}
+            placeholder={t("innov.council.optPlaceholder")}
+            className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200"
+            chipLabel="候选项备选"
+            suggestions={[
+              "继续推进, 暂缓观察, 放弃",
+              "做用户访谈, 发布 MVP, 先收款验证",
+              "聚焦产品, 聚焦销售, 聚焦交付",
+            ]}
+          />
+        </div>
         <button onClick={convene} disabled={run.isPending || question.trim().length < 3}
           className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50">
           {run.isPending ? t("innov.council.convening") : t("innov.council.convene")}

@@ -6,6 +6,7 @@ import { useApi, useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
 import { BOTTLENECKS, type Bi } from "@/lib/bottleneck-rules";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface Rx { title: string; whyItMatters: string; sevenDay: string[]; thirtyDay: string[]; metrics: string[]; firstAction: string }
 interface Result { bottleneck: string; prescription: Rx }
@@ -32,9 +33,21 @@ export default function PrescriptionsPage() {
           </select>
           {latest.data?.latest?.primary && <span className="text-xs text-slate-500">{T("已根据最近诊断预填", "prefilled from your latest diagnosis")}</span>}
         </div>
-        <textarea value={context} onChange={(e) => setContext(e.target.value)} rows={2}
-          placeholder={T("情境(可选)…", "Context (optional)…")}
-          className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+        <div className="mt-2">
+          <SuggestionField
+            value={context}
+            onChange={setContext}
+            rows={2}
+            placeholder={T("情境(可选)…", "Context (optional)…")}
+            className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200"
+            chipLabel={T("情境备选", "Context options")}
+            suggestions={[
+              T("本周只能投入 3 个 25 分钟时间块，需要最小有效行动。", "This week I only have three 25-minute blocks and need the smallest effective action."),
+              T("已经有初版产品，但缺少真实用户反馈。", "I have a first version but lack real user feedback."),
+              T("团队目标不清，大家都在做局部优化。", "Team goals are unclear and everyone is locally optimizing."),
+            ]}
+          />
+        </div>
         <button onClick={() => run.mutate({ bottleneck: chosen, context })} disabled={run.isPending}
           className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50">
           {run.isPending ? T("生成中…", "Generating…") : T("生成处方", "Generate prescription")}

@@ -14,6 +14,7 @@ import CrisisSupportCard from "./CrisisSupportCard";
 import GroundingExerciseCard from "./GroundingExerciseCard";
 import NextSkillLinks from "./NextSkillLinks";
 import type { SafetyTriageOutput } from "@/lib/domain/risk";
+import { SuggestionField } from "@/components/SuggestionField";
 
 /** Most skill outputs carry nextRecommendedSkills; stabilization uses nextAllowedSkills. */
 function extractNextSkills(result: unknown): string[] {
@@ -63,12 +64,18 @@ export default function HealingSkillShell<TResult>({
       <PageHeader title={title} subtitle={subtitle} />
 
       <Card title={T("此刻发生了什么？", "What's going on right now?")}>
-        <textarea
+        <SuggestionField
           value={problem}
-          onChange={(e) => setProblem(e.target.value)}
+          onChange={setProblem}
           rows={3}
           placeholder={placeholder}
           className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-3 text-sm text-slate-100"
+          chipLabel={T("温和开头", "Gentle starters")}
+          suggestions={[
+            T("我现在最困扰的是：\n它通常在什么情境出现：\n我希望先变得更稳定的是：", "What is weighing on me:\nWhen it usually appears:\nWhat I want to stabilize first:"),
+            T("我不需要立刻解决全部问题，只想先看清一个循环：", "I do not need to solve everything now; I want to understand one loop first:"),
+            T("今天我能承受的最小练习是：", "The smallest practice I can tolerate today is:"),
+          ]}
         />
         <button onClick={run} disabled={!problem.trim() || pending}
           className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50">

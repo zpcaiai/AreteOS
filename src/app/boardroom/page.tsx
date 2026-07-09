@@ -5,6 +5,7 @@ import { Card, PageHeader, ScoreBar } from "@/components/ui";
 import { useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface Position { key: string; advisor: string; analysis: string; keyRisk: string; opportunity: string; recommendation: string; confidence: number }
 interface Synthesis { summary: string; agreements: string[]; disagreements: string[]; keyRisks: string[]; recommendedDecision: string; confidence: number }
@@ -31,11 +32,34 @@ export default function BoardroomPage() {
     <div>
       <PageHeader title={T("个人董事会", "Personal Boardroom")} subtitle={T("十位顾问从不同心智模型审视你的重大决策 —— 提升判断力,而非替你决定。", "Ten advisors weigh your decision from different mental models — to sharpen judgment, not replace it.")} />
       <Card title={T("提出一个重大决策", "Pose a high-stakes decision")}>
-        <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3}
+        <SuggestionField
+          value={question}
+          onChange={setQuestion}
+          rows={3}
           placeholder={T("例如:我该接受管理岗,还是继续做独立贡献者?", "e.g. Should I take the manager role or stay an IC?")}
-          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-3 text-sm text-slate-200" />
-        <input value={options} onChange={(e) => setOptions(e.target.value)} placeholder={T("可选:候选项,逗号分隔", "Optional: options, comma-separated")}
-          className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-3 text-sm text-slate-200"
+          chipLabel={T("决策备选", "Decision options")}
+          suggestions={[
+            T("我应该把下一季度押注在产品打磨、销售验证，还是渠道合作？", "Should next quarter focus on product polish, sales validation, or channel partnerships?"),
+            T("我该亲自负责这个新项目，还是交给团队负责人试运行？", "Should I personally own this new project or let a team lead run it?"),
+            T("我们是否应该现在上线收费版本，还是再做一轮免费验证？", "Should we launch a paid version now or run one more free validation round?"),
+          ]}
+        />
+        <div className="mt-2">
+          <SuggestionField
+            as="input"
+            value={options}
+            onChange={setOptions}
+            placeholder={T("可选:候选项,逗号分隔", "Optional: options, comma-separated")}
+            className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200"
+            chipLabel={T("候选方案", "Candidate paths")}
+            suggestions={[
+              T("立即执行, 小范围试点, 暂缓", "Execute now, pilot narrowly, pause"),
+              T("产品优先, 销售优先, 交付优先", "Product first, sales first, delivery first"),
+              T("自己负责, 授权负责人, 外部合作", "Own it myself, delegate owner, partner externally"),
+            ]}
+          />
+        </div>
         <button onClick={convene} disabled={run.isPending || question.trim().length < 3}
           className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50">
           {run.isPending ? T("董事会审议中…", "The board is deliberating…") : T("召集董事会", "Convene the board")}

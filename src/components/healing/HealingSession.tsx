@@ -19,6 +19,7 @@ import NextSkillLinks from "./NextSkillLinks";
 import type { SafetyTriageOutput, RiskLevel } from "@/lib/domain/risk";
 import type { MentalStateIntakeOutput } from "@/lib/domain/mental-state";
 import type { DiltsClinicalFormulationOutput } from "@/lib/domain/dilts";
+import { SuggestionField } from "@/components/SuggestionField";
 
 type IntakeResult = MentalStateIntakeOutput & { intakeId: string };
 type FormulationResult = DiltsClinicalFormulationOutput & { formulationId: string; depth: string };
@@ -79,12 +80,18 @@ export default function HealingSession() {
       />
 
       <Card title={T("此刻发生了什么？", "What's going on right now?")}>
-        <textarea
+        <SuggestionField
           value={problem}
-          onChange={(e) => setProblem(e.target.value)}
+          onChange={setProblem}
           rows={3}
           placeholder={T("例如：我一开会就紧张，怕说错话，所以总是沉默，会后又很后悔。", "e.g. I freeze up in meetings, afraid I'll say something wrong, so I stay silent and regret it afterward.")}
           className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-3 text-sm text-slate-100"
+          chipLabel={T("温和开头", "Gentle starters")}
+          suggestions={[
+            T("触发我的情境是：\n我身体里的感觉是：\n我通常会回避的是：", "The triggering situation is:\nWhat I feel in my body is:\nWhat I usually avoid is:"),
+            T("我现在不想深入，只想先稳定下来并看清下一步。", "I do not want to go deep now; I just want to stabilize and see the next step."),
+            T("这件事反复出现，我想先找出其中一个维持循环。", "This keeps repeating, and I want to identify one maintaining loop first."),
+          ]}
         />
         <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
           {RATINGS.map((r) => (

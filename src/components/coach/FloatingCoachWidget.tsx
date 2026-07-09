@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { deckStats } from "@/lib/client/memory-deck";
 import { useDraft } from "@/lib/client/useDraft";
 import { useT } from "@/lib/i18n/client";
+import { SuggestionField } from "@/components/SuggestionField";
 
 const POS_KEY = "arete-floating-coach-pos";
 const BOX = 72;
@@ -127,14 +128,20 @@ export default function FloatingCoachWidget() {
             )}
             {tab === "checkin" && (
               <div>
-                <label htmlFor="floating-checkin" className="text-sm font-semibold text-slate-100">{T("快速签到", "Quick check-in")}</label>
-                <textarea
-                  id="floating-checkin"
+                <p className="text-sm font-semibold text-slate-100">{T("快速签到", "Quick check-in")}</p>
+                <SuggestionField
                   value={checkin}
-                  onChange={(e) => setCheckin(e.target.value)}
+                  onChange={setCheckin}
+                  rows={6}
                   className="mt-2 min-h-40 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm leading-6 text-slate-100"
                   placeholder={T("现在发生了什么?你在回避什么?下一个诚实的行动是什么?", "What is happening, what are you avoiding, and what is the next honest action?")}
                   maxLength={1600}
+                  chipLabel={T("签到备选", "Check-in options")}
+                  suggestions={[
+                    T("现在发生的是：\n我在回避的是：\n下一个诚实行动是：", "What is happening:\nWhat I am avoiding:\nNext honest action:"),
+                    T("今天我只有 5 分钟，所以我会完成：", "I only have 5 minutes today, so I will finish:"),
+                    T("我需要停止责备自己，转而收集一个证据：", "I need to stop blaming myself and collect one piece of evidence:"),
+                  ]}
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-xs text-slate-500" aria-live="polite">{savedHint ? T("草稿已保存", "Draft saved") : ""}</span>
@@ -206,4 +213,3 @@ function Metric({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
-

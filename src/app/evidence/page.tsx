@@ -5,6 +5,7 @@ import { Card, PageHeader, ScoreBar } from "@/components/ui";
 import { useApi, useApiMutation } from "@/lib/hooks";
 import { useI18n } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface DomainGap { domain: string; stated: number; enacted: number; gap: number; integrity: number; samples: number }
 interface Interp { summary: string; biggestGap: string; suggestedExperiment: string }
@@ -34,7 +35,17 @@ export default function EvidencePage() {
 
       <Card title={t("innov.evidence.recordCard")}>
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <input value={source} onChange={(e) => setSource(e.target.value)} placeholder={t("innov.evidence.sourcePlaceholder")} className="rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200" />
+          <div className="min-w-64 flex-1">
+            <SuggestionField
+              as="input"
+              value={source}
+              onChange={setSource}
+              placeholder={t("innov.evidence.sourcePlaceholder")}
+              className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200"
+              chipLabel="来源备选"
+              suggestions={["manual", "customer-interview", "published-asset", "weekly-review"]}
+            />
+          </div>
           <select value={kind} onChange={(e) => setKind(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200">
             {KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
           </select>
@@ -58,8 +69,19 @@ export default function EvidencePage() {
               className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium hover:bg-indigo-500 disabled:opacity-50">{imp.isPending ? t("innov.evidence.importing") : t("innov.evidence.importBtn")}</button>
             {imp.data && <span className="text-xs text-emerald-400">+{imp.data.ingested}</span>}
           </div>
-          <textarea value={raw} onChange={(e) => setRaw(e.target.value)} placeholder={t("innov.evidence.importPlaceholder")} rows={4}
-            className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 font-mono text-xs text-slate-200" />
+          <SuggestionField
+            value={raw}
+            onChange={setRaw}
+            placeholder={t("innov.evidence.importPlaceholder")}
+            rows={4}
+            className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 font-mono text-xs text-slate-200"
+            chipLabel="导入样例"
+            suggestions={[
+              "2026-07-09 完成一次用户访谈，用户愿意为模板工作区支付试用费。",
+              "2026-07-09 发布 v0.1 页面，收集到 3 条明确改进反馈。",
+              "2026-07-09 复盘：今天真正推进的是客户验证，而不是继续堆功能。",
+            ]}
+          />
           {imp.error && !isUpgradeError(imp.error) && <p className="mt-2 text-sm text-rose-400" role="alert">{imp.error.message}</p>}
         </Card>
       </div>

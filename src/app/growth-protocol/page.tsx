@@ -6,6 +6,7 @@ import { useApi, useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
 import { PROTOCOL_STAGES, type ProtocolStage } from "@/lib/protocol-scoring";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface Run { id: string; title: string; contextType: string; progress: number; score: number; nextStage: ProtocolStage | null; stages: Partial<Record<ProtocolStage, { score: number; notes: string }>> }
 interface DiagnoseResp { run: Run; diagnosis: { diagnosis: { primaryBottleneck: string; recommendation: string; recommendedNextEngine: string } } }
@@ -42,7 +43,21 @@ export default function GrowthProtocolPage() {
       <PageHeader title={T("成长协议", "Growth Protocol")} subtitle={T("统一循环;诊断/设计阶段直接驱动瓶颈诊断与成长处方引擎。", "The unified loop; the diagnose/design stages drive the Bottleneck and Prescription engines.")} />
       <Card title={T("开启一次协议运行", "Start a protocol run")}>
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={T("主题", "Title")} className="flex-1 rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200" />
+          <div className="min-w-64 flex-1">
+            <SuggestionField
+              as="input"
+              value={title}
+              onChange={setTitle}
+              placeholder={T("主题", "Title")}
+              className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200"
+              chipLabel={T("协议备选", "Protocol options")}
+              suggestions={[
+                T("完成一次真实用户验证", "Complete one real user validation"),
+                T("发布一个可复用资产", "Publish one reusable asset"),
+                T("把一个业务模板跑成可交付工作区", "Turn one business template into a deliverable workspace"),
+              ]}
+            />
+          </div>
           <button onClick={() => title.trim() && create.mutate({ title })} disabled={create.isPending || title.trim().length < 2} className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium hover:bg-indigo-500 disabled:opacity-50">{T("创建", "Create")}</button>
         </div>
         {create.error && isUpgradeError(create.error) && <div className="mt-3"><UpgradeNotice feature={T("成长协议", "Growth Protocol")} tier="Plus" /></div>}
@@ -67,7 +82,19 @@ export default function GrowthProtocolPage() {
           </Card>
 
           <Card title={T("端到端编排", "End-to-end orchestration")} accent="#a78bfa">
-            <textarea value={problem} onChange={(e) => setProblem(e.target.value)} rows={2} placeholder={T("描述当前问题(用于自动诊断)…", "Describe the problem (for auto-diagnose)…")} className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+            <SuggestionField
+              value={problem}
+              onChange={setProblem}
+              rows={2}
+              placeholder={T("描述当前问题(用于自动诊断)…", "Describe the problem (for auto-diagnose)…")}
+              className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200"
+              chipLabel={T("问题备选", "Problem options")}
+              suggestions={[
+                T("我有很多想法，但没有完成可验证的最小行动。", "I have many ideas but no verifiable minimum action completed."),
+                T("我在产品、销售、交付之间摇摆，今天不知道该推进什么。", "I am switching between product, sales, and delivery and do not know what to push today."),
+                T("我已经做了功能，但缺少用户证据和付费信号。", "I have built features but lack user evidence and payment signals."),
+              ]}
+            />
             <div className="mt-2 flex flex-wrap gap-2 text-xs">
               <button onClick={() => diagnose.mutate({ action: "diagnose", problemStatement: problem })} disabled={diagnose.isPending} className="rounded-lg bg-amber-600 px-3 py-1.5 font-medium text-white hover:bg-amber-500 disabled:opacity-50">{diagnose.isPending ? "…" : T("自动诊断(瓶颈引擎)", "Auto-diagnose (Bottleneck)")}</button>
               <button onClick={() => design.mutate({ action: "design" })} disabled={design.isPending} className="rounded-lg bg-emerald-600 px-3 py-1.5 font-medium text-white hover:bg-emerald-500 disabled:opacity-50">{design.isPending ? "…" : T("自动设计(处方引擎)", "Auto-design (Prescription)")}</button>

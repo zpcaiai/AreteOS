@@ -5,6 +5,7 @@ import { Card, PageHeader } from "@/components/ui";
 import { useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
+import { SuggestionField } from "@/components/SuggestionField";
 
 interface Stack { primary: string; secondary: string; emerging: string; legacy: string }
 interface OS {
@@ -34,9 +35,19 @@ export default function PersonalOSPage() {
     <div>
       <PageHeader title={T("人生 OS 编译器", "Personal OS Compiler")} subtitle={T("描述你想成为谁,系统把它编译成可执行的人生操作系统。", "Describe who you want to become; the system compiles an executable life OS.")} />
       <Card title={T("你想成为谁?", "Who do you want to become?")}>
-        <textarea value={intent} onChange={(e) => setIntent(e.target.value)} rows={2}
+        <SuggestionField
+          value={intent}
+          onChange={setIntent}
+          rows={2}
           placeholder={T("例如:我想成为一名 AI 研究型创业者。", "e.g. I want to become an AI research entrepreneur.")}
-          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200" />
+          className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-sm text-slate-200"
+          chipLabel={T("身份备选", "Identity options")}
+          suggestions={[
+            T("我想成为一名能持续把 AI 想法做成可收费产品的创业者。", "I want to become a founder who consistently turns AI ideas into paid products."),
+            T("我想成为一名能把专业知识沉淀成资产和课程的专家。", "I want to become an expert who turns knowledge into assets and courses."),
+            T("我想成为一名能带团队完成真实业务结果的负责人。", "I want to become a leader who helps a team produce real business outcomes."),
+          ]}
+        />
         <button onClick={() => intent.trim().length >= 5 && run.mutate({ intent })} disabled={run.isPending || intent.trim().length < 5}
           className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50">
           {run.isPending ? T("编译中…", "Compiling…") : T("编译人生 OS", "Compile life OS")}
