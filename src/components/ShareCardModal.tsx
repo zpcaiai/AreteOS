@@ -93,6 +93,8 @@ export default function ShareCardModal({
 }) {
   const T = useT();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
   const [tplId, setTplId] = useState("dawn");
   const tpl = TEMPLATES.find((item) => item.id === tplId) || TEMPLATES[0];
 
@@ -110,6 +112,21 @@ export default function ShareCardModal({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  useEffect(() => {
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input:not([disabled])')).filter((element) => !element.hasAttribute("hidden"));
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); previous?.focus(); };
+  }, []);
 
   function download() {
     const canvas = canvasRef.current;
@@ -130,19 +147,20 @@ export default function ShareCardModal({
 
   return (
     <div className="fixed inset-0 z-[1400] flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur" onClick={onClose}>
-      <section className="max-h-full w-full max-w-[420px] overflow-y-auto rounded-xl border border-slate-800 bg-slate-900 p-4" onClick={(e) => e.stopPropagation()}>
+      <section ref={dialogRef} className="max-h-full w-full max-w-[420px] overflow-y-auto rounded-xl border border-slate-800 bg-slate-900 p-4" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="share-card-title">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-100">{T("分享卡片", "Share card")}</h2>
-          <button onClick={onClose} className="rounded-lg px-2 py-1 text-slate-400 hover:bg-slate-800" aria-label={T("关闭分享卡片", "Close share card")}>✕</button>
+          <h2 id="share-card-title" className="text-sm font-semibold text-slate-100">{T("分享卡片", "Share card")}</h2>
+          <button ref={closeRef} onClick={onClose} className="rounded-lg px-2 py-1 text-slate-400 hover:bg-slate-800" aria-label={T("关闭分享卡片", "Close share card")}>✕</button>
         </div>
         <div className="overflow-hidden rounded-lg border border-slate-800">
-          <canvas ref={canvasRef} className="block w-full" />
+          <canvas ref={canvasRef} className="block w-full" role="img" aria-label={T("成长分享卡片预览", "Growth share-card preview")} />
         </div>
         <div className="my-3 grid grid-cols-4 gap-2">
           {TEMPLATES.map((item) => (
             <button
               key={item.id}
               onClick={() => setTplId(item.id)}
+              aria-pressed={tplId === item.id}
               className={`rounded-lg px-2 py-2 text-xs font-medium text-white ${tplId === item.id ? "ring-2 ring-indigo-400" : ""}`}
               style={{ background: `linear-gradient(135deg, ${item.stops[0]}, ${item.stops[item.stops.length - 1]})` }}>
               {T(TPL_ZH[item.id] ?? item.name, item.name)}
@@ -157,4 +175,3 @@ export default function ShareCardModal({
     </div>
   );
 }
-

@@ -13,6 +13,7 @@ export default function CommandPalette() {
   const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const label = (it: NavItem) => (it.labelKey ? t(it.labelKey) : it.label);
 
@@ -31,11 +32,26 @@ export default function CommandPalette() {
 
   useEffect(() => {
     if (open) {
+      const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setQ("");
       setActive(0);
       const id = setTimeout(() => inputRef.current?.focus(), 0);
-      return () => clearTimeout(id);
+      return () => { clearTimeout(id); previous?.focus(); };
     }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('input:not([disabled]), button:not([disabled]), [href]'));
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
   const results = useMemo(() => {
@@ -61,6 +77,7 @@ export default function CommandPalette() {
       className="fixed inset-0 z-[1500] flex items-start justify-center bg-slate-950/70 p-4 pt-[12vh] backdrop-blur-sm"
       onClick={() => setOpen(false)}>
       <div
+        ref={dialogRef}
         className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -77,12 +94,16 @@ export default function CommandPalette() {
           }}
           placeholder={T("跳转到任意页面…", "Jump to any page…")}
           aria-label={T("跳转到任意页面", "Jump to any page")}
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="command-palette-results"
+          aria-activedescendant={results[active] ? `command-option-${results[active].href.replaceAll("/", "-") || "root"}` : undefined}
           className="w-full border-b border-slate-800 bg-transparent px-4 py-3.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
         />
-        <ul className="max-h-[50vh] overflow-y-auto p-2" role="listbox">
+        <ul id="command-palette-results" className="max-h-[50vh] overflow-y-auto p-2" role="listbox">
           {results.length ? (
             results.map((it, i) => (
-              <li key={it.href} role="option" aria-selected={i === active}>
+              <li key={it.href} id={`command-option-${it.href.replaceAll("/", "-") || "root"}`} role="option" aria-selected={i === active}>
                 <button
                   onMouseEnter={() => setActive(i)}
                   onClick={() => go(it)}

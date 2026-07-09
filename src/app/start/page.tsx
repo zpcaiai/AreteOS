@@ -7,7 +7,7 @@ export const generateMetadata = titleMeta("从这里开始", "Start Here");
 export default async function StartHerePage() {
   const { t } = await getDict();
   const STEPS = [
-    { n: 1, title: t("innov.start.s1t"), body: t("innov.start.s1b"), href: "/coach", cta: t("innov.start.s1c") },
+    { n: 1, title: t("innov.start.s1t"), body: t("innov.start.s1b"), href: "/onboarding", cta: t("innov.start.s1c") },
     { n: 2, title: t("innov.start.s2t"), body: t("innov.start.s2b"), href: "/twin", cta: t("innov.start.s2c") },
     { n: 3, title: t("innov.start.s3t"), body: t("innov.start.s3b"), href: "/council", cta: t("innov.start.s3c") },
     { n: 4, title: t("innov.start.s4t"), body: t("innov.start.s4b"), href: "/evidence", cta: t("innov.start.s4c") },

@@ -1,8 +1,12 @@
-export default function Loading() {
+/** A stable loading surface prevents the main pane from appearing broken on slow data routes. */
+export default function GlobalLoading() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-slate-500">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-indigo-500" />
-      <div className="text-sm tracking-wide font-serif">ARETE</div>
+    <div className="animate-pulse" aria-busy="true" aria-label="Loading content">
+      <div className="h-8 w-56 rounded bg-slate-800" />
+      <div className="mt-3 h-4 w-96 max-w-full rounded bg-slate-800" />
+      <div className="mt-7 grid gap-4 md:grid-cols-3">
+        {["a", "b", "c"].map((key) => <div key={key} className="h-40 rounded-2xl border border-slate-800 bg-slate-900/60" />)}
+      </div>
     </div>
   );
 }

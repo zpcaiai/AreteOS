@@ -30,7 +30,7 @@ export function selectEmotionRegulationSkill(input: {
 
   if (input.arousal === "hyperarousal") {
     if (/愤怒|生气|怒|anger|furious/i.test(names)) return "check_the_facts";
-    if (/冲动|想砸|想骂|想逃|urge|impulse/i.test(urges)) return "urge_surfing";
+    if (/冲动|想.*(?:砸|骂|逃)|urge|impulse/i.test(urges)) return "urge_surfing";
     return "paced_breathing";
   }
   if (input.arousal === "hypoarousal") return "body_scan";
