@@ -5,6 +5,7 @@ import { Card, PageHeader } from "@/components/ui";
 import { useApiMutation } from "@/lib/hooks";
 import { useI18n, useT } from "@/lib/i18n/client";
 import { isUpgradeError, UpgradeNotice } from "@/components/UpgradeGate";
+import { SuggestionField } from "@/components/SuggestionField";
 
 type Kind = "curiosity" | "talent" | "experience" | "obsession" | "market";
 interface Sig { label: string; kind: Kind; intensity: number; rarity: number }
@@ -64,7 +65,22 @@ export default function SpecificKnowledgePage() {
 
       <Card title={T("你的信号", "Your signals")}>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <input value={draft.label} onChange={(e) => setDraft({ ...draft, label: e.target.value })} placeholder={T("信号(如:系统思维)", "signal (e.g. systems thinking)")} className="rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200" />
+          <div className="min-w-64 flex-1">
+            <SuggestionField
+              as="input"
+              value={draft.label}
+              onChange={(value) => setDraft({ ...draft, label: value })}
+              placeholder={T("信号(如:系统思维)", "signal (e.g. systems thinking)")}
+              className="w-full rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200"
+              chipLabel={T("信号备选", "Signal options")}
+              suggestions={[
+                T("系统思维", "systems thinking"),
+                T("AI 产品化", "AI productization"),
+                T("业务流程重构", "business process redesign"),
+                T("客户验证", "customer validation"),
+              ]}
+            />
+          </div>
           <select value={draft.kind} onChange={(e) => setDraft({ ...draft, kind: e.target.value as Kind })} className="rounded-lg border border-slate-700 bg-slate-950/50 p-2 text-slate-200">
             {(["curiosity", "talent", "experience", "obsession", "market"] as Kind[]).map((k) => <option key={k} value={k}>{k}</option>)}
           </select>

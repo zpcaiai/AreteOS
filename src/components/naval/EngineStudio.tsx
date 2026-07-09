@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import type { EngineConfig } from "./config";
 import { PORTFOLIO_AREAS } from "./config";
 import { useT } from "@/lib/i18n/client";
+import { SuggestionField } from "@/components/SuggestionField";
 
 /* Generic interactive panel for one Naval engine: renders the input fields from
    config, POSTs to the assess endpoint, and pretty-prints the JSON result. Also
@@ -134,11 +135,33 @@ export default function EngineStudio({ config }: { config: EngineConfig }) {
                   ))}
                 </div>
               ) : f.kind === "text" ? (
-                <input value={vals[f.name] ?? ""} onChange={(e) => setVals((s) => ({ ...s, [f.name]: e.target.value }))} placeholder={tr(f.placeholder)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
+                <SuggestionField
+                  as="input"
+                  value={vals[f.name] ?? ""}
+                  onChange={(value) => setVals((s) => ({ ...s, [f.name]: value }))}
+                  placeholder={tr(f.placeholder)}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm"
+                  chipLabel={T("输入备选", "Input options")}
+                  suggestions={[
+                    T("建立一个可收费的长期项目", "Build a paid long-term project"),
+                    T("把专属知识变成自有资产", "Turn specific knowledge into owned assets"),
+                    T("减少低杠杆事务，提升判断质量", "Reduce low-leverage work and improve judgment quality"),
+                  ]}
+                />
               ) : (
-                <textarea value={vals[f.name] ?? ""} onChange={(e) => setVals((s) => ({ ...s, [f.name]: e.target.value }))} placeholder={tr(f.placeholder)} rows={f.kind === "list" ? 4 : 3}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" />
+                <SuggestionField
+                  value={vals[f.name] ?? ""}
+                  onChange={(value) => setVals((s) => ({ ...s, [f.name]: value }))}
+                  placeholder={tr(f.placeholder)}
+                  rows={f.kind === "list" ? 4 : 3}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm"
+                  chipLabel={T("内容备选", "Content options")}
+                  suggestions={[
+                    T("AI 工程\n系统设计\n写作\n客户验证", "AI engineering\nsystems design\nwriting\ncustomer validation"),
+                    T("工资\n咨询服务\n副业产品", "salary\nconsulting service\nside product"),
+                    T("我行动很快，但很少写下假设和复盘。", "I act fast but rarely write down assumptions and reviews."),
+                  ]}
+                />
               )}
             </div>
           ))}

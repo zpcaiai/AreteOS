@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { inputCls, lines } from "@/components/studio";
 import { useT, useTx } from "@/lib/i18n/client";
+import { SuggestionField } from "@/components/SuggestionField";
 
 const ta = inputCls;
 
@@ -37,8 +38,10 @@ export function AssessmentTool() {
       <h2 className="text-lg font-bold">{T("身份评估", "Identity Assessment")}</h2>
       <p className="mt-1 text-sm text-slate-400">{T("回顾你实际把注意力花在哪、如何做决定——每行一条想法。", "Reflect on how you actually spend attention and make decisions — one thought per line.")}</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
-      <input value={mission} onChange={(e) => setMission(e.target.value)} placeholder={tx("Your mission (optional)")} className={`mt-3 ${ta}`} />
-      <textarea value={reflections} onChange={(e) => setReflections(e.target.value)} rows={5} placeholder={tx("Reflections, one per line…")} className={`mt-2 ${ta}`} />
+      <SuggestionField as="input" value={mission} onChange={setMission} placeholder={tx("Your mission (optional)")} className={`mt-3 ${ta}`} chipLabel={T("使命备选", "Mission options")} suggestions={[T("把想法变成真实成果。", "Turn ideas into real outcomes."), T("帮助组织用证据做判断。", "Help organizations make judgments with evidence."), T("把专业能力沉淀为可复用资产。", "Turn expertise into reusable assets.")]} />
+      <div className="mt-2">
+        <SuggestionField value={reflections} onChange={setReflections} rows={5} placeholder={tx("Reflections, one per line…")} className={ta} chipLabel={T("反思备选", "Reflection options")} suggestions={[T("我实际把时间花在响应别人，而不是推进核心协议。", "I spend time reacting to others instead of advancing the core protocol."), T("我在困难任务前会转去做低风险优化。", "Before difficult tasks I switch to low-risk optimization."), T("我最想成为的人，会先留下证据再解释自己。", "The person I want to become leaves evidence before explaining.")]} />
+      </div>
       <button onClick={run} disabled={busy} className="mt-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium disabled:opacity-50">{busy ? tx("Assessing…") : tx("Assess my identity")}</button>
       {result && (
         <div className="mt-3 rounded-lg border border-indigo-800 bg-indigo-950/30 p-3 text-sm">
@@ -77,13 +80,13 @@ export function StackTool() {
       <h2 className="text-lg font-bold">{T("构建你的身份栈", "Build Your Identity Stack")}</h2>
       <p className="mt-1 text-sm text-slate-400">{T("组合主要、次要、新兴与传承身份——再检测冲突并给出建议。", "Compose a primary, secondary, emerging and legacy identity — then detect conflicts and get recommendations.")}</p>
       {error && <p className="mt-2 rounded bg-rose-950/50 px-3 py-1 text-sm text-rose-300">{error}</p>}
-      <input value={mission} onChange={(e) => setMission(e.target.value)} placeholder={T("使命", "Mission")} className={`mt-3 ${ta}`} />
+      <SuggestionField as="input" value={mission} onChange={setMission} placeholder={T("使命", "Mission")} className={`mt-3 ${ta}`} chipLabel={T("使命备选", "Mission options")} suggestions={[T("持续交付真实客户结果", "Continuously deliver real customer outcomes"), T("用 AI 放大人的判断力", "Use AI to amplify human judgment"), T("把复杂工作变成可复制系统", "Turn complex work into repeatable systems")]} />
       <label className="mt-2 block text-xs text-slate-400">{T("价值观(每行一项)", "Values (one per line)")}</label>
-      <textarea value={values} onChange={(e) => setValues(e.target.value)} rows={2} className={ta} />
+      <SuggestionField value={values} onChange={setValues} rows={2} className={ta} chipLabel={T("价值观备选", "Value options")} suggestions={[T("真实结果", "Real outcomes"), T("长期信任", "Long-term trust"), T("证据复盘", "Evidence-based review")]} />
       <label className="mt-2 block text-xs text-slate-400">{T("优势(每行一项)", "Strengths (one per line)")}</label>
-      <textarea value={strengths} onChange={(e) => setStrengths(e.target.value)} rows={2} className={ta} />
+      <SuggestionField value={strengths} onChange={setStrengths} rows={2} className={ta} chipLabel={T("优势备选", "Strength options")} suggestions={[T("系统思维", "Systems thinking"), T("产品判断", "Product judgment"), T("客户洞察", "Customer insight")]} />
       <label className="mt-2 block text-xs text-slate-400">{T("当前身份(每行一项,可选)", "Current identities (one per line, optional)")}</label>
-      <textarea value={current} onChange={(e) => setCurrent(e.target.value)} rows={2} className={ta} />
+      <SuggestionField value={current} onChange={setCurrent} rows={2} className={ta} chipLabel={T("身份备选", "Identity options")} suggestions={[T("产品构建者", "Product builder"), T("AI 创业者", "AI founder"), T("组织系统设计者", "Organizational system designer")]} />
       <div className="mt-2 flex flex-wrap gap-2">
         <button disabled={busy !== null} onClick={() => call("stack", "/api/ethos/stack", { mission, values: lines(values), strengths: lines(strengths), current: lines(current) })}
           className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium disabled:opacity-50">{busy === "stack" ? tx("Building…") : tx("Build stack")}</button>

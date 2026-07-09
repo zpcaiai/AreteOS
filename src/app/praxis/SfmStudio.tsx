@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAgentRun, inputCls, lines, StudioSection, RunButton } from "@/components/studio";
 import { useT } from "@/lib/i18n/client";
+import { SuggestionField } from "@/components/SuggestionField";
 
 const FOUNDER_QUESTIONS = [
   "Why did you start this business?",
@@ -63,8 +64,18 @@ export default function SfmStudio() {
           {FOUNDER_QUESTIONS.map((q, i) => (
             <div key={i}>
               <label className="text-xs text-slate-400">{i + 1}. {T(FOUNDER_QUESTIONS_ZH[i], q)}</label>
-              <input value={answers[i]} onChange={(e) => { const a = [...answers]; a[i] = e.target.value; setAnswers(a); }}
-                className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1 text-sm" />
+              <SuggestionField
+                as="input"
+                value={answers[i]}
+                onChange={(value) => { const a = [...answers]; a[i] = value; setAnswers(a); }}
+                className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-2 py-1 text-sm"
+                chipLabel={T("回答备选", "Answer options")}
+                suggestions={[
+                  T("最关键的是客户真实愿意付费的痛点。", "The key is the customer pain people truly pay for."),
+                  T("我们靠更快的验证和更高质量的交付取得突破。", "We broke through with faster validation and higher-quality delivery."),
+                  T("不能妥协的是长期信任、证据和交付结果。", "We do not compromise on trust, evidence, and delivered outcomes."),
+                ]}
+              />
             </div>
           ))}
           <button disabled={busy !== null}
@@ -76,22 +87,22 @@ export default function SfmStudio() {
       </details>
 
       <StudioSection title={T("2 · 成功要素", "2 · Success Factors")} hint={T("每行一个成就/里程碑", "One win / milestone per line")}>
-        <textarea value={wins} onChange={(e) => setWins(e.target.value)} rows={3} className={ta} />
+        <SuggestionField value={wins} onChange={setWins} rows={3} className={ta} chipLabel={T("里程碑备选", "Milestone options")} suggestions={[T("第一个客户愿意付费试点", "First customer willing to pay for a pilot"), T("团队把交付流程标准化", "Team standardized the delivery workflow"), T("一个渠道带来稳定线索", "One channel generated steady leads")]} />
         <RunButton busy={busy} runKey="factors" onClick={() => run("factors", "/api/praxis/success-factors/analyze", { wins: lines(wins) })} label={T("为成功要素建模", "Model Success Factors")} />
       </StudioSection>
 
       <StudioSection title={T("3 · 公司身份", "3 · Company Identity")} hint={T("公司的使命是什么?", "What is the company's mission?")}>
-        <input value={mission} onChange={(e) => setMission(e.target.value)} className={ta} />
+        <SuggestionField as="input" value={mission} onChange={setMission} className={ta} chipLabel={T("使命备选", "Mission options")} suggestions={[T("帮助客户把复杂业务变成可复制的系统。", "Help customers turn complex business into repeatable systems."), T("用 AI 和证据提升组织的判断与交付质量。", "Use AI and evidence to improve organizational judgment and delivery."), T("让小团队也能完成大公司级别的专业交付。", "Let small teams deliver with enterprise-grade professionalism.")]} />
         <RunButton busy={busy} runKey="identity" onClick={() => run("identity", "/api/praxis/company-identity/build", { mission })} label={T("构建公司身份", "Build Company Identity")} />
       </StudioSection>
 
       <StudioSection title={T("4 · 价值观", "4 · Values")} hint={T("每行一个创始人价值观", "One founder value per line")}>
-        <textarea value={founderVals} onChange={(e) => setFounderVals(e.target.value)} rows={3} className={ta} />
+        <SuggestionField value={founderVals} onChange={setFounderVals} rows={3} className={ta} chipLabel={T("价值观备选", "Value options")} suggestions={[T("真实结果优先于表面热闹", "Real outcomes over surface activity"), T("长期信任优先于短期成交", "Long-term trust over short-term closing"), T("用证据复盘，不用情绪定罪", "Review with evidence, not blame")]} />
         <RunButton busy={busy} runKey="values" onClick={() => run("values", "/api/praxis/values/extract", { founderValues: lines(founderVals) })} label={T("提取并排序价值观", "Extract & Rank Values")} />
       </StudioSection>
 
       <StudioSection title={T("5 · 决策规则与运营原则", "5 · Decision Rules & Operating Principles")} hint={T("每行一个过去的决策", "One past decision per line")}>
-        <textarea value={decisions} onChange={(e) => setDecisions(e.target.value)} rows={3} className={ta} />
+        <SuggestionField value={decisions} onChange={setDecisions} rows={3} className={ta} chipLabel={T("决策备选", "Decision options")} suggestions={[T("先签一个小额试点，再扩大投入。", "Sign a small paid pilot before expanding investment."), T("砍掉没有用户证据的功能。", "Cut features without user evidence."), T("把关键经验写成检查清单再交给团队。", "Turn key experience into a checklist before delegating.")]} />
         <div className="flex gap-2">
           <RunButton busy={busy} runKey="rules" onClick={() => run("rules", "/api/praxis/decision-rules/extract", { decisions: lines(decisions) })} label={T("编码决策规则", "Encode Decision Rules")} />
           <RunButton busy={busy} runKey="principles" onClick={() => run("principles", "/api/praxis/operating-principles/create", { values: lines(founderVals), decisionRules: lines(decisions) })} label={T("构建运营原则", "Build Operating Principles")} />
@@ -99,17 +110,17 @@ export default function SfmStudio() {
       </StudioSection>
 
       <StudioSection title={T("6 · 协作", "6 · Collaboration")} hint={T("每行一个团队观察", "One team observation per line")}>
-        <textarea value={obs} onChange={(e) => setObs(e.target.value)} rows={3} className={ta} />
+        <SuggestionField value={obs} onChange={setObs} rows={3} className={ta} chipLabel={T("观察备选", "Observation options")} suggestions={[T("信息集中在创始人手里，团队等待指令。", "Information is concentrated with the founder; the team waits for instructions."), T("会议很多，但责任人与截止时间不清楚。", "Many meetings, but owners and deadlines are unclear."), T("复盘常停留在感受，没有证据日志。", "Reviews stay at feelings without evidence logs.")]} />
         <RunButton busy={busy} runKey="collab" onClick={() => run("collab", "/api/praxis/collaboration/analyze", { observations: lines(obs) })} label={T("分析协作", "Analyze Collaboration")} />
       </StudioSection>
 
       <StudioSection title={T("7 · 自觉领导力", "7 · Conscious Leadership")} hint={T("每行一个领导力复盘", "One leadership reflection per line")}>
-        <textarea value={reflections} onChange={(e) => setReflections(e.target.value)} rows={3} className={ta} />
+        <SuggestionField value={reflections} onChange={setReflections} rows={3} className={ta} chipLabel={T("复盘备选", "Reflection options")} suggestions={[T("我在压力下会亲自接管，而不是训练负责人。", "Under pressure I take over instead of training owners."), T("我需要把标准说清楚，而不是期待团队自己理解。", "I need to make standards explicit instead of expecting the team to infer them."), T("我把速度误认为质量，忽略了复盘。", "I confuse speed with quality and skip review.")]} />
         <RunButton busy={busy} runKey="lead" onClick={() => run("lead", "/api/praxis/archon/analyze", { reflections: lines(reflections) })} label={T("评估领导力", "Assess Leadership")} />
       </StudioSection>
 
       <StudioSection title={T("8 · 韧性", "8 · Resilience")} hint={T("每行一个背景事实(现金跑道、关键人物等)", "One context fact per line (runway, key people, etc.)")}>
-        <textarea value={ctx} onChange={(e) => setCtx(e.target.value)} rows={3} className={ta} />
+        <SuggestionField value={ctx} onChange={setCtx} rows={3} className={ta} chipLabel={T("压力事实备选", "Stress facts")} suggestions={[T("现金流只能支持 4 个月。", "Cash runway supports only 4 months."), T("关键客户集中度过高。", "Customer concentration is too high."), T("交付知识主要掌握在一名核心成员手里。", "Delivery knowledge is concentrated in one core person.")]} />
         <RunButton busy={busy} runKey="res" onClick={() => run("res", "/api/praxis/resilience/stress-test", { context: lines(ctx) })} label={T("压力测试", "Stress-Test")} />
       </StudioSection>
 
@@ -121,5 +132,4 @@ export default function SfmStudio() {
 }
 
 const ta = inputCls;
-
 
