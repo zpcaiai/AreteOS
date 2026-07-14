@@ -26,11 +26,13 @@
     "db:seed:audiobooks": "tsx prisma/seed-audiobooks.ts",
     "db:seed:emporion": "tsx prisma/seed-emporion.ts",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && (prisma migrate deploy || echo \"migrate skipped — set DATABASE_URL in Vercel to enable\") && next build",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "analyze": "ANALYZE=true next build",
     "db:seed:naval": "tsx prisma/seed-naval.ts",
     "weekly": "tsx scripts/weekly.ts",
-    "db:seed:demo": "tsx prisma/seed.ts"
+    "db:seed:demo": "tsx prisma/seed.ts",
+    "eval:scenarios": "tsx scripts/eval-scenarios.ts",
+    "check:clinical": "tsx scripts/clinical-gate.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
