@@ -1,10 +1,19 @@
 import type { DictKey } from "./i18n/dictionaries";
 
 export type NavItem = { href: string; label: string; labelKey?: DictKey };
-export type NavGroup = { id: string; zh: string; en: string; items: NavItem[] };
+/** Progressive-disclosure modes: keep the daily loop narrow; the full library is one click away. */
+export type NavMode = "do" | "build" | "explore";
+export type NavGroup = { id: string; zh: string; en: string; modes: NavMode[]; items: NavItem[] };
+
+export const NAV_MODES: { id: NavMode; zh: string; en: string }[] = [
+  { id: "do", zh: "今天做", en: "Do today" },
+  { id: "build", zh: "构建", en: "Build" },
+  { id: "explore", zh: "探索", en: "Explore" },
+];
 
 // Always-visible daily entry points.
 export const PINNED: NavItem[] = [
+  { href: "/today", label: "Today · 今天" },
   { href: "/dashboard", label: "Dashboard", labelKey: "nav.dashboard" },
   { href: "/journey", label: "Journey · Mission Control", labelKey: "nav.journey" },
   { href: "/coach", label: "AI Coach", labelKey: "nav.coach" },
@@ -12,14 +21,14 @@ export const PINNED: NavItem[] = [
 
 // Thematic sections — collapsed by default in the sidebar; the active section auto-opens.
 export const NAV_GROUPS: NavGroup[] = [
-  { id: "start", zh: "开始", en: "Get started", items: [
+  { id: "start", zh: "开始", en: "Get started", modes: ["do", "build", "explore"], items: [
     { href: "/start", label: "Start Here", labelKey: "nav.start" },
     { href: "/onboarding", label: "First Run · Full Loop", labelKey: "nav.onboarding" },
     { href: "/project-foundry", label: "Project Foundry · 项目铸造厂" },
     { href: "/skills", label: "All 20 engines · search", labelKey: "nav.skillsAll" },
     { href: "/growth-map", label: "Growth Map", labelKey: "nav.growthMap" },
   ]},
-  { id: "diagnose", zh: "诊断与成长", en: "Diagnose & grow", items: [
+  { id: "diagnose", zh: "诊断与成长", en: "Diagnose & grow", modes: ["do", "explore"], items: [
     { href: "/growth-protocol", label: "Growth Protocol", labelKey: "nav.growthProtocol" },
     { href: "/bottlenecks", label: "Bottleneck Diagnosis", labelKey: "nav.bottlenecks" },
     { href: "/prescriptions", label: "Growth Prescription", labelKey: "nav.prescriptions" },
@@ -27,7 +36,8 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/evidence", label: "Evidence · Gap", labelKey: "nav.evidence" },
     { href: "/experiments", label: "N-of-1 Experiments", labelKey: "nav.experiments" },
   ]},
-  { id: "thinking", zh: "思维", en: "Thinking", items: [
+  { id: "thinking", zh: "思维", en: "Thinking", modes: ["build", "explore"], items: [
+    { href: "/synthesis", label: "Cross-Engine Synthesis · 跨引擎综合" },
     { href: "/phronesis", label: "Phronesis · Cognitive", labelKey: "nav.phronesis" },
     { href: "/psychology", label: "Psychology · CBT", labelKey: "nav.psychology" },
     { href: "/decisions", label: "Decisions", labelKey: "nav.decisions" },
@@ -39,7 +49,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/future-self", label: "Future Self · Monte Carlo", labelKey: "nav.futureSelf" },
     { href: "/narrative", label: "Growth Narrative", labelKey: "nav.narrative" },
   ]},
-  { id: "healing", zh: "疗愈 OS · Healing", en: "Healing OS", items: [
+  { id: "healing", zh: "疗愈 OS · Healing", en: "Healing OS", modes: ["explore"], items: [
     { href: "/healing-os", label: "Journey Map · 旅程地图" },
     { href: "/healing", label: "Healing Session · 疗愈会谈" },
     { href: "/core-belief", label: "Core Belief · 核心信念" },
@@ -53,7 +63,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/relapse-prevention", label: "Relapse Prevention · 复发预防" },
     { href: "/safety", label: "Safety & Support · 安全与求助" },
   ]},
-  { id: "identity", zh: "身份与方向", en: "Identity & direction", items: [
+  { id: "identity", zh: "身份与方向", en: "Identity & direction", modes: ["build", "explore"], items: [
     { href: "/personal-os", label: "Personal OS Compiler", labelKey: "nav.personalOs" },
     { href: "/identity-tree", label: "Identity Evolution Tree", labelKey: "nav.identityTree" },
     { href: "/telos", label: "Telos · Mission", labelKey: "nav.telos" },
@@ -65,7 +75,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/cosmos/constellation", label: "Constellation", labelKey: "nav.constellation" },
     { href: "/cosmos/emotions", label: "Emotion Planet", labelKey: "nav.emotions" },
   ]},
-  { id: "execution", zh: "执行与精通", en: "Execution & mastery", items: [
+  { id: "execution", zh: "执行与精通", en: "Execution & mastery", modes: ["do", "build", "explore"], items: [
     { href: "/deep-work", label: "Deep Work ★", labelKey: "nav.deepWork" },
     { href: "/specific-knowledge", label: "Specific Knowledge ★", labelKey: "nav.specificKnowledge" },
     { href: "/assets", label: "Asset-Based Growth", labelKey: "nav.assets" },
@@ -77,7 +87,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/memory-deck", label: "Memory Deck", labelKey: "nav.memoryDeck" },
     { href: "/legacy", label: "Legacy", labelKey: "nav.legacy" },
   ]},
-  { id: "naval", zh: "Naval 人生 OS", en: "Naval Life OS", items: [
+  { id: "naval", zh: "Naval 人生 OS", en: "Naval Life OS", modes: ["build", "explore"], items: [
     { href: "/naval", label: "Naval · Overview", labelKey: "nav.navalOverview" },
     { href: "/naval/dashboard", label: "Naval Dashboard", labelKey: "nav.navalDashboard" },
     { href: "/naval/onboarding", label: "Naval · Get set up", labelKey: "nav.navalOnboarding" },
@@ -96,15 +106,16 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/naval/life-portfolio", label: "Life Portfolio", labelKey: "nav.navalLifePortfolio" },
     { href: "/naval/twin", label: "Naval Digital Twin", labelKey: "nav.navalTwin" },
   ]},
-  { id: "org", zh: "组织", en: "Organization", items: [
+  { id: "org", zh: "组织", en: "Organization", modes: ["build", "explore"], items: [
     { href: "/archon", label: "Archon · Leadership", labelKey: "nav.archon" },
     { href: "/oikos", label: "Oikos · Management", labelKey: "nav.oikos" },
     { href: "/praxis", label: "Praxis · Scaling", labelKey: "nav.praxis" },
   ]},
-  { id: "childhood", zh: "童年", en: "Childhood", items: [
+  { id: "childhood", zh: "童年", en: "Childhood", modes: ["explore"], items: [
     { href: "/genius", label: "Genius · Kids", labelKey: "nav.geniusKids" },
   ]},
-  { id: "review", zh: "回顾与社区", en: "Review & community", items: [
+  { id: "review", zh: "回顾与社区", en: "Review & community", modes: ["do", "explore"], items: [
+    { href: "/outcomes", label: "Life Outcomes · 人生成果" },
     { href: "/reviews", label: "Reviews", labelKey: "nav.reviews" },
     { href: "/timeline", label: "Timeline", labelKey: "nav.timeline" },
     { href: "/twin", label: "Digital Twin", labelKey: "nav.digitalTwin" },
@@ -112,8 +123,9 @@ export const NAV_GROUPS: NavGroup[] = [
     { href: "/mnemosyne", label: "Mnemosyne · Listen", labelKey: "nav.mnemosyne" },
     { href: "/community", label: "Agora · Community", labelKey: "nav.community" },
   ]},
-  { id: "account", zh: "账户", en: "Account", items: [
+  { id: "account", zh: "账户", en: "Account", modes: ["do", "build", "explore"], items: [
     { href: "/account", label: "Account · Trust", labelKey: "nav.accountTrust" },
+    { href: "/team", label: "Team seats · 团队席位" },
     { href: "/membership", label: "Membership", labelKey: "nav.membership" },
     { href: "/emporion", label: "Emporion · Store", labelKey: "nav.emporion" },
     { href: "/about", label: "About Arete", labelKey: "nav.about" },

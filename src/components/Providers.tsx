@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import FloatingCoachWidget from "@/components/coach/FloatingCoachWidget";
 import CompanionWidget from "@/components/companion/CompanionWidget";
+import Telemetry from "@/components/Telemetry";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -22,6 +23,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
+      <Telemetry />
       <FloatingCoachWidget />
       <CompanionWidget />
     </QueryClientProvider>

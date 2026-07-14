@@ -31,7 +31,7 @@ export const FEATURES: Record<string, number> = {
   sfm: 2, leadership: 2, management: 2, cognitive: 2, child: 2,
   naval: 2,
   // Innovation engines (2026-06)
-  council: 2, future_self: 2, graph_path: 2,
+  council: 2, future_self: 2, graph_path: 2, cross_engine: 2,
   narrative: 1, evidence: 1, experiments: 1,
   // Orchestration engines (2026-06)
   bottleneck: 1, prescription: 1, growth_protocol: 1, boardroom: 2,
@@ -50,6 +50,13 @@ export function hasFeature(tier: Tier, featureKey: string): boolean {
 export const PRICES: Record<Exclude<Tier, "FREE">, Record<Period, number>> = {
   PLUS: { MONTHLY: 39, QUARTERLY: 99, ANNUAL: 299 },
   PRO: { MONTHLY: 99, QUARTERLY: 269, ANNUAL: 899 },
+};
+
+/** B2B seat tier — grants PRO to each member. Priced per seat (min 3 seats). */
+export const TEAM_PLAN = {
+  grantsTier: "PRO" as const,
+  minSeats: 3,
+  pricePerSeat: { MONTHLY: 79, QUARTERLY: 219, ANNUAL: 719 } as Record<Period, number>,
 };
 
 export const PERIOD_DAYS: Record<Period, number> = { MONTHLY: 30, QUARTERLY: 90, ANNUAL: 365 };

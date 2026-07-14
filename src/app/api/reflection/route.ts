@@ -6,6 +6,7 @@ import { ReflectionGuide } from "@/lib/agents/registry";
 import { emit } from "@/lib/events";
 import { recordProgress } from "@/lib/analytics";
 import { memoryContext, remember } from "@/lib/memory";
+import { recordFirstMeaningfulAction, track } from "@/lib/telemetry";
 
 export async function GET(req: Request) {
   return route(async () => {
@@ -54,6 +55,8 @@ export async function POST(req: Request) {
       importance: guide.depth,
       occurredAt: reflection.date,
     }).catch(() => null);
+    await recordFirstMeaningfulAction(userId, "reflection");
+    await track({ userId, name: "engine_run", props: { engine: "reflection", depth: guide.depth } });
     await recordProgress(userId).catch(() => null);
     return created({ reflection, nextFocus: guide.nextFocus });
   });

@@ -5,6 +5,8 @@
 
 import { computeScoresCached, type ScoreSet } from "./analytics";
 import { growthScore, clamp01 } from "./scoring";
+import { approach } from "./whatif-math";
+export { approach } from "./whatif-math";
 
 export interface WhatIfIntervention {
   /** Target habit consistency 0..1 sustained over the horizon. */
@@ -35,16 +37,6 @@ export interface WhatIfResult {
   notes: string[];
 }
 
-/**
- * Skills approach targets along a saturating exponential — fast early gains,
- * diminishing returns — with a small decay pull when the target is below the
- * current level (skills atrophy without practice).
- */
-export function approach(current: number, target: number, day: number, horizon: number): number {
-  const tau = horizon / 3; // ~95% of the move completes within the horizon
-  const progress = 1 - Math.exp(-day / tau);
-  return clamp01(current + (target - current) * progress);
-}
 
 const MUTABLE: (keyof ScoreSet)[] = ["habitConsistency", "reflection", "decisionQuality", "mentalModelUsage", "firstPrinciple"];
 

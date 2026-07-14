@@ -1,0 +1,16 @@
+// Periodic life-outcome self-reports. One row per dimension per check-in; the earliest
+// check-in per user is the baseline. Longitudinal deltas vs baseline are the product's
+// evidence-of-change surface. Denormalized (no User relation) to stay a light write log.
+
+model SelfReport {
+  id         String   @id @default(cuid())
+  userId     String
+  metric     String
+  value      Int
+  note       String?
+  isBaseline Boolean  @default(false)
+  occurredAt DateTime @default(now())
+
+  @@index([userId, metric, occurredAt])
+  @@map("self_reports")
+}

@@ -1,0 +1,29 @@
+// B2B seat tier. A Team is a billing wrapper that grants PRO-level access to its members
+// (so no change to the MemberTier enum). The owner buys N seats and invites members.
+// Denormalized-ish; membership entitlement is resolved fail-safe in membership/service.ts.
+
+model Team {
+  id         String   @id @default(cuid())
+  name       String
+  ownerId    String
+  seats      Int      @default(5)
+  grantsTier String   @default("PRO")
+  status     String   @default("ACTIVE") // ACTIVE | EXPIRED | CANCELLED
+  expiresAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([ownerId])
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      String   @default("member") // owner | member
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@index([userId])
+  @@map("team_members")
+}

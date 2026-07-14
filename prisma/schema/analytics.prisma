@@ -1,0 +1,17 @@
+// Product telemetry — append-only analytics events used to measure activation,
+// first-meaningful-action, weekly-retained use and time-to-value. Intentionally
+// denormalized (no User relation) so it stays a lightweight, high-write log that
+// never blocks a product write path. Writes are best-effort (see src/lib/telemetry.ts).
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  props      Json?
+  sessionId  String?
+  occurredAt DateTime @default(now())
+
+  @@index([userId, occurredAt])
+  @@index([name, occurredAt])
+  @@map("analytics_events")
+}

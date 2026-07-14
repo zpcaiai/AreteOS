@@ -17,3 +17,14 @@ export async function resetGrowthData(userId: string): Promise<{ deleted: number
   });
   return { deleted: r.count };
 }
+
+/** Count of AI memories (RAG / personal_memories) stored for this user. */
+export async function personalMemoryCount(userId: string): Promise<number> {
+  return prisma.personalMemory.count({ where: { userId } });
+}
+
+/** Forget the user's AI memory — clears the personal_memories (RAG) store. */
+export async function clearPersonalMemory(userId: string): Promise<{ deleted: number }> {
+  const r = await prisma.personalMemory.deleteMany({ where: { userId } });
+  return { deleted: r.count };
+}

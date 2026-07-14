@@ -1,16 +1,34 @@
 import { prisma } from "../db";
 import { HttpError } from "../http";
 import { PERIOD_DAYS, TIER_RANK, hasFeature, type Tier, type Period } from "./plans";
+import { teamGrantedTier } from "../teams";
 
 export interface ActiveMembership {
   tier: Tier;
   rank: number;
   expiresAt: Date | null;
   period: Period | null;
+  /** Where the effective tier came from — a team seat can grant PRO. */
+  source?: "personal" | "team";
 }
 
 /** Resolve the user's effective tier, downgrading to FREE if expired. */
 export async function getActiveMembership(userId: string): Promise<ActiveMembership> {
+  const personal = await personalMembership(userId);
+  // A team seat can grant PRO. Fail-safe and upgrade-only: it never downgrades the
+  // user's personal tier, and a missing teams table / DB blip is ignored.
+  const granted = await teamGrantedTier(userId);
+  if (granted) {
+    const gTier = granted as Tier;
+    const gRank = TIER_RANK[gTier] ?? 0;
+    if (gRank > personal.rank) {
+      return { tier: gTier, rank: gRank, expiresAt: personal.expiresAt, period: null, source: "team" };
+    }
+  }
+  return { ...personal, source: "personal" };
+}
+
+async function personalMembership(userId: string): Promise<ActiveMembership> {
   const m = await prisma.membership.findUnique({ where: { userId } });
   if (!m || m.tier === "FREE") return { tier: "FREE", rank: 0, expiresAt: null, period: null };
   const expired = m.expiresAt != null && m.expiresAt.getTime() < Date.now();

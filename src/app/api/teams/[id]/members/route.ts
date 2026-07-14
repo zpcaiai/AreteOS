@@ -1,0 +1,30 @@
+import { z } from "zod";
+import { getUserId } from "@/lib/auth";
+import { ok, created, parseBody, route } from "@/lib/http";
+import { addMemberByEmail, getTeamDetail, removeMember } from "@/lib/teams";
+
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  return route(async () => {
+    const userId = await getUserId(req);
+    const { id } = await params;
+    return ok(await getTeamDetail(id, userId));
+  });
+}
+
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  return route(async () => {
+    const userId = await getUserId(req);
+    const { id } = await params;
+    const body = await parseBody(req, z.object({ email: z.string().email() }));
+    return created(await addMemberByEmail(id, userId, body.email));
+  });
+}
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  return route(async () => {
+    const userId = await getUserId(req);
+    const { id } = await params;
+    const body = await parseBody(req, z.object({ userId: z.string().min(1) }));
+    return ok(await removeMember(id, userId, body.userId));
+  });
+}

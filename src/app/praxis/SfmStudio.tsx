@@ -116,7 +116,7 @@ export default function SfmStudio() {
 
       <StudioSection title={T("7 · 自觉领导力", "7 · Conscious Leadership")} hint={T("每行一个领导力复盘", "One leadership reflection per line")}>
         <SuggestionField value={reflections} onChange={setReflections} rows={3} className={ta} chipLabel={T("复盘备选", "Reflection options")} suggestions={[T("我在压力下会亲自接管，而不是训练负责人。", "Under pressure I take over instead of training owners."), T("我需要把标准说清楚，而不是期待团队自己理解。", "I need to make standards explicit instead of expecting the team to infer them."), T("我把速度误认为质量，忽略了复盘。", "I confuse speed with quality and skip review.")]} />
-        <RunButton busy={busy} runKey="lead" onClick={() => run("lead", "/api/praxis/archon/analyze", { reflections: lines(reflections) })} label={T("评估领导力", "Assess Leadership")} />
+        <RunButton busy={busy} runKey="lead" onClick={() => run("lead", "/api/praxis/leadership/analyze", { reflections: lines(reflections) })} label={T("评估领导力", "Assess Leadership")} />
       </StudioSection>
 
       <StudioSection title={T("8 · 韧性", "8 · Resilience")} hint={T("每行一个背景事实(现金跑道、关键人物等)", "One context fact per line (runway, key people, etc.)")}>

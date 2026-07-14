@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Fast required gate — pure type & unit checks, no database needed.
+  typecheck-test:
+    name: Typecheck & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run prisma:generate
+      - run: npm run typecheck
+      - run: npm test
+
+  # Full build — validates that every tracked migration applies and Next builds.
+  build:
+    name: Migrate & build
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mission_os
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d mission_os"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mission_os
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mission_os
+      AI_PROVIDER: mock
+      AUTH_SECRET: ci-not-a-real-secret
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # PersonalMemory.embedding needs the pgvector extension before migrations run.
+      - name: Enable pgvector
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d mission_os -c "CREATE EXTENSION IF NOT EXISTS vector"
+      - run: npm run db:migrate:deploy
+      - run: npm run build
+
+  # End-to-end smoke tests. Runs the app against a seeded database.
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mission_os
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d mission_os"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mission_os
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mission_os
+      AI_PROVIDER: mock
+      AUTH_SECRET: ci-not-a-real-secret
+      DEV_USER_ID: usr_demo
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Enable pgvector
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d mission_os -c "CREATE EXTENSION IF NOT EXISTS vector"
+      - run: npm run db:migrate:deploy
+      - run: npm run db:seed
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Run E2E
+        run: npx playwright test
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000

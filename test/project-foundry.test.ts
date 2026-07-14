@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FOUNDRY_FEATURES, STARTER_PACKS, WORKSPACE_TEMPLATES } from "../src/lib/project-foundry-catalog";
-import { buildProjectBlueprint, expandFeatureDependencies } from "../src/lib/project-foundry";
+import { buildProjectBlueprint, expandFeatureDependencies } from "../src/lib/project-foundry-blueprint";
 
 describe("Project Foundry", () => {
   it("has unique module identifiers and resolvable dependencies", () => {

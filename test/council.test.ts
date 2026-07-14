@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { consensusMetrics, jaccard, tokenize } from "../src/lib/council";
+import { consensusMetrics, jaccard, tokenize } from "../src/lib/council-math";
 
 describe("council text similarity", () => {
   it("drops stopwords and short tokens", () => {

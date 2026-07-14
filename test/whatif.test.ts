@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { approach } from "../src/lib/whatif";
+import { approach } from "../src/lib/whatif-math";
 
 describe("what-if approach curve", () => {
   it("starts at the current value", () => {

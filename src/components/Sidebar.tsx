@@ -5,9 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import { useI18n, useT, LanguageSwitcher } from "@/lib/i18n/client";
-import { PINNED, NAV_GROUPS as GROUPS, type NavItem as Item } from "@/lib/nav";
+import { PINNED, NAV_GROUPS as GROUPS, NAV_MODES, type NavItem as Item, type NavMode } from "@/lib/nav";
+import { track } from "@/lib/client/telemetry";
 
 const STORE_KEY = "arete-nav-open";
+const MODE_KEY = "arete-nav-mode";
 
 export default function Sidebar() {
   const path = usePathname();
@@ -24,6 +26,21 @@ export default function Sidebar() {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [ready, setReady] = useState(false);
+  const [mode, setMode] = useState<NavMode>("do");
+
+  // Hydrate the progressive-disclosure mode (default "do" — the narrowest daily loop).
+  useEffect(() => {
+    try {
+      const m = localStorage.getItem(MODE_KEY);
+      if (m === "do" || m === "build" || m === "explore") setMode(m);
+    } catch { /* ignore */ }
+  }, []);
+
+  function chooseMode(m: NavMode) {
+    setMode(m);
+    try { localStorage.setItem(MODE_KEY, m); } catch { /* ignore */ }
+    track("nav_mode", { mode: m });
+  }
 
   const label = (it: Item) => (it.labelKey ? t(it.labelKey) : it.label);
   const isActive = (href: string) => path === href || path.startsWith(href + "/");
@@ -65,6 +82,10 @@ export default function Sidebar() {
           (label(it).toLowerCase().includes(query) || it.href.toLowerCase().includes(query)),
       )
     : [];
+
+  // In "explore" every group shows; "do"/"build" narrow it, but always keep the
+  // section for the current page reachable so navigation never dead-ends.
+  const shownGroups = GROUPS.filter((g) => g.modes.includes(mode) || g.id === activeGroup);
 
   const linkCls = (active: boolean) =>
     `block truncate rounded-lg px-3 py-1.5 text-sm ${active ? "bg-indigo-600 text-white" : "text-slate-300 hover:bg-slate-800"}`;
@@ -127,7 +148,19 @@ export default function Sidebar() {
                   </Link>
                 ))}
               </div>
-              {GROUPS.map((g) => {
+              <div className="mb-1 flex gap-1 rounded-lg bg-slate-950/60 p-0.5" role="tablist" aria-label={T("导航模式", "Navigation mode")}>
+                {NAV_MODES.map((m) => (
+                  <button
+                    key={m.id}
+                    role="tab"
+                    aria-selected={mode === m.id}
+                    onClick={() => chooseMode(m.id)}
+                    className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition ${mode === m.id ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-slate-200"}`}>
+                    {T(m.zh, m.en)}
+                  </button>
+                ))}
+              </div>
+              {shownGroups.map((g) => {
                 const groupOpen = ready ? !!open[g.id] : g.id === activeGroup;
                 const hasActive = g.items.some((it) => isActive(it.href));
                 return (
