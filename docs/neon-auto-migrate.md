@@ -56,7 +56,13 @@ history was enforced. It had business tables but no `_prisma_migrations` table,
 and it was missing several later modules. Running `migrate deploy` directly in
 that state would try to replay the initial migration over existing tables.
 
-Before the first automated `main` deployment:
+**Completed 2026-07-16:** production was aligned to the current Prisma
+datamodel on an isolated Neon branch first, then applied to `main`. All eight
+repository migrations were registered with their Prisma checksums;
+`prisma migrate status` and a live schema diff both report an up-to-date,
+zero-difference database. Do not repeat the baseline procedure.
+
+The procedure retained here is for audit and disaster-recovery context:
 
 1. Generate a read-only Prisma schema diff from production to the current
    datamodel.
