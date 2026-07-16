@@ -18,23 +18,22 @@ test("coach: create a session and get a grounded reply", async ({ page }) => {
 test("theme toggle and language switcher persist", async ({ page }) => {
   await page.goto("/dashboard");
   const mobile = (page.viewportSize()?.width ?? 1280) < 1024;
-  const activeControl = <T extends ReturnType<typeof page.locator>>(controls: T) =>
-    mobile ? controls.first() : controls.last();
+  const activeShell = page.locator(mobile ? '[data-shell="mobile-toolbar"]' : '[data-shell="sidebar"]');
 
   // Theme: toggling flips html[data-theme] and survives reload via cookie.
   const before = await page.evaluate(() => document.documentElement.dataset.theme);
   const after = before === "light" ? "dark" : "light";
-  await activeControl(page.locator('button[aria-label^="Switch to"]')).click({ force: true });
+  await activeShell.locator('button[aria-label^="Switch to"]').click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", after);
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", after);
 
   // Locale: switching to EN re-renders server copy in English.
-  await activeControl(page.locator("button").filter({ hasText: /^EN$/i })).click({ force: true });
+  await activeShell.getByRole("button", { name: "EN", exact: true }).click();
   await expect.poll(() => page.evaluate(() => document.cookie)).toContain("locale=en");
   await page.reload();
   await expect(page.getByRole("heading", { name: /^Dashboard$/ })).toBeVisible();
-  await activeControl(page.locator("button").filter({ hasText: /^(ZH|中文)$/i })).click({ force: true });
+  await activeShell.getByRole("button", { name: "中文", exact: true }).click();
   await expect.poll(() => page.evaluate(() => document.cookie)).toContain("locale=zh");
   await page.reload();
   await expect(page.getByRole("heading", { name: /总览/ })).toBeVisible();

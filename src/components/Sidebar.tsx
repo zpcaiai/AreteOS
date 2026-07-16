@@ -92,7 +92,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-900/90 p-3 lg:hidden" style={{ position: "sticky", top: 0, zIndex: 30 }}>
+      <div data-shell="mobile-toolbar" className="flex items-center gap-2 border-b border-slate-800 bg-slate-900/90 p-3 lg:hidden" style={{ position: "sticky", top: 0, zIndex: 30 }}>
         <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="rounded-lg p-1.5 text-slate-300 hover:bg-slate-800">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" /></svg>
         </button>
@@ -104,7 +104,7 @@ export default function Sidebar() {
 
       {mobileOpen && <div onClick={() => setMobileOpen(false)} className="fixed inset-0 z-30 bg-black/50 lg:hidden" />}
 
-      <aside className={`fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 flex-col border-r border-slate-800 bg-slate-900 p-4 transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 lg:bg-slate-900/50 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside data-shell="sidebar" className={`fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 flex-col border-r border-slate-800 bg-slate-900 p-4 transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 lg:bg-slate-900/50 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="mb-3 flex items-center justify-between">
           <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
             <Logo size={32} />
