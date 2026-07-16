@@ -96,6 +96,7 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
           : ["AI_PROVIDER"];
     checks.push(required("ai-credentials", "ai", aiCredential, env, "AI provider credentials are configured"));
   }
+  checks.push(attestation("ai-runtime", "ai", "AI_RUNTIME_VERIFIED_AT", 7, env, "A real AI request and blocking scenario suite passed recently"));
 
   if (registrationMode !== "closed" || truthy(env.AUTH_REQUIRE_EMAIL_VERIFICATION)) {
     checks.push(required("transactional-email", "runtime", ["RESEND_API_KEY", "AUTH_EMAIL_FROM"], env, "Transactional email is configured"));
@@ -176,7 +177,7 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
 
 export function runtimeReadiness(env: NodeJS.ProcessEnv = process.env) {
   const commercial = releaseReadiness(env, profileFrom(env.RELEASE_PROFILE));
-  const runtimeIds = new Set(["runtime-core", "auth-secret-strength", "registration-mode", "real-ai-provider", "ai-credentials", "transactional-email", "observability"]);
+  const runtimeIds = new Set(["runtime-core", "auth-secret-strength", "registration-mode", "real-ai-provider", "ai-credentials", "ai-runtime", "transactional-email", "observability"]);
   const checks = commercial.checks.filter((check) => runtimeIds.has(check.id));
   const failed = checks.filter((check) => check.status === "fail").map((check) => check.id);
   return { ready: failed.length === 0, checks, failed, profile: commercial.profile };

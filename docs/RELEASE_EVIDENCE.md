@@ -13,6 +13,7 @@ application repository.
 | Variable | Evidence required | Maximum age |
 | --- | --- | --- |
 | `LEGAL_REVIEW_ATTESTED_AT` | Qualified counsel reviewed the rendered terms/privacy policy for the operating regions | 365 days |
+| `AI_RUNTIME_VERIFIED_AT` | A real provider request and the blocking scenario suite completed successfully | 7 days |
 | `AI_EVAL_ATTESTED_AT` | Real-provider agent and scenario reports passed, with model/version, commit, latency and cost retained | 30 days |
 | `PAYMENT_E2E_ATTESTED_AT` | Sandbox and low-value live payment, duplicate webhook, invalid signature, refund and reconciliation passed | 90 days |
 | `RESTORE_DRILL_ATTESTED_AT` | Isolated Neon point-in-time branch restored and `npm run verify:restore` passed | 100 days |

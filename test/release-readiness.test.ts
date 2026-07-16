@@ -16,6 +16,7 @@ const base = (): NodeJS.ProcessEnv => ({
   PAYMENTS_ENABLED: "false",
   CLINICAL_FEATURE_ENABLED: "false",
   CHILD_FEATURE_ENABLED: "false",
+  AI_RUNTIME_VERIFIED_AT: new Date().toISOString(),
 });
 
 describe("release readiness", () => {
@@ -41,6 +42,11 @@ describe("release readiness", () => {
     const report = releaseReadiness(env, "pilot");
     expect(report.ready).toBe(true);
     expect(report.checks.find((check) => check.id === "ai-credentials")?.status).toBe("pass");
+  });
+
+  it("fails runtime readiness when AI is configured but has not completed a real request", () => {
+    const env = { ...base(), AI_RUNTIME_VERIFIED_AT: "" };
+    expect(runtimeReadiness(env).failed).toContain("ai-runtime");
   });
 
   it("fails clinical promotion while expert reviews are pending", () => {
