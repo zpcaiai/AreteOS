@@ -12,6 +12,13 @@ export interface TeamSummary { id: string; name: string; seats: number; ownerId:
 export interface TeamMemberView { userId: string; email: string; name: string | null; role: string; createdAt: number }
 export interface TeamDetail { id: string; name: string; seats: number; ownerId: string; status: string; members: TeamMemberView[] }
 
+/** Membership guard used by shared resources. */
+export async function requireTeamMember(teamId: string, userId: string) {
+  const member = await prisma.teamMember.findUnique({ where: { teamId_userId: { teamId, userId } }, include: { team: true } });
+  if (!member || member.team.status !== "ACTIVE" || (member.team.expiresAt && member.team.expiresAt <= new Date())) throw new HttpError(403, "你无权访问该团队工作区");
+  return member;
+}
+
 /** Create a team and enroll the owner as its first member. */
 export async function createTeam(ownerId: string, name: string, seats: number): Promise<{ id: string }> {
   const id = uuid();

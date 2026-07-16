@@ -66,107 +66,113 @@ enum IncomeKind {
 
 // ── Specific Knowledge ──────────────────────────────────────────────────────
 model SpecificKnowledgeProfile {
-  id              String   @id @default(cuid())
+  id              String                   @id @default(cuid())
   userId          String
-  summary         String   @default("")
-  curiosityDepth  Float    @default(0)   // 0..1 component scores
-  skillRarity     Float    @default(0)
-  marketRelevance Float    @default(0)
-  personalEnergy  Float    @default(0)
-  compounding     Float    @default(0)
-  score           Float?                  // 0..100
+  summary         String                   @default("")
+  curiosityDepth  Float                    @default(0) // 0..1 component scores
+  skillRarity     Float                    @default(0)
+  marketRelevance Float                    @default(0)
+  personalEnergy  Float                    @default(0)
+  compounding     Float                    @default(0)
+  score           Float? // 0..100
   metadata        Json?
   notes           String?
   source          String?
   assets          SpecificKnowledgeAsset[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
   @@index([userId])
   @@index([userId, score])
   @@map("naval_specific_knowledge_profiles")
 }
 
 model SpecificKnowledgeAsset {
-  id          String  @id @default(cuid())
+  id          String                    @id @default(cuid())
   userId      String
   profileId   String?
   profile     SpecificKnowledgeProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
   name        String
-  description String   @default("")
-  evidence    String[] @default([])
-  rarity      Float    @default(0)
-  relevance   Float    @default(0)
+  description String                    @default("")
+  evidence    String[]                  @default([])
+  rarity      Float                     @default(0)
+  relevance   Float                     @default(0)
   score       Float?
   metadata    Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+
   @@index([userId])
   @@map("naval_specific_knowledge_assets")
 }
 
 // ── Talent Stack ────────────────────────────────────────────────────────────
 model TalentStack {
-  id            String  @id @default(cuid())
+  id            String         @id @default(cuid())
   userId        String
-  name          String   @default("Talent stack")
-  combination   String[] @default([])   // the rare combo of skills
-  identityStack String   @default("")
-  rarityScore   Float    @default(0)
-  defensibility Float    @default(0)
-  optionality   Float    @default(0)
+  name          String         @default("Talent stack")
+  combination   String[]       @default([]) // the rare combo of skills
+  identityStack String         @default("")
+  rarityScore   Float          @default(0)
+  defensibility Float          @default(0)
+  optionality   Float          @default(0)
   score         Float?
   metadata      Json?
   signals       TalentSignal[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
   @@index([userId])
   @@map("naval_talent_stacks")
 }
 
 model TalentSignal {
-  id        String  @id @default(cuid())
+  id        String       @id @default(cuid())
   userId    String
   stackId   String?
   stack     TalentStack? @relation(fields: [stackId], references: [id], onDelete: SetNull)
   skill     String
-  depth     Float    @default(0)   // 0..1
-  demand    Float    @default(0)
-  evidence  String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  depth     Float        @default(0) // 0..1
+  demand    Float        @default(0)
+  evidence  String       @default("")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
   @@index([userId])
   @@map("naval_talent_signals")
 }
 
 // ── Leverage ────────────────────────────────────────────────────────────────
 model LeverageProfile {
-  id           String  @id @default(cuid())
+  id           String           @id @default(cuid())
   userId       String
-  summary      String   @default("")
-  timeForMoney Float    @default(0)   // 0..1 share of income from renting time
+  summary      String           @default("")
+  timeForMoney Float            @default(0) // 0..1 share of income from renting time
   score        Float?
   metadata     Json?
   sources      LeverageSource[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
   @@index([userId])
   @@map("naval_leverage_profiles")
 }
 
 model LeverageSource {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   userId      String
   profileId   String?
   profile     LeverageProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
   category    LeverageCategory
-  usage       Float    @default(0)   // current usage 0..1
-  scalability Float    @default(0)
-  ownership   Float    @default(0)
-  risk        Float    @default(0)
-  compounding Float    @default(0)
+  usage       Float            @default(0) // current usage 0..1
+  scalability Float            @default(0)
+  ownership   Float            @default(0)
+  risk        Float            @default(0)
+  compounding Float            @default(0)
   notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
   @@index([userId])
   @@index([userId, category])
   @@map("naval_leverage_sources")
@@ -174,343 +180,363 @@ model LeverageSource {
 
 // ── Judgment + Decision Journal ─────────────────────────────────────────────
 model NavalJudgmentProfile {
-  id                String  @id @default(cuid())
-  userId            String
-  predictionAccuracy Float  @default(0)
-  assumptionQuality Float   @default(0)
-  modelUsage        Float   @default(0)
-  emotionalDiscipline Float @default(0)
-  learningRate      Float   @default(0)
-  blindSpots        String[] @default([])
-  score             Float?
-  metadata          Json?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  userId              String
+  predictionAccuracy  Float    @default(0)
+  assumptionQuality   Float    @default(0)
+  modelUsage          Float    @default(0)
+  emotionalDiscipline Float    @default(0)
+  learningRate        Float    @default(0)
+  blindSpots          String[] @default([])
+  score               Float?
+  metadata            Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
   @@index([userId])
   @@map("naval_judgment_profiles")
 }
 
 model DecisionJournalEntry {
-  id              String   @id @default(cuid())
+  id              String                  @id @default(cuid())
   userId          String
   title           String
-  context         String   @default("")
-  options         String[] @default([])
-  assumptions     String[] @default([])
-  expectedOutcome String   @default("")
-  downsideRisk    String   @default("")
-  upsidePotential String   @default("")
-  timeHorizon     String   @default("")
-  emotionalState  String   @default("")
-  confidence      Float    @default(0.5)
-  modelsUsed      String[] @default([])
-  rationale       String   @default("")
+  context         String                  @default("")
+  options         String[]                @default([])
+  assumptions     String[]                @default([])
+  expectedOutcome String                  @default("")
+  downsideRisk    String                  @default("")
+  upsidePotential String                  @default("")
+  timeHorizon     String                  @default("")
+  emotionalState  String                  @default("")
+  confidence      Float                   @default(0.5)
+  modelsUsed      String[]                @default([])
+  rationale       String                  @default("")
   reviewDate      DateTime?
-  status          NavalStatus @default(ACTIVE)
+  status          NavalStatus             @default(ACTIVE)
   metadata        Json?
   reviews         DecisionJournalReview[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
   @@index([userId, createdAt])
   @@index([userId, status])
   @@map("naval_decision_journal_entries")
 }
 
 model DecisionJournalReview {
-  id            String   @id @default(cuid())
-  userId        String
-  entryId       String
-  entry         DecisionJournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
-  actualOutcome String   @default("")
-  lessons       String[] @default([])
-  biasDetected  String   @default("")
-  expectedVsActual Float  @default(0)   // -1..1
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               String               @id @default(cuid())
+  userId           String
+  entryId          String
+  entry            DecisionJournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  actualOutcome    String               @default("")
+  lessons          String[]             @default([])
+  biasDetected     String               @default("")
+  expectedVsActual Float                @default(0) // -1..1
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
   @@index([userId])
   @@map("naval_decision_journal_reviews")
 }
 
 // ── Wealth + Assets ─────────────────────────────────────────────────────────
 model WealthProfile {
-  id            String  @id @default(cuid())
-  userId        String
-  summary       String   @default("")
-  ownershipRatio Float   @default(0)   // 0..1 owned vs rented income
-  assetQuality  Float    @default(0)
-  durability    Float    @default(0)
-  bottleneck    String   @default("")
-  score         Float?
-  metadata      Json?
-  assets        WealthAsset[]
-  incomeStreams IncomeStream[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String         @id @default(cuid())
+  userId         String
+  summary        String         @default("")
+  ownershipRatio Float          @default(0) // 0..1 owned vs rented income
+  assetQuality   Float          @default(0)
+  durability     Float          @default(0)
+  bottleneck     String         @default("")
+  score          Float?
+  metadata       Json?
+  assets         WealthAsset[]
+  incomeStreams  IncomeStream[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
   @@index([userId])
   @@map("naval_wealth_profiles")
 }
 
 model WealthAsset {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   userId      String
   profileId   String?
   profile     WealthProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
   name        String
   category    AssetCategory
-  ownership   Float    @default(1)   // 0..1
-  leverage    Float    @default(0)
-  compounding Float    @default(0)
-  durability  Float    @default(0)
+  ownership   Float          @default(1) // 0..1
+  leverage    Float          @default(0)
+  compounding Float          @default(0)
+  durability  Float          @default(0)
   score       Float?
   metadata    Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
   @@index([userId])
   @@index([userId, category])
   @@map("naval_wealth_assets")
 }
 
 model IncomeStream {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   userId    String
   profileId String?
   profile   WealthProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
   name      String
-  kind      IncomeKind @default(ACTIVE)
-  monthly   Float    @default(0)
-  leverage  Float    @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  kind      IncomeKind     @default(ACTIVE)
+  monthly   Float          @default(0)
+  leverage  Float          @default(0)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
   @@index([userId])
   @@map("naval_income_streams")
 }
 
 model AssetBuildPlan {
-  id            String   @id @default(cuid())
-  userId        String
-  assetName     String
-  category      AssetCategory
-  buildSteps    String[] @default([])
-  distribution  String[] @default([])
-  maintenance   String   @default("")
-  compounding   Float    @default(0)
-  qualityScore  Float?
-  status        NavalStatus @default(DRAFT)
-  metadata      Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String        @id @default(cuid())
+  userId       String
+  assetName    String
+  category     AssetCategory
+  buildSteps   String[]      @default([])
+  distribution String[]      @default([])
+  maintenance  String        @default("")
+  compounding  Float         @default(0)
+  qualityScore Float?
+  status       NavalStatus   @default(DRAFT)
+  metadata     Json?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
   @@index([userId, status])
   @@map("naval_asset_build_plans")
 }
 
 // ── Permissionless Entrepreneurship ─────────────────────────────────────────
 model StartupOpportunity {
-  id            String   @id @default(cuid())
-  userId        String
-  title         String
-  opportunityType String @default("")
-  problem       String   @default("")
-  market        String   @default("")
-  distribution  String[] @default([])
-  mvp           String   @default("")
-  fitScore      Float?
-  status        NavalStatus @default(DRAFT)
-  metadata      Json?
-  experiments   ValidationExperiment[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String                 @id @default(cuid())
+  userId          String
+  title           String
+  opportunityType String                 @default("")
+  problem         String                 @default("")
+  market          String                 @default("")
+  distribution    String[]               @default([])
+  mvp             String                 @default("")
+  fitScore        Float?
+  status          NavalStatus            @default(DRAFT)
+  metadata        Json?
+  experiments     ValidationExperiment[]
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
   @@index([userId, status])
   @@map("naval_startup_opportunities")
 }
 
 model ValidationExperiment {
-  id            String   @id @default(cuid())
+  id            String              @id @default(cuid())
   userId        String
   opportunityId String?
   opportunity   StartupOpportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
   hypothesis    String
-  test          String   @default("")
-  metric        String   @default("")
-  result        String   @default("")
-  validated     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  test          String              @default("")
+  metric        String              @default("")
+  result        String              @default("")
+  validated     Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
   @@index([userId])
   @@map("naval_validation_experiments")
 }
 
 // ── Long-Term Games ─────────────────────────────────────────────────────────
 model LongTermGame {
-  id               String   @id @default(cuid())
-  userId           String
-  name             String
-  compounding      Float    @default(0)
-  identityAlignment Float   @default(0)
-  relationshipQuality Float @default(0)
-  reputationUpside Float    @default(0)
-  learningRate     Float    @default(0)
-  shortTermTrapRisk Float   @default(0.1)
-  score            Float?
-  status           NavalStatus @default(ACTIVE)
-  metadata         Json?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                  String      @id @default(cuid())
+  userId              String
+  name                String
+  compounding         Float       @default(0)
+  identityAlignment   Float       @default(0)
+  relationshipQuality Float       @default(0)
+  reputationUpside    Float       @default(0)
+  learningRate        Float       @default(0)
+  shortTermTrapRisk   Float       @default(0.1)
+  score               Float?
+  status              NavalStatus @default(ACTIVE)
+  metadata            Json?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
   @@index([userId, status])
   @@map("naval_long_term_games")
 }
 
 // ── Freedom ─────────────────────────────────────────────────────────────────
 model FreedomProfile {
-  id            String  @id @default(cuid())
-  userId        String
-  timeFreedom   Float    @default(0)
-  locationFreedom Float  @default(0)
-  financialResilience Float @default(0)
-  psychologicalFreedom Float @default(0)
-  optionality   Float    @default(0)
-  score         Float?
-  metadata      Json?
-  constraints   FreedomConstraint[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                   String              @id @default(cuid())
+  userId               String
+  timeFreedom          Float               @default(0)
+  locationFreedom      Float               @default(0)
+  financialResilience  Float               @default(0)
+  psychologicalFreedom Float               @default(0)
+  optionality          Float               @default(0)
+  score                Float?
+  metadata             Json?
+  constraints          FreedomConstraint[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
   @@index([userId])
   @@map("naval_freedom_profiles")
 }
 
 model FreedomConstraint {
-  id         String   @id @default(cuid())
-  userId     String
-  profileId  String?
-  profile    FreedomProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
-  dimension  FreedomDimension
+  id          String           @id @default(cuid())
+  userId      String
+  profileId   String?
+  profile     FreedomProfile?  @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  dimension   FreedomDimension
   description String
-  severity   Float    @default(0.5)
-  dependency String   @default("")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  severity    Float            @default(0.5)
+  dependency  String           @default("")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
   @@index([userId, dimension])
   @@map("naval_freedom_constraints")
 }
 
 // ── Happiness ───────────────────────────────────────────────────────────────
 model HappinessProfile {
-  id           String  @id @default(cuid())
-  userId       String
-  peace        Float    @default(0)
-  health       Float    @default(0)
-  relationships Float   @default(0)
-  autonomy     Float    @default(0)
-  gratitude    Float    @default(0)
-  desireLoad   Float    @default(0.3)
-  score        Float?
-  metadata     Json?
-  reflections  HappinessReflection[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String                @id @default(cuid())
+  userId        String
+  peace         Float                 @default(0)
+  health        Float                 @default(0)
+  relationships Float                 @default(0)
+  autonomy      Float                 @default(0)
+  gratitude     Float                 @default(0)
+  desireLoad    Float                 @default(0.3)
+  score         Float?
+  metadata      Json?
+  reflections   HappinessReflection[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
   @@index([userId])
   @@map("naval_happiness_profiles")
 }
 
 model HappinessReflection {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   userId    String
   profileId String?
   profile   HappinessProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
-  prompt    String   @default("")
-  entry     String   @default("")
-  practice  String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  prompt    String            @default("")
+  entry     String            @default("")
+  practice  String            @default("")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
   @@index([userId, createdAt])
   @@map("naval_happiness_reflections")
 }
 
 // ── Life Portfolio ──────────────────────────────────────────────────────────
 model LifePortfolio {
-  id        String   @id @default(cuid())
+  id        String              @id @default(cuid())
   userId    String
   score     Float?
-  imbalance String   @default("")
+  imbalance String              @default("")
   metadata  Json?
   areas     LifePortfolioArea[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
   @@index([userId])
   @@map("naval_life_portfolios")
 }
 
 model LifePortfolioArea {
-  id          String   @id @default(cuid())
+  id          String            @id @default(cuid())
   userId      String
   portfolioId String?
-  portfolio   LifePortfolio? @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
+  portfolio   LifePortfolio?    @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
   area        PortfolioAreaType
-  current     Float    @default(0.5)   // 0..1 satisfaction/health
-  target      Float    @default(0.7)
-  allocation  Float    @default(0)     // share of attention 0..1
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  current     Float             @default(0.5) // 0..1 satisfaction/health
+  target      Float             @default(0.7)
+  allocation  Float             @default(0) // share of attention 0..1
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
   @@index([userId, area])
   @@map("naval_life_portfolio_areas")
 }
 
 // ── Score snapshots + Digital Twin ──────────────────────────────────────────
 model NavalScoreSnapshot {
-  id                  String   @id @default(cuid())
-  userId              String
-  globalScore         Float    @default(0)
-  specificKnowledge   Float    @default(0)
-  talentStack         Float    @default(0)
-  leverage            Float    @default(0)
-  judgment            Float    @default(0)
-  wealthCreation      Float    @default(0)
-  longTermGame        Float    @default(0)
-  freedom             Float    @default(0)
-  happiness           Float    @default(0)
-  lifePortfolio       Float    @default(0)
-  metadata            Json?
-  createdAt           DateTime @default(now())
+  id                String   @id @default(cuid())
+  userId            String
+  globalScore       Float    @default(0)
+  specificKnowledge Float    @default(0)
+  talentStack       Float    @default(0)
+  leverage          Float    @default(0)
+  judgment          Float    @default(0)
+  wealthCreation    Float    @default(0)
+  longTermGame      Float    @default(0)
+  freedom           Float    @default(0)
+  happiness         Float    @default(0)
+  lifePortfolio     Float    @default(0)
+  metadata          Json?
+  createdAt         DateTime @default(now())
+
   @@index([userId, createdAt])
   @@map("naval_score_snapshots")
 }
 
 model NavalDigitalTwinProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  summary     String   @default("")
-  strategy    Json?     // serialized life-strategy state
-  driftScore  Float    @default(0)
-  metadata    Json?
-  memories    NavalTwinMemory[]
-  insights    NavalTwinInsight[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String             @id @default(cuid())
+  userId     String             @unique
+  summary    String             @default("")
+  strategy   Json? // serialized life-strategy state
+  driftScore Float              @default(0)
+  metadata   Json?
+  memories   NavalTwinMemory[]
+  insights   NavalTwinInsight[]
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
   @@index([userId])
   @@map("naval_twin_profiles")
 }
 
 model NavalTwinMemory {
-  id        String   @id @default(cuid())
+  id        String                   @id @default(cuid())
   userId    String
   twinId    String?
   twin      NavalDigitalTwinProfile? @relation(fields: [twinId], references: [id], onDelete: Cascade)
-  kind      String   @default("")   // knowledge | decision | leverage | asset | game | freedom | happiness
+  kind      String                   @default("") // knowledge | decision | leverage | asset | game | freedom | happiness
   content   String
-  weight    Float    @default(0.5)
-  createdAt DateTime @default(now())
+  weight    Float                    @default(0.5)
+  createdAt DateTime                 @default(now())
+
   @@index([userId, kind])
   @@map("naval_twin_memories")
 }
 
 model NavalTwinInsight {
-  id        String   @id @default(cuid())
+  id        String                   @id @default(cuid())
   userId    String
   twinId    String?
   twin      NavalDigitalTwinProfile? @relation(fields: [twinId], references: [id], onDelete: Cascade)
   insight   String
-  kind      String   @default("opportunity")   // opportunity | drift | constraint
-  priority  Int      @default(3)
-  createdAt DateTime @default(now())
+  kind      String                   @default("opportunity") // opportunity | drift | constraint
+  priority  Int                      @default(3)
+  createdAt DateTime                 @default(now())
+
   @@index([userId, kind])
   @@map("naval_twin_insights")
 }

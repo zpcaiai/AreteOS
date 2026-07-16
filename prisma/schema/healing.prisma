@@ -10,25 +10,25 @@
 /// classifications come from deterministic rules, not the LLM — see
 /// src/lib/healing/safety-rules.ts.
 model SafetyTriageEvent {
-  id                String   @id @default(cuid())
-  userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId         String
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
 
-  inputMessage      String
-  riskLevel         String   // green | yellow | orange | red
-  riskDomains       Json     // RiskDomain[]
-  confidence        Float    @default(0.5)
-  detectedSignals   Json     // DetectedSignal[]
-  recommendedRoute  String
+  inputMessage     String
+  riskLevel        String // green | yellow | orange | red
+  riskDomains      Json // RiskDomain[]
+  confidence       Float  @default(0.5)
+  detectedSignals  Json // DetectedSignal[]
+  recommendedRoute String
 
   userFacingMessage String
-  allowedNextSkills Json     // string[]
-  blockedSkills     Json     // string[]
-  safetyPlan        Json?    // SafetyPlan
+  allowedNextSkills Json // string[]
+  blockedSkills     Json // string[]
+  safetyPlan        Json? // SafetyPlan
 
-  overridden        Boolean  @default(false) // a rule escalated the LLM level
-  createdAt         DateTime @default(now())
+  overridden Boolean  @default(false) // a rule escalated the LLM level
+  createdAt  DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -39,26 +39,26 @@ model SafetyTriageEvent {
 /// Structured snapshot of current state (mood/anxiety/function/loops). One row
 /// per intake; the formulation references the latest.
 model MentalStateIntake {
-  id                  String   @id @default(cuid())
-  userId              String
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId           String
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
 
-  freeText            String?
-  ratings             Json?    // IntakeRatings
-  checkboxes          Json?    // IntakeCheckboxes
+  freeText   String?
+  ratings    Json? // IntakeRatings
+  checkboxes Json? // IntakeCheckboxes
 
   summary             String
-  primaryConcerns     Json     // { concern, severity, evidence }[]
-  emotionalProfile    Json     // { dominantEmotions, intensityPattern, bodySignals }
-  functionalImpact    Json     // { workOrStudy, relationships, selfCare, sleep }
-  maintainingLoops    Json     // MaintainingLoop[]
-  suggestedNextSkills Json     // NextSkill[]
+  primaryConcerns     Json // { concern, severity, evidence }[]
+  emotionalProfile    Json // { dominantEmotions, intensityPattern, bodySignals }
+  functionalImpact    Json // { workOrStudy, relationships, selfCare, sleep }
+  maintainingLoops    Json // MaintainingLoop[]
+  suggestedNextSkills Json // NextSkill[]
 
-  riskLevelAtIntake   String   @default("green")
-  createdAt           DateTime @default(now())
+  riskLevelAtIntake String   @default("green")
+  createdAt         DateTime @default(now())
 
-  formulations        DiltsClinicalFormulation[]
+  formulations DiltsClinicalFormulation[]
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -67,25 +67,25 @@ model MentalStateIntake {
 
 /// Dilts six-level map + 5P formulation + causal loop + recommended path.
 model DiltsClinicalFormulation {
-  id                          String             @id @default(cuid())
-  userId                      String
-  user                        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId                   String
-  intakeId                    String?
-  intake                      MentalStateIntake? @relation(fields: [intakeId], references: [id], onDelete: SetNull)
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
+  intakeId  String?
+  intake    MentalStateIntake? @relation(fields: [intakeId], references: [id], onDelete: SetNull)
 
-  problemStatement            String
-  depth                       String             @default("standard") // light|standard|deep|shallow
+  problemStatement String
+  depth            String @default("standard") // light|standard|deep|shallow
 
-  diltsMap                    Json               // DiltsMap
-  fiveP                       Json               // FiveP
-  causalLoop                  Json               // CausalLoopEdge[]
+  diltsMap                    Json // DiltsMap
+  fiveP                       Json // FiveP
+  causalLoop                  Json // CausalLoopEdge[]
   formulationSummary          String
-  recommendedInterventionPath Json               // InterventionStep[]
-  cautions                    Json               // string[]
+  recommendedInterventionPath Json // InterventionStep[]
+  cautions                    Json // string[]
 
-  createdAt                   DateTime           @default(now())
-  updatedAt                   DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -97,27 +97,27 @@ model DiltsClinicalFormulation {
 /// identity all create small, measurable tasks here; the timeline reads
 /// completion stats. sourceType+sourceId link back to the producing record.
 model PracticeTask {
-  id               String    @id @default(cuid())
-  userId           String
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId        String
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
 
-  sourceType       String    // cbt | emotion-regulation | core-belief | parts-work | exposure | identity | ...
-  sourceId         String?
+  sourceType String // cbt | emotion-regulation | core-belief | parts-work | exposure | identity | ...
+  sourceId   String?
 
   title            String
-  description      String    @default("")
-  steps            Json      // string[]
-  difficulty       String    @default("easy")
-  status           String    @default("pending") // pending | in_progress | completed | skipped
-  completionMetric String    @default("")
+  description      String @default("")
+  steps            Json // string[]
+  difficulty       String @default("easy")
+  status           String @default("pending") // pending | in_progress | completed | skipped
+  completionMetric String @default("")
 
-  scheduledFor     DateTime?
-  completedAt      DateTime?
-  reflection       Json?
+  scheduledFor DateTime?
+  completedAt  DateTime?
+  reflection   Json?
 
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, status])
   @@index([userId, createdAt])
@@ -129,12 +129,12 @@ model PracticeTask {
 // ───────────────────────── Healing OS · Batch 2 (intervention) ─────────────────────────
 
 model CoreBeliefRecord {
-  id                    String   @id @default(cuid())
-  userId                String
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId             String
-  formulationId         String?
-  intakeId              String?
+  id            String  @id @default(cuid())
+  userId        String
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId     String
+  formulationId String?
+  intakeId      String?
 
   problemStatement      String
   extractedBeliefs      Json
@@ -145,8 +145,8 @@ model CoreBeliefRecord {
   cautions              Json
   nextRecommendedSkills Json
 
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -155,9 +155,9 @@ model CoreBeliefRecord {
 }
 
 model CBTSession {
-  id                    String   @id @default(cuid())
+  id                    String  @id @default(cuid())
   userId                String
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   sessionId             String
   mode                  String
   situation             String
@@ -172,8 +172,8 @@ model CBTSession {
   reflectionQuestions   Json
   nextRecommendedSkills Json
 
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -182,16 +182,16 @@ model CBTSession {
 }
 
 model EmotionRegulationSession {
-  id                    String   @id @default(cuid())
-  userId                String
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId             String
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
 
-  currentEmotionText    String
-  emotions              Json?
-  bodySignals           Json?
-  urges                 Json?
-  context               Json?
+  currentEmotionText String
+  emotions           Json?
+  bodySignals        Json?
+  urges              Json?
+  context            Json?
 
   emotionalStateMap     Json
   recommendedSkillSet   Json
@@ -202,8 +202,8 @@ model EmotionRegulationSession {
   reflectionQuestions   Json
   nextRecommendedSkills Json
 
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -213,15 +213,15 @@ model EmotionRegulationSession {
 // ───────────────────────── Healing OS · Batch 3 (deep pattern) ─────────────────────────
 
 model TraumaStabilizationSession {
-  id                      String   @id @default(cuid())
-  userId                  String
-  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId               String
+  id        String @id @default(cuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
 
-  currentExperience       String
-  symptoms                Json?
-  bodySignals             Json?
-  orientation             Json?
+  currentExperience String
+  symptoms          Json?
+  bodySignals       Json?
+  orientation       Json?
 
   stabilizationAssessment Json
   userFacingValidation    String
@@ -233,8 +233,8 @@ model TraumaStabilizationSession {
   nextAllowedSkills       Json
   blockedSkills           Json
 
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -242,14 +242,14 @@ model TraumaStabilizationSession {
 }
 
 model PartsWorkSession {
-  id                      String   @id @default(cuid())
-  userId                  String
-  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId               String
-  mode                    String
-  currentConflict         String
-  relatedFormulationId    String?
-  relatedBeliefRecordId   String?
+  id                    String  @id @default(cuid())
+  userId                String
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId             String
+  mode                  String
+  currentConflict       String
+  relatedFormulationId  String?
+  relatedBeliefRecordId String?
 
   partsMap                Json
   internalConflictSummary Json
@@ -259,8 +259,8 @@ model PartsWorkSession {
   nextRecommendedSkills   Json
   cautions                Json
 
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -269,16 +269,16 @@ model PartsWorkSession {
 }
 
 model ExposurePlan {
-  id                    String            @id @default(cuid())
+  id                    String  @id @default(cuid())
   userId                String
-  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   sessionId             String
   avoidanceProblem      String
   relatedCBTSessionId   String?
   relatedBeliefRecordId String?
   relatedFormulationId  String?
 
-  blocked               Boolean           @default(false)
+  blocked               Boolean @default(false)
   blockReason           String?
   avoidanceLoop         Json?
   exposureType          String?
@@ -289,9 +289,9 @@ model ExposurePlan {
   nextRecommendedSkills Json?
   cautions              Json?
 
-  attempts              ExposureAttempt[]
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
+  attempts  ExposureAttempt[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -300,12 +300,12 @@ model ExposurePlan {
 }
 
 model ExposureAttempt {
-  id                  String       @id @default(cuid())
-  userId              String
-  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId           String
-  exposurePlanId      String
-  plan                ExposurePlan @relation(fields: [exposurePlanId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId      String
+  exposurePlanId String
+  plan           ExposurePlan @relation(fields: [exposurePlanId], references: [id], onDelete: Cascade)
 
   hierarchyLevel      Int
   beforeDistress      Int?
@@ -314,10 +314,10 @@ model ExposureAttempt {
   actualOutcome       String?
   learningStatement   String?
   safetyBehaviorsUsed Json?
-  completed           Boolean      @default(false)
+  completed           Boolean @default(false)
 
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([exposurePlanId])
@@ -327,27 +327,27 @@ model ExposureAttempt {
 // ───────────────────────── Healing OS · Batch 4 (long-term growth) ─────────────────────────
 
 model IdentityReconstructionSession {
-  id                        String   @id @default(cuid())
-  userId                    String
-  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId                 String
-  mode                      String
-  currentIdentityPain       String
-  relatedFormulationId      String?
-  relatedBeliefRecordId     String?
+  id                    String  @id @default(cuid())
+  userId                String
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId             String
+  mode                  String
+  currentIdentityPain   String
+  relatedFormulationId  String?
+  relatedBeliefRecordId String?
 
-  identityMap               Json
-  missionRecovery           Json
-  dailyEvidencePlan         Json
-  identityPracticeTask      Json
-  integrationSummary        String
-  nextRecommendedSkills     Json
-  cautions                  Json
+  identityMap           Json
+  missionRecovery       Json
+  dailyEvidencePlan     Json
+  identityPracticeTask  Json
+  integrationSummary    String
+  nextRecommendedSkills Json
+  cautions              Json
 
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  evidences                 IdentityEvidence[]
+  evidences IdentityEvidence[]
 
   @@index([userId, createdAt])
   @@index([sessionId])
@@ -366,10 +366,10 @@ model IdentityEvidence {
   evidenceAction    String
   userReflection    String?
   evidenceStrength  Int?
-  completed         Boolean                        @default(false)
+  completed         Boolean @default(false)
 
-  createdAt         DateTime                       @default(now())
-  updatedAt         DateTime                       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([identitySessionId])
@@ -377,13 +377,13 @@ model IdentityEvidence {
 }
 
 model HealingTimelineReport {
-  id                      String   @id @default(cuid())
-  userId                  String
-  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  timeRangeFrom           DateTime
-  timeRangeTo             DateTime
-  reportMode              String
+  timeRangeFrom DateTime
+  timeRangeTo   DateTime
+  reportMode    String
 
   timelineSummary         Json
   timelineEvents          Json
@@ -394,19 +394,19 @@ model HealingTimelineReport {
   nextStepRecommendations Json
   userFacingWeeklyReport  String
 
-  createdAt               DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
   @@map("healing_timeline_reports")
 }
 
 model RelapsePreventionPlan {
-  id                      String   @id @default(cuid())
-  userId                  String
-  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId               String?
-  mode                    String
-  currentConcern          String?
+  id             String  @id @default(cuid())
+  userId         String
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId      String?
+  mode           String
+  currentConcern String?
 
   relapseRiskMap          Json
   ifThenPlans             Json
@@ -418,9 +418,9 @@ model RelapsePreventionPlan {
   nextRecommendedSkills   Json
   cautions                Json
 
-  active                  Boolean  @default(true)
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
   @@index([active])
@@ -428,18 +428,18 @@ model RelapsePreventionPlan {
 }
 
 model RelapseCheckIn {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId      String?
-  planId         String?
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?
+  planId    String?
 
   signals        Json
   riskLevel      String
   actionTaken    Json?
   userReflection String?
 
-  createdAt      DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([planId])

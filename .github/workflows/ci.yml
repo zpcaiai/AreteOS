@@ -8,7 +8,9 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Never interrupt a production migration midway. Pull-request checks remain
+  # replaceable, while main-branch pushes are serialized in commit order.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   # Fast required gate — pure type & unit checks, no database needed.
@@ -25,6 +27,8 @@ jobs:
       - run: npm run prisma:generate
       - run: npm run typecheck
       - run: npm test
+      - run: npm run check:clinical
+      - run: npm audit --omit=dev --audit-level=moderate --registry=https://registry.npmjs.org
 
   # Full build — validates that every tracked migration applies and Next builds.
   build:
@@ -48,7 +52,7 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mission_os
       DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mission_os
       AI_PROVIDER: mock
-      AUTH_SECRET: ci-not-a-real-secret
+      AUTH_SECRET: ci-not-a-real-secret-at-least-32-characters
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
@@ -61,6 +65,9 @@ jobs:
       - name: Enable pgvector
         run: PGPASSWORD=postgres psql -h localhost -U postgres -d mission_os -c "CREATE EXTENSION IF NOT EXISTS vector"
       - run: npm run db:migrate:deploy
+      - run: npm run db:migrate:status
+      - name: Verify critical production tables
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d mission_os -v ON_ERROR_STOP=1 -c "SELECT 1 FROM users, auth_sessions, rate_limit_buckets, foundry_workspaces LIMIT 0"
       - run: npm run build
 
   # End-to-end smoke tests. Runs the app against a seeded database.
@@ -85,7 +92,7 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mission_os
       DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mission_os
       AI_PROVIDER: mock
-      AUTH_SECRET: ci-not-a-real-secret
+      AUTH_SECRET: ci-not-a-real-secret-at-least-32-characters
       DEV_USER_ID: usr_demo
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
     steps:
@@ -105,3 +112,49 @@ jobs:
         run: npx playwright test
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+          PLAYWRIGHT_WEB_SERVER_COMMAND: npm run start
+
+  # Production schema deployment. This runs only after every release gate has
+  # passed for a push to main; pull requests never receive production secrets.
+  deploy-neon:
+    name: Deploy migrations to Neon
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [typecheck-test, build, e2e]
+    runs-on: ubuntu-latest
+    environment: Production
+    permissions:
+      contents: read
+    env:
+      # Prisma Migrate must use Neon's direct (non-pooler) connection. Setting
+      # both values keeps Prisma 6 and future config resolution deterministic.
+      DATABASE_URL: ${{ secrets.NEON_DIRECT_URL }}
+      DIRECT_URL: ${{ secrets.NEON_DIRECT_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate migration secret
+        run: >-
+          node -e 'const value = process.env.DIRECT_URL;
+          if (!value) throw new Error("NEON_DIRECT_URL is missing");
+          const url = new URL(value);
+          if (url.hostname.includes("-pooler"))
+          throw new Error("NEON_DIRECT_URL must use a non-pooled Neon hostname");'
+      - name: Refuse an unbaselined legacy database
+        shell: bash
+        run: |
+          printf '%s\n' \
+            'DO $$ BEGIN IF to_regclass('"'"'public._prisma_migrations'"'"') IS NULL AND to_regclass('"'"'public.users'"'"') IS NOT NULL THEN RAISE EXCEPTION '"'"'Legacy database has no Prisma migration baseline; follow docs/neon-auto-migrate.md'"'"'; END IF; END $$;' \
+            | npx prisma db execute --url "$DIRECT_URL" --stdin
+      - name: Apply pending migrations
+        run: npm run db:migrate:deploy
+      - name: Verify migration state
+        run: npm run db:migrate:status
+      - name: Verify critical production tables
+        shell: bash
+        run: |
+          printf '%s\n' 'SELECT 1 FROM users, auth_sessions, rate_limit_buckets, foundry_workspaces LIMIT 0;' \
+            | npx prisma db execute --url "$DIRECT_URL" --stdin

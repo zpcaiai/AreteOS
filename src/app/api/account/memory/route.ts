@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { getUserId } from "@/lib/auth";
-import { ok, parseBody, route } from "@/lib/http";
+import { ok, parseBody, requireSameOrigin, route } from "@/lib/http";
 import { clearPersonalMemory, personalMemoryCount } from "@/lib/account-data";
 
 // GET  /api/account/memory        -> how many AI memories are stored
@@ -14,6 +14,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   return route(async () => {
+    requireSameOrigin(req);
     const userId = await getUserId(req);
     await parseBody(req, z.object({ confirm: z.literal(true) }));
     return ok(await clearPersonalMemory(userId));

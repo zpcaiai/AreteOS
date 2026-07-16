@@ -39,6 +39,10 @@ export interface ProjectBlueprint {
 export interface ProjectWorkspace extends ProjectBriefInput {
   id: string;
   templateId?: string;
+  teamId?: string;
+  ownerId?: string;
+  teamName?: string;
+  revision?: number;
   updatedAt: number;
 }
 
@@ -144,4 +148,3 @@ export function buildProjectBlueprint(input: ProjectBriefInput): ProjectBlueprin
     createdAt: Date.now(),
   };
 }
-

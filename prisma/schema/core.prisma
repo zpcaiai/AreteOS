@@ -115,89 +115,100 @@ enum MemberOrderStatus {
 
 // ───────────────────────────── core ─────────────────────────────
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String?
-  passwordHash String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String?
+  passwordHash      String?
+  emailVerifiedAt   DateTime?
+  termsAcceptedAt   DateTime?
+  privacyAcceptedAt DateTime?
+  consentVersion    String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  personality       PersonalityState?
-  transitions       PersonalityTransition[]
-  worldviews        Worldview[]
-  worldviewAssessments WorldviewAssessment[]
-  missions          Mission[]
-  visions           Vision[]
-  lifeThemes        LifeTheme[]
-  constitutions     Constitution[]
-  identities        Identity[]
-  roles             Role[]
-  identityHistory   IdentityHistory[]
-  values            Value[]
-  valueRankings     ValueRanking[]
-  valueConflicts    ValueConflict[]
-  mentalModels      MentalModel[]
-  modelUsageLogs    ModelUsageLog[]
-  assumptions       Assumption[]
-  rootCauses        RootCause[]
-  constraints       Constraint[]
-  firstPrincipleMaps FirstPrincipleMap[]
-  decisions         Decision[]
-  roleModels        RoleModel[]
-  habits            Habit[]
-  shadowPatterns    ShadowPattern[]
-  shadowEvents      ShadowEvent[]
-  interventions     Intervention[]
-  reflections       Reflection[]
-  lessons           Lesson[]
-  reviews           Review[]
-  skills            Skill[]
-  leadershipMetrics LeadershipMetric[]
+  authSessions      AuthSession[]
+  authTokens        AuthToken[]
+  legalConsents     LegalConsent[]
+  ownedTeams        Team[]             @relation("TeamOwner")
+  teamMemberships   TeamMember[]
+  foundryWorkspaces FoundryWorkspace[]
+
+  personality           PersonalityState?
+  transitions           PersonalityTransition[]
+  worldviews            Worldview[]
+  worldviewAssessments  WorldviewAssessment[]
+  missions              Mission[]
+  visions               Vision[]
+  lifeThemes            LifeTheme[]
+  constitutions         Constitution[]
+  identities            Identity[]
+  roles                 Role[]
+  identityHistory       IdentityHistory[]
+  values                Value[]
+  valueRankings         ValueRanking[]
+  valueConflicts        ValueConflict[]
+  mentalModels          MentalModel[]
+  modelUsageLogs        ModelUsageLog[]
+  assumptions           Assumption[]
+  rootCauses            RootCause[]
+  constraints           Constraint[]
+  firstPrincipleMaps    FirstPrincipleMap[]
+  decisions             Decision[]
+  roleModels            RoleModel[]
+  habits                Habit[]
+  shadowPatterns        ShadowPattern[]
+  shadowEvents          ShadowEvent[]
+  interventions         Intervention[]
+  reflections           Reflection[]
+  lessons               Lesson[]
+  reviews               Review[]
+  skills                Skill[]
+  leadershipMetrics     LeadershipMetric[]
   // Psychology OS (migrated from emotion-sphere)
-  cbtEntries        CbtEntry[]
-  driverEntries     DriverEntry[]
-  narrativeEntries  NarrativeEntry[]
-  formationSnapshots FormationSnapshot[]
-  decisionDiscernments DecisionDiscernment[]
-  personaTags       PersonaTagRecord[]
+  cbtEntries            CbtEntry[]
+  driverEntries         DriverEntry[]
+  narrativeEntries      NarrativeEntry[]
+  formationSnapshots    FormationSnapshot[]
+  decisionDiscernments  DecisionDiscernment[]
+  personaTags           PersonaTagRecord[]
   // Healing OS (Robot Dilts)
-  safetyTriageEvents SafetyTriageEvent[]
-  mentalStateIntakes MentalStateIntake[]
-  diltsFormulations  DiltsClinicalFormulation[]
-  practiceTasks      PracticeTask[]
-  coreBeliefRecords  CoreBeliefRecord[]
-  cbtSessions        CBTSession[]
-  emotionRegSessions EmotionRegulationSession[]
+  safetyTriageEvents    SafetyTriageEvent[]
+  mentalStateIntakes    MentalStateIntake[]
+  diltsFormulations     DiltsClinicalFormulation[]
+  practiceTasks         PracticeTask[]
+  coreBeliefRecords     CoreBeliefRecord[]
+  cbtSessions           CBTSession[]
+  emotionRegSessions    EmotionRegulationSession[]
   stabilizationSessions TraumaStabilizationSession[]
-  partsWorkSessions  PartsWorkSession[]
-  exposurePlans      ExposurePlan[]
-  exposureAttempts   ExposureAttempt[]
-  identitySessions   IdentityReconstructionSession[]
-  identityEvidence   IdentityEvidence[]
-  timelineReports    HealingTimelineReport[]
-  relapsePlans       RelapsePreventionPlan[]
-  relapseCheckIns    RelapseCheckIn[]
-  influenceLogs     InfluenceLog[]
-  legacyProjects    LegacyProject[]
-  mentees           Mentee[]
-  knowledgeAssets   KnowledgeAsset[]
-  scoreSnapshots    ScoreSnapshot[]
-  events            DomainEvent[]
-  beliefs           Belief[]
-  beliefChangeLogs  BeliefChangeLog[]
-  digitalTwin       DigitalTwinProfile?
-  twinMemories      TwinMemory[]
-  personalMemories  PersonalMemory[]
-  coachSessions     CoachSession[]
-  twinInsights      TwinInsight[]
-  driftPredictions  DriftPrediction[]
-  strategyAdoptions StrategyAdoption[]
-  blueprintAdaptations BlueprintAdaptation[]
-  learningPaths     LearningPath[]
-  communityPosts    CommunityPost[]
-  postComments      PostComment[]
-  membership        Membership?
-  membershipOrders  MembershipOrder[]
+  partsWorkSessions     PartsWorkSession[]
+  exposurePlans         ExposurePlan[]
+  exposureAttempts      ExposureAttempt[]
+  identitySessions      IdentityReconstructionSession[]
+  identityEvidence      IdentityEvidence[]
+  timelineReports       HealingTimelineReport[]
+  relapsePlans          RelapsePreventionPlan[]
+  relapseCheckIns       RelapseCheckIn[]
+  influenceLogs         InfluenceLog[]
+  legacyProjects        LegacyProject[]
+  mentees               Mentee[]
+  knowledgeAssets       KnowledgeAsset[]
+  scoreSnapshots        ScoreSnapshot[]
+  events                DomainEvent[]
+  beliefs               Belief[]
+  beliefChangeLogs      BeliefChangeLog[]
+  digitalTwin           DigitalTwinProfile?
+  twinMemories          TwinMemory[]
+  personalMemories      PersonalMemory[]
+  coachSessions         CoachSession[]
+  twinInsights          TwinInsight[]
+  driftPredictions      DriftPrediction[]
+  strategyAdoptions     StrategyAdoption[]
+  blueprintAdaptations  BlueprintAdaptation[]
+  learningPaths         LearningPath[]
+  communityPosts        CommunityPost[]
+  postComments          PostComment[]
+  membership            Membership?
+  membershipOrders      MembershipOrder[]
 
   @@map("users")
 }
@@ -210,6 +221,7 @@ model PersonalityState {
   progress  Float          @default(0) // 0..1 toward next stage goal
   enteredAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+
   @@map("personality_states")
 }
 
@@ -221,6 +233,7 @@ model PersonalityTransition {
   toStage   EvolutionStage
   reason    String         @default("")
   createdAt DateTime       @default(now())
+
   @@index([userId, createdAt])
   @@map("personality_transitions")
 }
@@ -235,17 +248,19 @@ model Worldview {
   updatedAt DateTime @updatedAt
 
   dimensions WorldviewDimension[]
+
   @@index([userId])
   @@map("worldviews")
 }
 
 model WorldviewDimension {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   worldviewId String
   worldview   Worldview @relation(fields: [worldviewId], references: [id], onDelete: Cascade)
   // e.g. "reality", "success", "failure", "human_nature", "responsibility"
   dimension   String
-  stance      String   @default("")
+  stance      String    @default("")
+
   @@index([worldviewId])
   @@map("worldview_dimensions")
 }
@@ -257,6 +272,7 @@ model WorldviewAssessment {
   question  String
   answer    String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("worldview_assessments")
 }
@@ -270,6 +286,7 @@ model Mission {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@map("missions")
 }
@@ -281,6 +298,7 @@ model Vision {
   statement String
   horizon   String   @default("10Y")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("visions")
 }
@@ -292,6 +310,7 @@ model LifeTheme {
   name      String
   note      String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("life_themes")
 }
@@ -303,6 +322,7 @@ model Constitution {
   article   String
   rank      Int      @default(0)
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("constitutions")
 }
@@ -318,23 +338,25 @@ model Identity {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  roles  Role[]
-  scores IdentityScore[]
+  roles      Role[]
+  scores     IdentityScore[]
   habitLinks HabitIdentityLink[]
+
   @@index([userId])
   @@map("identities")
 }
 
 model Role {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   identityId String?
   identity   Identity? @relation(fields: [identityId], references: [id], onDelete: SetNull)
   name       String
-  intention  String   @default("")
-  weight     Float    @default(1)
-  createdAt  DateTime @default(now())
+  intention  String    @default("")
+  weight     Float     @default(1)
+  createdAt  DateTime  @default(now())
+
   @@index([userId])
   @@map("roles")
 }
@@ -345,6 +367,7 @@ model IdentityScore {
   identity   Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
   alignment  Float    @default(0)
   date       DateTime @default(now())
+
   @@index([identityId, date])
   @@map("identity_scores")
 }
@@ -355,45 +378,49 @@ model IdentityHistory {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   snapshot Json
   date     DateTime @default(now())
+
   @@index([userId, date])
   @@map("identity_history")
 }
 
 // ──────────────── ENGINE 4: Values (Layer 2) ────────────────
 model Value {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   name        String
-  description String   @default("")
-  createdAt   DateTime @default(now())
-  rankings ValueRanking[]
+  description String         @default("")
+  createdAt   DateTime       @default(now())
+  rankings    ValueRanking[]
+
   @@index([userId])
   @@map("values")
 }
 
 model ValueRanking {
-  id      String @id @default(cuid())
-  userId  String
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  valueId String
-  value   Value  @relation(fields: [valueId], references: [id], onDelete: Cascade)
-  rank    Int
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  valueId   String
+  value     Value    @relation(fields: [valueId], references: [id], onDelete: Cascade)
+  rank      Int
   createdAt DateTime @default(now())
+
   @@unique([userId, valueId])
   @@index([userId, rank])
   @@map("value_rankings")
 }
 
 model ValueConflict {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  valueAId  String
-  valueBId  String
-  context   String   @default("")
-  resolution String  @default("")
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  valueAId   String
+  valueBId   String
+  context    String   @default("")
+  resolution String   @default("")
+  createdAt  DateTime @default(now())
+
   @@index([userId])
   @@map("value_conflicts")
 }
@@ -426,18 +453,20 @@ model ModelConnection {
   toModel     MentalModel @relation("toModel", fields: [toModelId], references: [id], onDelete: Cascade)
   relation    String      @default("relates_to") // reinforces | contradicts | composes
   createdAt   DateTime    @default(now())
+
   @@unique([fromModelId, toModelId, relation])
   @@map("model_connections")
 }
 
 model ModelUsageLog {
-  id        String      @id @default(cuid())
-  userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  modelId   String
-  model     MentalModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
-  context   String      @default("") // where it was applied (often a decision)
-  date      DateTime    @default(now())
+  id      String      @id @default(cuid())
+  userId  String
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  modelId String
+  model   MentalModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  context String      @default("") // where it was applied (often a decision)
+  date    DateTime    @default(now())
+
   @@index([userId, date])
   @@index([modelId])
   @@map("model_usage_logs")
@@ -456,116 +485,124 @@ model FirstPrincipleMap {
   assumptions Assumption[]
   rootCauses  RootCause[]
   constraints Constraint[]
+
   @@index([userId])
   @@map("first_principle_maps")
 }
 
 model Assumption {
-  id        String   @id @default(cuid())
+  id        String             @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   mapId     String?
   map       FirstPrincipleMap? @relation(fields: [mapId], references: [id], onDelete: SetNull)
   statement String
   valid     Boolean? // null = untested; result of the "assumption killer"
-  createdAt DateTime @default(now())
+  createdAt DateTime           @default(now())
+
   @@index([userId])
   @@map("assumptions")
 }
 
 model RootCause {
-  id        String   @id @default(cuid())
+  id        String             @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   mapId     String?
   map       FirstPrincipleMap? @relation(fields: [mapId], references: [id], onDelete: SetNull)
   cause     String
-  depth     Int      @default(1) // 5-whys depth
-  createdAt DateTime @default(now())
+  depth     Int                @default(1) // 5-whys depth
+  createdAt DateTime           @default(now())
+
   @@index([userId])
   @@map("root_causes")
 }
 
 model Constraint {
-  id        String   @id @default(cuid())
+  id        String             @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   mapId     String?
   map       FirstPrincipleMap? @relation(fields: [mapId], references: [id], onDelete: SetNull)
   statement String
-  kind      String   @default("PHYSICAL") // PHYSICAL | ECONOMIC | REGULATORY | SELF_IMPOSED
-  createdAt DateTime @default(now())
+  kind      String             @default("PHYSICAL") // PHYSICAL | ECONOMIC | REGULATORY | SELF_IMPOSED
+  createdAt DateTime           @default(now())
+
   @@index([userId])
   @@map("constraints")
 }
 
 // ──────────────── ENGINE 7: Decisions (Layer 3/4) ────────────────
 model Decision {
-  id        String         @id @default(cuid())
-  userId    String
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  context   String         @default("")
-  status    DecisionStatus @default(DRAFT)
-  quality   Float?
-  reversible Boolean       @default(true)
-  createdAt DateTime       @default(now())
+  id         String         @id @default(cuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String
+  context    String         @default("")
+  status     DecisionStatus @default(DRAFT)
+  quality    Float?
+  reversible Boolean        @default(true)
+  createdAt  DateTime       @default(now())
 
   options DecisionOption[]
   reviews DecisionReview[]
+
   @@index([userId])
   @@map("decisions")
 }
 
 model DecisionOption {
-  id         String   @id @default(cuid())
+  id         String           @id @default(cuid())
   decisionId String
-  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  decision   Decision         @relation(fields: [decisionId], references: [id], onDelete: Cascade)
   label      String
-  chosen     Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  reviews DecisionReview[]
+  chosen     Boolean          @default(false)
+  createdAt  DateTime         @default(now())
+  reviews    DecisionReview[]
+
   @@index([decisionId])
   @@map("decision_options")
 }
 
 model DecisionReview {
-  id             String   @id @default(cuid())
-  decisionId     String
-  decision       Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
-  optionId       String?
-  option         DecisionOption? @relation(fields: [optionId], references: [id], onDelete: Cascade)
-  missionFit     Float    @default(0)
-  identityFit    Float    @default(0)
-  valueFit       Float    @default(0)
-  expectedValue  Float    @default(0) // 0..1 normalized
-  opportunityCost Float   @default(0)
-  secondOrder    Float    @default(0) // 0..1 quality of 2nd-order thinking
-  risk           Float    @default(0)
-  reversibility  Float    @default(0.5)
-  shadowMotive   Float    @default(0) // penalty
-  quality        Float    @default(0) // composite
-  note           String   @default("")
-  createdAt      DateTime @default(now())
+  id              String          @id @default(cuid())
+  decisionId      String
+  decision        Decision        @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  optionId        String?
+  option          DecisionOption? @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  missionFit      Float           @default(0)
+  identityFit     Float           @default(0)
+  valueFit        Float           @default(0)
+  expectedValue   Float           @default(0) // 0..1 normalized
+  opportunityCost Float           @default(0)
+  secondOrder     Float           @default(0) // 0..1 quality of 2nd-order thinking
+  risk            Float           @default(0)
+  reversibility   Float           @default(0.5)
+  shadowMotive    Float           @default(0) // penalty
+  quality         Float           @default(0) // composite
+  note            String          @default("")
+  createdAt       DateTime        @default(now())
+
   @@index([decisionId])
   @@map("decision_reviews")
 }
 
 // ──────────────── ENGINE 8: Excellence Modeling — Dilts (Layer 3) ────────────────
 model RoleModel {
-  id        String         @id @default(cuid())
-  userId    String
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  person    String
-  archetype ModelArchetype @default(CUSTOM)
-  values    String         @default("")
-  beliefs   String         @default("")
-  environment String       @default("")
-  createdAt DateTime       @default(now())
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  person      String
+  archetype   ModelArchetype @default(CUSTOM)
+  values      String         @default("")
+  beliefs     String         @default("")
+  environment String         @default("")
+  createdAt   DateTime       @default(now())
 
   identityPatterns IdentityPattern[]
   decisionPatterns DecisionPattern[]
   habitPatterns    HabitPattern[]
+
   @@index([userId])
   @@map("role_models")
 }
@@ -575,6 +612,7 @@ model IdentityPattern {
   roleModelId String
   roleModel   RoleModel @relation(fields: [roleModelId], references: [id], onDelete: Cascade)
   pattern     String
+
   @@index([roleModelId])
   @@map("identity_patterns")
 }
@@ -584,6 +622,7 @@ model DecisionPattern {
   roleModelId String
   roleModel   RoleModel @relation(fields: [roleModelId], references: [id], onDelete: Cascade)
   rule        String
+
   @@index([roleModelId])
   @@map("decision_patterns")
 }
@@ -593,6 +632,7 @@ model HabitPattern {
   roleModelId String
   roleModel   RoleModel @relation(fields: [roleModelId], references: [id], onDelete: Cascade)
   habit       String
+
   @@index([roleModelId])
   @@map("habit_patterns")
 }
@@ -610,6 +650,7 @@ model Habit {
 
   logs          HabitLog[]
   identityLinks HabitIdentityLink[]
+
   @@index([userId])
   @@map("habits")
 }
@@ -622,6 +663,7 @@ model HabitLog {
   done         Boolean  @default(true)
   identityNote String   @default("")
   createdAt    DateTime @default(now())
+
   @@index([habitId, date])
   @@map("habit_logs")
 }
@@ -633,6 +675,7 @@ model HabitIdentityLink {
   identityId String
   identity   Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+
   @@unique([habitId, identityId])
   @@index([habitId])
   @@map("habit_identity_links")
@@ -649,32 +692,35 @@ model ShadowPattern {
 
   events        ShadowEvent[]
   interventions Intervention[]
+
   @@index([userId, type])
   @@map("shadow_patterns")
 }
 
 model ShadowEvent {
-  id        String        @id @default(cuid())
+  id        String         @id @default(cuid())
   userId    String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   patternId String?
   pattern   ShadowPattern? @relation(fields: [patternId], references: [id], onDelete: SetNull)
   type      ShadowType
-  trigger   String        @default("")
-  severity  Float         @default(0.5)
-  date      DateTime      @default(now())
+  trigger   String         @default("")
+  severity  Float          @default(0.5)
+  date      DateTime       @default(now())
+
   @@index([userId, date])
   @@map("shadow_events")
 }
 
 model Intervention {
-  id        String        @id @default(cuid())
+  id        String         @id @default(cuid())
   userId    String
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   patternId String?
   pattern   ShadowPattern? @relation(fields: [patternId], references: [id], onDelete: SetNull)
   action    String
-  createdAt DateTime      @default(now())
+  createdAt DateTime       @default(now())
+
   @@index([userId])
   @@map("interventions")
 }
@@ -691,19 +737,21 @@ model Reflection {
   wrongAssumptions   String   @default("")
   identityReinforced String   @default("")
   depth              Float    @default(0.5)
-  lessons Lesson[]
+  lessons            Lesson[]
+
   @@index([userId, date])
   @@map("reflections")
 }
 
 model Lesson {
-  id           String   @id @default(cuid())
+  id           String      @id @default(cuid())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   reflectionId String?
   reflection   Reflection? @relation(fields: [reflectionId], references: [id], onDelete: SetNull)
   text         String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime    @default(now())
+
   @@index([userId])
   @@map("lessons")
 }
@@ -717,6 +765,7 @@ model Review {
   summary   String       @default("")
   metrics   Json?
   createdAt DateTime     @default(now())
+
   @@unique([userId, period, periodKey])
   @@index([userId, period])
   @@map("reviews")
@@ -733,20 +782,22 @@ model Skill {
 
   masteryLevel MasteryLevel?
   progress     SkillProgress[]
+
   @@index([userId])
   @@map("skills")
 }
 
 model MasteryLevel {
-  id           String       @id @default(cuid())
-  skillId      String       @unique
-  skill        Skill        @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  stage        MasteryStage @default(NOVICE)
-  knowledge    Float        @default(0)
-  execution    Float        @default(0)
-  problemSolving Float      @default(0)
-  teaching     Float        @default(0)
-  updatedAt    DateTime     @updatedAt
+  id             String       @id @default(cuid())
+  skillId        String       @unique
+  skill          Skill        @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  stage          MasteryStage @default(NOVICE)
+  knowledge      Float        @default(0)
+  execution      Float        @default(0)
+  problemSolving Float        @default(0)
+  teaching       Float        @default(0)
+  updatedAt      DateTime     @updatedAt
+
   @@map("mastery_levels")
 }
 
@@ -757,21 +808,23 @@ model SkillProgress {
   note    String   @default("")
   delta   Float    @default(0)
   date    DateTime @default(now())
+
   @@index([skillId, date])
   @@map("skill_progress")
 }
 
 // ──────────────── ENGINE 13: Leadership (Layer 4) ────────────────
 model LeadershipMetric {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  communication Float  @default(0) // 0..1
-  influence   Float    @default(0)
-  delegation  Float    @default(0)
-  teamBuilding Float   @default(0)
-  decisionQuality Float @default(0)
-  date        DateTime @default(now())
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  communication   Float    @default(0) // 0..1
+  influence       Float    @default(0)
+  delegation      Float    @default(0)
+  teamBuilding    Float    @default(0)
+  decisionQuality Float    @default(0)
+  date            DateTime @default(now())
+
   @@index([userId, date])
   @@map("leadership_metrics")
 }
@@ -783,6 +836,7 @@ model InfluenceLog {
   who       String   @default("")
   outcome   String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("influence_logs")
 }
@@ -796,6 +850,7 @@ model LegacyProject {
   kind      String   @default("INSTITUTION")
   impact    String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("legacy_projects")
 }
@@ -807,6 +862,7 @@ model Mentee {
   name      String
   focus     String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("mentees")
 }
@@ -819,6 +875,7 @@ model KnowledgeAsset {
   type      String   @default("ARTICLE")
   url       String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("knowledge_assets")
 }
@@ -832,6 +889,7 @@ model ScoreSnapshot {
   value  Float
   detail Json?
   date   DateTime  @default(now())
+
   @@index([userId, kind, date])
   @@map("score_snapshots")
 }
@@ -846,6 +904,7 @@ model DomainEvent {
   payload       Json
   version       Int      @default(1)
   occurredAt    DateTime @default(now())
+
   @@index([userId, occurredAt])
   @@index([aggregateType, aggregateId])
   @@map("domain_events")
@@ -883,6 +942,7 @@ model LimitingBelief {
   trigger   String   @default("")
   cost      String   @default("")
   createdAt DateTime @default(now())
+
   @@map("limiting_beliefs")
 }
 
@@ -892,6 +952,7 @@ model EmpoweringBelief {
   belief    Belief   @relation(fields: [beliefId], references: [id], onDelete: Cascade)
   evidence  String   @default("")
   createdAt DateTime @default(now())
+
   @@map("empowering_beliefs")
 }
 
@@ -903,6 +964,7 @@ model BeliefReframe {
   empoweringText String   @default("")
   action         String   @default("")
   createdAt      DateTime @default(now())
+
   @@index([beliefId])
   @@map("belief_reframes")
 }
@@ -916,6 +978,7 @@ model BeliefChangeLog {
   toType    BeliefType
   note      String     @default("")
   createdAt DateTime   @default(now())
+
   @@index([userId])
   @@map("belief_change_logs")
 }
@@ -930,6 +993,7 @@ model DigitalTwinProfile {
   summary   String   @default("")
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
+
   @@map("digital_twin_profiles")
 }
 
@@ -941,6 +1005,7 @@ model TwinMemory {
   content   String
   weight    Float    @default(0.5)
   createdAt DateTime @default(now())
+
   @@index([userId, createdAt])
   @@map("twin_memories")
 }
@@ -952,19 +1017,21 @@ model TwinInsight {
   insight   String
   basis     String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId, createdAt])
   @@map("twin_insights")
 }
 
 model DriftPrediction {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  risk        Float    @default(0) // 0..1 identity-drift risk
-  fromIdentity String  @default("")
-  towardIdentity String @default("")
-  rationale   String   @default("")
-  createdAt   DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  risk           Float    @default(0) // 0..1 identity-drift risk
+  fromIdentity   String   @default("")
+  towardIdentity String   @default("")
+  rationale      String   @default("")
+  createdAt      DateTime @default(now())
+
   @@index([userId, createdAt])
   @@map("drift_predictions")
 }
@@ -982,64 +1049,68 @@ model Genius {
   createdAt DateTime @default(now())
 
   strategies GeniusStrategy[]
+
   @@map("geniuses")
 }
 
 model GeniusStrategy {
-  id           String   @id @default(cuid())
-  geniusId     String
-  genius       Genius   @relation(fields: [geniusId], references: [id], onDelete: Cascade)
-  name         String
-  description  String   @default("")
+  id              String   @id @default(cuid())
+  geniusId        String
+  genius          Genius   @relation(fields: [geniusId], references: [id], onDelete: Cascade)
+  name            String
+  description     String   @default("")
   // [{ step, system: "V"|"A"|"K"|"Ad", description }]
-  repSequence  Json?
+  repSequence     Json?
   // { test, operate, testExit, exit } — the T.O.T.E. control loop
-  tote         Json?
+  tote            Json?
   // High-leverage logical levels (the point of leverage is identity/values/beliefs)
-  identity     String   @default("")
-  beliefs      String   @default("")
-  values       String   @default("")
-  capabilities String   @default("")
-  highLeverage String   @default("")
+  identity        String   @default("")
+  beliefs         String   @default("")
+  values          String   @default("")
+  capabilities    String   @default("")
+  highLeverage    String   @default("")
   // Full Excellence Blueprint dimensions (reverse-engineering "how", not biography)
-  creativeProcess String @default("")
-  learningProcess String @default("")
-  feedbackProcess String @default("")
-  shadowPatterns  String @default("")
-  failureModes    String @default("")
+  creativeProcess String   @default("")
+  learningProcess String   @default("")
+  feedbackProcess String   @default("")
+  shadowPatterns  String   @default("")
+  failureModes    String   @default("")
   // string[] — how a user installs/practices this strategy
   installProtocol Json?
-  createdAt    DateTime @default(now())
+  createdAt       DateTime @default(now())
 
-  adoptions StrategyAdoption[]
+  adoptions   StrategyAdoption[]
   adaptations BlueprintAdaptation[]
+
   @@index([geniusId])
   @@map("genius_strategies")
 }
 
 model StrategyAdoption {
-  id         String   @id @default(cuid())
+  id         String         @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   strategyId String
   strategy   GeniusStrategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
-  status     String   @default("ADOPTED") // ADOPTED | PRACTICING | INTEGRATED
-  note       String   @default("")
-  createdAt  DateTime @default(now())
+  status     String         @default("ADOPTED") // ADOPTED | PRACTICING | INTEGRATED
+  note       String         @default("")
+  createdAt  DateTime       @default(now())
 
   logs GeniusPracticeLog[]
+
   @@unique([userId, strategyId])
   @@index([userId])
   @@map("strategy_adoptions")
 }
 
 model GeniusPracticeLog {
-  id         String   @id @default(cuid())
+  id         String           @id @default(cuid())
   adoptionId String
   adoption   StrategyAdoption @relation(fields: [adoptionId], references: [id], onDelete: Cascade)
-  reflection String   @default("")
-  fidelity   Float    @default(0.5) // how faithfully the strategy was reproduced, 0..1
-  date       DateTime @default(now())
+  reflection String           @default("")
+  fidelity   Float            @default(0.5) // how faithfully the strategy was reproduced, 0..1
+  date       DateTime         @default(now())
+
   @@index([adoptionId, date])
   @@map("genius_practice_logs")
 }
@@ -1047,52 +1118,55 @@ model GeniusPracticeLog {
 // ──────────────── Excellence Reverse Engineering: adaptation + learning path ────────────────
 // Persona Adaptation: convert a genius blueprint into a blueprint adapted to THIS user.
 model BlueprintAdaptation {
-  id               String   @id @default(cuid())
-  userId           String
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  strategyId       String
-  strategy         GeniusStrategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
-  title            String   // e.g. "Leonardo-inspired Research Architect"
-  identity         String   @default("")
-  beliefs          String   @default("")
-  values           String   @default("")
-  decisionRules    Json?    // string[]
-  habits           Json?    // string[]
-  creativeProcess  String   @default("")
-  summary          String   @default("")
-  createdAt        DateTime @default(now())
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  strategyId      String
+  strategy        GeniusStrategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+  title           String // e.g. "Leonardo-inspired Research Architect"
+  identity        String         @default("")
+  beliefs         String         @default("")
+  values          String         @default("")
+  decisionRules   Json? // string[]
+  habits          Json? // string[]
+  creativeProcess String         @default("")
+  summary         String         @default("")
+  createdAt       DateTime       @default(now())
 
   paths LearningPath[]
+
   @@index([userId])
   @@map("blueprint_adaptations")
 }
 
 // Excellence Learning Loop: Observe → Imitate → Practice → Internalize → Adapt → Create → Teach.
 model LearningPath {
-  id           String   @id @default(cuid())
+  id           String               @id @default(cuid())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   adaptationId String?
   adaptation   BlueprintAdaptation? @relation(fields: [adaptationId], references: [id], onDelete: SetNull)
   strategyId   String?
   title        String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime             @default(now())
 
   steps LearningStep[]
+
   @@index([userId])
   @@map("learning_paths")
 }
 
 model LearningStep {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   pathId    String
   path      LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
-  stage     String   // OBSERVE | IMITATE | PRACTICE | INTERNALIZE | ADAPT | CREATE | TEACH
-  order     Int      @default(0)
-  action    String   @default("")
-  done      Boolean  @default(false)
+  stage     String // OBSERVE | IMITATE | PRACTICE | INTERNALIZE | ADAPT | CREATE | TEACH
+  order     Int          @default(0)
+  action    String       @default("")
+  done      Boolean      @default(false)
   doneAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime     @default(now())
+
   @@index([pathId, order])
   @@map("learning_steps")
 }
@@ -1107,50 +1181,57 @@ model CommunityPost {
   createdAt DateTime @default(now())
 
   comments PostComment[]
+
   @@index([userId])
   @@index([createdAt])
   @@map("community_posts")
 }
 
 model PostComment {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   postId    String
   post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   content   String
-  createdAt DateTime @default(now())
+  createdAt DateTime      @default(now())
+
   @@index([postId, createdAt])
   @@map("post_comments")
 }
 
 // ──────────────── Membership / Subscription ────────────────
 model Membership {
-  id        String        @id @default(cuid())
-  userId    String        @unique
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tier      MemberTier    @default(FREE)
+  id        String         @id @default(cuid())
+  userId    String         @unique
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier      MemberTier     @default(FREE)
   period    BillingPeriod?
-  status    String        @default("ACTIVE") // ACTIVE | EXPIRED | CANCELLED
-  startedAt DateTime      @default(now())
+  status    String         @default("ACTIVE") // ACTIVE | EXPIRED | CANCELLED
+  startedAt DateTime       @default(now())
   expiresAt DateTime?
-  updatedAt DateTime      @updatedAt
+  updatedAt DateTime       @updatedAt
+
   @@map("memberships")
 }
 
 model MembershipOrder {
-  id         String            @id @default(cuid())
-  userId     String
-  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tier       MemberTier
-  period     BillingPeriod
-  amount     Decimal           @db.Decimal(10, 2)
-  currency   String            @default("CNY")
-  status     MemberOrderStatus @default(CREATED)
-  provider   String            @default("mock") // mock | alipay | wechat
-  outTradeNo String            @unique
-  createdAt  DateTime          @default(now())
-  paidAt     DateTime?
+  id                    String            @id @default(cuid())
+  userId                String
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier                  MemberTier
+  period                BillingPeriod
+  amount                Decimal           @db.Decimal(10, 2)
+  currency              String            @default("CNY")
+  status                MemberOrderStatus @default(CREATED)
+  provider              String            @default("mock") // mock | alipay | wechat
+  outTradeNo            String            @unique
+  providerTransactionId String?           @unique
+  paymentPayloadHash    String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  paidAt                DateTime?
+
   @@index([userId])
   @@map("membership_orders")
 }

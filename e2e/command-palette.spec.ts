@@ -4,6 +4,7 @@ const PALETTE = /command palette|命令面板/i;
 
 test("command palette (⌘K) opens, filters, jumps, and closes", async ({ page }) => {
   await page.goto("/dashboard");
+  await expect(page.locator("html")).toHaveAttribute("data-command-palette-ready", "true");
 
   // Open via keyboard shortcut (component listens for meta OR ctrl + k).
   await page.keyboard.press("Control+k");
@@ -11,8 +12,8 @@ test("command palette (⌘K) opens, filters, jumps, and closes", async ({ page }
   await expect(dialog).toBeVisible();
 
   // Filtering by route narrows the list, Enter opens the top hit.
-  await page.getByRole("textbox", { name: /jump to any page|跳转到任意页面/i }).fill("naval");
-  await expect(dialog.getByRole("option").first()).toBeVisible();
+  await page.getByRole("combobox", { name: /jump to any page|跳转到任意页面/i }).fill("naval");
+  await expect(dialog.getByRole("option").first()).toContainText("/naval");
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/naval/);
 

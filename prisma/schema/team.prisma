@@ -3,14 +3,18 @@
 // Denormalized-ish; membership entitlement is resolved fail-safe in membership/service.ts.
 
 model Team {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   name       String
   ownerId    String
-  seats      Int      @default(5)
-  grantsTier String   @default("PRO")
-  status     String   @default("ACTIVE") // ACTIVE | EXPIRED | CANCELLED
+  owner      User      @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  seats      Int       @default(5)
+  grantsTier String    @default("PRO")
+  status     String    @default("ACTIVE") // ACTIVE | EXPIRED | CANCELLED
   expiresAt  DateTime?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
+
+  members           TeamMember[]
+  foundryWorkspaces FoundryWorkspace[]
 
   @@index([ownerId])
   @@map("teams")
@@ -19,7 +23,9 @@ model Team {
 model TeamMember {
   id        String   @id @default(cuid())
   teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   role      String   @default("member") // owner | member
   createdAt DateTime @default(now())
 

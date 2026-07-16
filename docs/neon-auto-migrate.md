@@ -1,13 +1,44 @@
 # Neon migrations
 
-Production Neon is migrated **automatically by Vercel**. The `vercel-build` script runs:
+Production Neon is migrated automatically after every push to `main`.
+
+The GitHub Actions `Deploy migrations to Neon` job waits for type checks, unit
+tests, a clean-database build, clinical gates, dependency audit, and production
+E2E to pass. It then runs:
+
+```bash
+prisma migrate deploy
+prisma migrate status
+```
+
+against the production database. Pull requests cannot run this job and never
+receive the production secret.
+
+## One-time GitHub setup
+
+1. In the Neon console, copy the **direct** connection string (hostname must not
+   contain `-pooler`). Prisma Migrate requires a direct connection.
+2. In GitHub, use the existing `Production` Environment and add an environment secret
+   named `NEON_DIRECT_URL`.
+3. Protect the `Production` Environment with required reviewers if your release
+   policy requires manual approval.
+4. Keep the pooled Neon URL in the application host as `DATABASE_URL`; never put
+   either URL in source control.
+
+The workflow serializes `main` pushes and does not cancel a migration in
+progress. A missing or pooled `NEON_DIRECT_URL` fails closed before touching the
+database. Production is never seeded automatically.
+
+Vercel remains a second fail-safe. The `vercel-build` script runs:
 
 ```
 prisma generate && prisma migrate deploy && next build
 ```
 
-so on every deploy, any new migration under `prisma/migrations/` is applied to the Neon
-database configured in the Vercel project before the new code goes live. No git hook is used.
+so a Vercel Git deployment cannot publish application code against a missing
+schema even if its deployment races the GitHub release gate. `migrate deploy`
+only applies pending migrations, so the second invocation is a no-op after a
+successful GitHub deployment.
 
 > The build now **fails** if `migrate deploy` fails. Previously it was
 > `prisma migrate deploy || echo "…"`, which swallowed the error and let deploys ship
@@ -18,38 +49,33 @@ database configured in the Vercel project before the new code goes live. No git 
 `prisma/migrations/migration_lock.toml` (`provider = "postgresql"`) must exist, or Prisma
 reports *"No migration found in prisma/migrations"* and applies nothing. It is now committed.
 
-## Clear the P3009 failure on prod Neon (one time, if present)
+## One-time legacy production baseline
 
-A failed row `20260618062503_add_healing_os` blocks `migrate deploy`. It's a local attempt
-that was deleted and recreated on disk as `20260618130000_add_healing_os`. Until it's cleared,
-the migrate step fails on every deploy — and that now fails the whole Vercel build.
+The original Neon production database was created before Prisma migration
+history was enforced. It had business tables but no `_prisma_migrations` table,
+and it was missing several later modules. Running `migrate deploy` directly in
+that state would try to replay the initial migration over existing tables.
 
-Run against prod Neon (export its strings locally, or run in a Vercel shell):
+Before the first automated `main` deployment:
 
-```bash
-export DIRECT_URL="<prod Neon direct>" DATABASE_URL="<prod Neon pooled>"
-npx prisma migrate status                                                # applied / pending / failed
-# if 062503 shows as failed:
-npx prisma migrate resolve --rolled-back 20260618062503_add_healing_os
-```
+1. Generate a read-only Prisma schema diff from production to the current
+   datamodel.
+2. Apply the alignment SQL to an isolated Neon branch and verify data counts,
+   constraints, and a zero Prisma schema diff.
+3. Apply the tested alignment to the Neon main branch through the Neon migration
+   approval workflow.
+4. Mark every migration already represented by that aligned schema as applied
+   with `prisma migrate resolve --applied <migration-name>`.
+5. Confirm `prisma migrate status` reports the database is up to date.
 
-Then handle `20260618130000_add_healing_os` based on whether its 16 tables already exist
-(the migration uses plain `CREATE TABLE`, so a partial apply can collide):
-
-```bash
-npx prisma db execute --url "$DIRECT_URL" --stdin <<< "SELECT to_regclass('public.safety_triage_events');"
-```
-
-- **NULL (absent):** the next deploy's `migrate deploy` applies it.
-- **All 16 already present** (prior `db push`): `npx prisma migrate resolve --applied 20260618130000_add_healing_os`.
-- **Partial:** drop the stray healing tables, then let deploy apply it.
-
-Verify: `npx prisma migrate status` → *"Database schema is up to date!"*
+The GitHub job contains a fail-closed guard: if `users` exists but
+`_prisma_migrations` does not, it stops before `migrate deploy` can touch the
+database. A genuinely empty database is still allowed to run all migrations.
 
 ## Daily flow
 
 ```bash
 npm run db:migrate        # create a migration locally (docker)
 git commit -am "…"
-git push                  # Vercel-connected branch → Vercel applies it to Neon on deploy
+git push                  # main CI gates → Neon migration; Vercel also fails closed
 ```

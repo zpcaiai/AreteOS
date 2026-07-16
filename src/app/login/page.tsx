@@ -11,19 +11,26 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setError(""); setBusy(true);
+    setError(""); setNotice(""); setBusy(true);
     try {
       const res = await fetch(`/api/auth/${mode}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(mode === "register" ? { email, password, name } : { email, password }),
+        body: JSON.stringify(mode === "register" ? { email, password, name, acceptTerms } : { email, password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t("login.failed"));
+      if (data.verificationRequired) {
+        setNotice("账户已创建。请查收验证邮件后再登录。");
+        setMode("login");
+        return;
+      }
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
@@ -43,7 +50,12 @@ export default function LoginPage() {
           <input className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" placeholder={t("login.name")} aria-label={t("login.name")} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
         )}
         <input className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" type="email" placeholder={t("login.email")} aria-label={t("login.email")} autoComplete="email" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" type="password" placeholder={t("login.password")} aria-label={t("login.password")} autoComplete={mode === "register" ? "new-password" : "current-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+        <input className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" type="password" placeholder={mode === "register" ? "密码（至少 12 位）" : t("login.password")} aria-label={t("login.password")} autoComplete={mode === "register" ? "new-password" : "current-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={mode === "register" ? 12 : 1} />
+        {mode === "register" && <label className="flex items-start gap-2 text-xs leading-5 text-slate-400">
+          <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} required className="mt-1 accent-indigo-500" />
+          <span>我已阅读并同意 <a href="/terms" className="text-indigo-300 hover:underline">服务条款</a> 与 <a href="/privacy" className="text-indigo-300 hover:underline">隐私政策</a>。</span>
+        </label>}
+        {notice && <p role="status" className="text-sm text-emerald-400">{notice}</p>}
         {error && <p className="text-sm text-rose-400">{error}</p>}
         <button disabled={busy} className="w-full rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium disabled:opacity-50">
           {busy ? t("login.busy") : mode === "login" ? t("login.login") : t("login.register")}
@@ -52,6 +64,7 @@ export default function LoginPage() {
       <button onClick={() => setMode(mode === "login" ? "register" : "login")} className="mt-4 text-sm text-indigo-400">
         {mode === "login" ? t("login.toRegister") : t("login.toLogin")}
       </button>
+      {mode === "login" && <a href="/forgot-password" className="float-right mt-4 text-sm text-slate-400 hover:text-indigo-300">忘记密码？</a>}
     </div>
   );
 }

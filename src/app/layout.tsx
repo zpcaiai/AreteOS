@@ -80,9 +80,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Providers>
           <I18nProvider locale={locale} dict={dict}>
             <CommandPalette />
-            <div className="flex min-h-screen">
+            <div className="flex min-h-screen flex-col lg:flex-row">
               <Sidebar />
-              <main id="main" className="flex-1 overflow-y-auto p-5 lg:p-8">
+              <main id="main" className="min-w-0 w-full flex-1 overflow-y-auto p-5 lg:w-auto lg:p-8">
                 <div className="mx-auto w-full max-w-6xl">
                   <PageTransition>{children}</PageTransition>
                   <Disclaimer />

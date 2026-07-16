@@ -9,6 +9,7 @@ import { defineConfig } from "prisma/config";
 export default defineConfig({
   schema: path.join("prisma", "schema"),
   migrations: {
+    path: path.join("prisma", "migrations"),
     seed: "tsx prisma/seed.ts && tsx prisma/seed-genius.ts && tsx prisma/seed-identity.ts && tsx prisma/seed-cognitive.ts && tsx prisma/seed-worldview.ts && tsx prisma/seed-audiobooks.ts && tsx prisma/seed-emporion.ts && tsx prisma/seed-naval.ts",
   },
 });

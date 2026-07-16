@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FOUNDRY_FEATURES, STARTER_PACKS, WORKSPACE_TEMPLATES } from "../src/lib/project-foundry-catalog";
+import { FOUNDRY_FEATURES, STARTER_PACKS, WORKSPACE_TEMPLATE_CATEGORIES, WORKSPACE_TEMPLATES } from "../src/lib/project-foundry-catalog";
 import { buildProjectBlueprint, expandFeatureDependencies } from "../src/lib/project-foundry-blueprint";
 
 describe("Project Foundry", () => {
@@ -12,7 +12,8 @@ describe("Project Foundry", () => {
   });
 
   it("offers complete, ready-to-edit workspaces across the capability catalog", () => {
-    expect(WORKSPACE_TEMPLATES.length).toBeGreaterThanOrEqual(10);
+    expect(WORKSPACE_TEMPLATES.length).toBeGreaterThanOrEqual(80);
+    expect(new Set(WORKSPACE_TEMPLATES.map((template) => template.id)).size).toBe(WORKSPACE_TEMPLATES.length);
     const covered = new Set(WORKSPACE_TEMPLATES.flatMap((template) => template.featureIds));
     for (const feature of FOUNDRY_FEATURES) expect(covered.has(feature.id)).toBe(true);
     for (const template of WORKSPACE_TEMPLATES) {
@@ -22,6 +23,15 @@ describe("Project Foundry", () => {
       expect(template.constraints.length).toBeGreaterThan(1);
       expect(template.featureIds.length).toBeGreaterThan(0);
     }
+  });
+
+  it("keeps every business category populated with granular scenarios", () => {
+    for (const category of Object.keys(WORKSPACE_TEMPLATE_CATEGORIES)) {
+      const templates = WORKSPACE_TEMPLATES.filter((template) => template.category === category);
+      expect(templates.length, category).toBeGreaterThanOrEqual(4);
+    }
+    const detailed = WORKSPACE_TEMPLATES.filter((template) => template.scenario && template.scale);
+    expect(detailed.length).toBeGreaterThanOrEqual(30);
   });
 
   it("includes the core enterprise business templates", () => {

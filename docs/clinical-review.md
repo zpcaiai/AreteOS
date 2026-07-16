@@ -33,8 +33,9 @@ recorded on the module in `review-registry.ts` (`expertReview: "reviewed"`), whi
 its status in the `/admin` "Clinical review" card and in `expertReviewStatus()`.
 
 Current coverage is intentionally honest: only `/safety` is marked reviewed; the rest are
-`pending` until a clinician signs off. This is **tracked, not blocking** — the automated
-safety essentials above are the hard gate.
+`pending` until a clinician signs off. Pending routes and APIs are **fail-closed in
+production by default** in `src/middleware.ts`. A controlled, non-paid preview may set
+`CLINICAL_PREVIEW_ENABLED=true`; this must not be enabled for the default or paid experience.
 
 ## How to record a review
 1. Clinician reviews the module against the checklist above.

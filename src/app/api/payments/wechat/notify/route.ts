@@ -9,8 +9,8 @@ export async function POST(req: Request) {
     if (!notification.paid) return ok({ ok: true, ignored: true });
 
     const order = notification.outTradeNo.startsWith("EMP")
-      ? await payAndFulfillByOutTradeNo(notification.outTradeNo)
-      : (await activateOrderByOutTradeNo(notification.outTradeNo)).order;
-    return ok({ ok: true, order });
+      ? await payAndFulfillByOutTradeNo(notification)
+      : (await activateOrderByOutTradeNo(notification)).order;
+    return ok({ code: "SUCCESS", message: "成功", orderId: order.id });
   });
 }

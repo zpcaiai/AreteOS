@@ -20,22 +20,22 @@ enum StoreOrderStatus {
 }
 
 model VirtualProduct {
-  id          String      @id @default(cuid())
-  slug        String      @unique
-  name        String
-  description String      @default("")
-  kind        ProductKind
-  price       Decimal     @db.Decimal(10, 2)
-  currency    String      @default("CNY")
+  id              String      @id @default(cuid())
+  slug            String      @unique
+  name            String
+  description     String      @default("")
+  kind            ProductKind
+  price           Decimal     @db.Decimal(10, 2)
+  currency        String      @default("CNY")
   // Fulfillment payload (exactly one group applies, by kind):
   grantTier       MemberTier? // MEMBERSHIP_DAYS: which tier the days extend
-  grantDays       Int     @default(0)
-  grantCredits    Int     @default(0) // CREDITS
-  grantContentKey String  @default("") // CONTENT
-  active      Boolean     @default(true)
-  sortOrder   Int         @default(0)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  grantDays       Int         @default(0)
+  grantCredits    Int         @default(0) // CREDITS
+  grantContentKey String      @default("") // CONTENT
+  active          Boolean     @default(true)
+  sortOrder       Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   orders StoreOrder[]
 
@@ -45,22 +45,24 @@ model VirtualProduct {
 }
 
 model StoreOrder {
-  id          String           @id @default(cuid())
-  userId      String
-  productId   String
-  product     VirtualProduct   @relation(fields: [productId], references: [id], onDelete: Restrict)
-  productName String // snapshot at purchase time
-  quantity    Int              @default(1)
-  amount      Decimal          @db.Decimal(10, 2)
-  currency    String           @default("CNY")
-  status      StoreOrderStatus @default(CREATED)
-  provider    String           @default("mock")
-  outTradeNo  String           @unique
-  paidAt      DateTime?
-  deliveredAt DateTime? // 虚拟商品: 与 paidAt 同刻 (instant delivery)
-  deliveryNote String          @default("")
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id                    String           @id @default(cuid())
+  userId                String
+  productId             String
+  product               VirtualProduct   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productName           String // snapshot at purchase time
+  quantity              Int              @default(1)
+  amount                Decimal          @db.Decimal(10, 2)
+  currency              String           @default("CNY")
+  status                StoreOrderStatus @default(CREATED)
+  provider              String           @default("mock")
+  outTradeNo            String           @unique
+  providerTransactionId String?          @unique
+  paymentPayloadHash    String?
+  paidAt                DateTime?
+  deliveredAt           DateTime? // 虚拟商品: 与 paidAt 同刻 (instant delivery)
+  deliveryNote          String           @default("")
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
 
   @@index([userId])
   @@index([status])

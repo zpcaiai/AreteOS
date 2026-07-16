@@ -17,21 +17,10 @@ export default function ServiceWorker() {
         .catch(() => undefined);
       return;
     }
-    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((registration) => {
-      registration.addEventListener("updatefound", () => {
-        const next = registration.installing;
-        if (!next) return;
-        next.addEventListener("statechange", () => {
-          if (next.state === "activated" && navigator.serviceWorker.controller) {
-            const key = "arete-sw-reloaded";
-            if (sessionStorage.getItem(key) !== "1") {
-              sessionStorage.setItem(key, "1");
-              window.location.reload();
-            }
-          }
-        });
-      });
-    }).catch(() => {
+    // Never force-reload an active page when an update installs. A reload can
+    // destroy unsaved form input or interrupt a payment/AI request. The new
+    // worker takes control safely and the next user navigation gets the update.
+    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => {
       /* offline support is progressive enhancement — never block the app */
     });
   }, []);

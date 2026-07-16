@@ -12,6 +12,16 @@ export const created = <T>(data: T) => NextResponse.json(data, { status: 201 });
 export const badRequest = (message: string) => NextResponse.json({ error: message }, { status: 400 });
 export const notFound = (message = "Not found") => NextResponse.json({ error: message }, { status: 404 });
 
+/** Reject cross-site browser writes. Webhooks must verify provider signatures instead. */
+export function requireSameOrigin(req: Request) {
+  const origin = req.headers.get("origin");
+  if (!origin && process.env.NODE_ENV !== "production") return;
+  const expected = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
+  if (!origin || new URL(origin).origin !== new URL(expected).origin) {
+    throw new HttpError(403, "Cross-site request rejected");
+  }
+}
+
 const MAX_JSON_BODY_CHARS = Number(process.env.MAX_JSON_BODY_CHARS ?? "24000");
 
 /** Parse + validate a JSON body; throws a Response on failure (catch in route). */
@@ -46,6 +56,6 @@ export function route<T>(handler: () => Promise<T>): Promise<T | NextResponse> {
     if (e instanceof NextResponse) return e;
     if (e instanceof HttpError) return NextResponse.json({ error: e.message }, { status: e.status });
     reportError(e, { surface: "api-route" });
-    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
+    return NextResponse.json({ error: process.env.NODE_ENV === "production" ? "Internal server error" : e instanceof Error ? e.message : String(e) }, { status: 500 });
   });
 }

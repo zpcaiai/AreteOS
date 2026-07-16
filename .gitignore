@@ -4,6 +4,8 @@ node_modules
 .env.local
 .env.migrate
 dist
+test-results/
+playwright-report/
 *.tsbuildinfo
 .env.production
 .env.production.local

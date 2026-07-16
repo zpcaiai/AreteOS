@@ -1,3 +1,5 @@
+import { EXTENDED_WORKSPACE_TEMPLATES } from "./project-foundry-templates-extended";
+
 // Project Foundry catalog: a composable map from the existing Arete engines to
 // shippable product capabilities. This file is deliberately pure data so the
 // catalog can later power a CLI/scaffolder as well as the in-app planner.
@@ -52,6 +54,10 @@ export interface WorkspaceTemplate {
   audience: string;
   constraints: string;
   featureIds: string[];
+  /** More precise context shown in the template browser. */
+  scenario?: { zh: string; en: string };
+  scale?: { zh: string; en: string };
+  keywords?: string[];
 }
 
 export type WorkspaceTemplateCategory =
@@ -151,7 +157,7 @@ export const STARTER_PACKS: StarterPack[] = [
  * They intentionally cover the whole capability catalog; users can change any
  * field or module after applying one.
  */
-export const WORKSPACE_TEMPLATES: WorkspaceTemplate[] = [
+const BASE_WORKSPACE_TEMPLATES: WorkspaceTemplate[] = [
   {
     id: "personal-90-day-reset", category: "personal", projectType: "personal",
     name: { zh: "90 天个人成长计划", en: "90-day personal growth plan" },
@@ -620,6 +626,11 @@ export const WORKSPACE_TEMPLATES: WorkspaceTemplate[] = [
     constraints: "遵守科研伦理、数据管理和成果署名规则；不替代学术评审；每个关键结论保留来源与复核记录。",
     featureIds: ["problem-framing", "knowledge-base", "knowledge-graph", "decision-journal", "role-based-workspaces", "audit-history", "analytics-observability"],
   },
+];
+
+export const WORKSPACE_TEMPLATES: WorkspaceTemplate[] = [
+  ...BASE_WORKSPACE_TEMPLATES,
+  ...EXTENDED_WORKSPACE_TEMPLATES,
 ];
 
 export const FEATURE_BY_ID = Object.fromEntries(FOUNDRY_FEATURES.map((feature) => [feature.id, feature]));

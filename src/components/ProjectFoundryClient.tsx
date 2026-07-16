@@ -26,6 +26,7 @@ interface FoundryData {
   workspaceTemplates: WorkspaceTemplate[];
   blueprints: ProjectBlueprint[];
   workspaces: ProjectWorkspace[];
+  teams: { id: string; name: string; role: string; memberCount: number; seats: number }[];
 }
 
 interface Form {
@@ -37,9 +38,10 @@ interface Form {
   projectType: ProjectType;
   selectedIds: string[];
   constraints: string;
+  teamId: string | null;
 }
 
-const emptyForm: Form = { title: "", problem: "", audience: "", projectType: "founder", selectedIds: [], constraints: "" };
+const emptyForm: Form = { title: "", problem: "", audience: "", projectType: "founder", selectedIds: [], constraints: "", teamId: null };
 
 function effortColor(effort: FoundryFeature["effort"]) {
   return effort === "S" ? "text-emerald-300" : effort === "M" ? "text-amber-300" : "text-rose-300";
@@ -54,6 +56,7 @@ function templateForm(template: WorkspaceTemplate): Form {
     projectType: template.projectType,
     selectedIds: template.featureIds,
     constraints: template.constraints,
+    teamId: null,
   };
 }
 
@@ -67,6 +70,7 @@ function workspaceForm(workspace: ProjectWorkspace): Form {
     projectType: workspace.projectType,
     selectedIds: workspace.selectedIds,
     constraints: workspace.constraints ?? "",
+    teamId: workspace.teamId ?? null,
   };
 }
 
@@ -76,20 +80,34 @@ export default function ProjectFoundryClient() {
   const [form, setForm] = useState<Form>(emptyForm);
   const [filter, setFilter] = useState<FoundryCategory | "all">("all");
   const [templateFilter, setTemplateFilter] = useState<WorkspaceTemplateCategory | "all">("all");
-  const create = useApiMutation<Omit<Form, "id" | "templateId">, { blueprint: ProjectBlueprint }>("/api/project-foundry", { invalidate: ["/api/project-foundry"] });
+  const [templateQuery, setTemplateQuery] = useState("");
+  const create = useApiMutation<Omit<Form, "id" | "templateId" | "teamId">, { blueprint: ProjectBlueprint }>("/api/project-foundry", { invalidate: ["/api/project-foundry"] });
   const saveWorkspace = useApiMutation<Form, { workspace: ProjectWorkspace }>("/api/project-foundry/workspaces", { invalidate: ["/api/project-foundry"] });
   const blueprint = create.data?.blueprint;
 
   // The library remains usable when saved data is briefly unavailable. Templates
   // are bundled for exactly that reason: the first useful state is never blank.
-  const foundry = catalog.data ?? { features: FOUNDRY_FEATURES, starterPacks: STARTER_PACKS, workspaceTemplates: WORKSPACE_TEMPLATES, blueprints: [], workspaces: [] };
+  const foundry = catalog.data ?? { features: FOUNDRY_FEATURES, starterPacks: STARTER_PACKS, workspaceTemplates: WORKSPACE_TEMPLATES, blueprints: [], workspaces: [], teams: [] };
   const shownFeatures = useMemo(
     () => filter === "all" ? foundry.features : foundry.features.filter((feature) => feature.category === filter),
     [filter, foundry.features],
   );
   const shownTemplates = useMemo(
-    () => templateFilter === "all" ? foundry.workspaceTemplates : foundry.workspaceTemplates.filter((template) => template.category === templateFilter),
-    [templateFilter, foundry.workspaceTemplates],
+    () => {
+      const query = templateQuery.trim().toLowerCase();
+      return foundry.workspaceTemplates.filter((template) => {
+        if (templateFilter !== "all" && template.category !== templateFilter) return false;
+        if (!query) return true;
+        const searchable = [
+          template.name.zh, template.name.en, template.description.zh, template.description.en,
+          template.title, template.audience, template.problem, template.constraints,
+          template.scenario?.zh, template.scenario?.en, template.scale?.zh, template.scale?.en,
+          ...(template.keywords ?? []),
+        ].filter(Boolean).join(" ").toLowerCase();
+        return searchable.includes(query);
+      });
+    },
+    [templateFilter, templateQuery, foundry.workspaceTemplates],
   );
   const selected = new Set(form.selectedIds);
   const isReady = form.title.trim().length >= 2 && form.problem.trim().length >= 10 && form.audience.trim().length >= 2 && form.selectedIds.length > 0;
@@ -134,19 +152,29 @@ export default function ProjectFoundryClient() {
 
       <Card title={T("选择一个可用工作区", "Choose a ready workspace")} accent="#a78bfa">
         <p className="text-sm leading-6 text-slate-300">{T("这些不是空白表单或仅选模块的推荐包。每个模板都预置了首批用户、真实问题、MVP 边界和对应的 Arete 能力；载入后任何内容都可以修改。", "These are not empty forms or module-only recommendations. Each template includes a first audience, concrete problem, MVP boundary, and matching Arete capabilities; every part remains editable.")}</p>
+        <div className="relative mt-4">
+          <input value={templateQuery} onChange={(event) => setTemplateQuery(event.target.value)} placeholder={T("搜索行业、场景、企业规模或关键词…", "Search industry, scenario, company size, or keyword…")} aria-label={T("搜索工作区模板", "Search workspace templates")} className="w-full rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-2.5 pr-20 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none" />
+          {templateQuery && <button type="button" onClick={() => setTemplateQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-200">{T("清除", "Clear")}</button>}
+        </div>
         <div className="mt-4 flex flex-wrap gap-2" aria-label={T("模板业务类型", "Template business type")}>
           <button type="button" onClick={() => setTemplateFilter("all")} className={`rounded-full px-3 py-1 text-xs ${templateFilter === "all" ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-300"}`}>{T("全部", "All")} · {foundry.workspaceTemplates.length}</button>
-          {(Object.keys(WORKSPACE_TEMPLATE_CATEGORIES) as WorkspaceTemplateCategory[]).map((category) => <button type="button" key={category} onClick={() => setTemplateFilter(category)} className={`rounded-full px-3 py-1 text-xs ${templateFilter === category ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-300"}`}>{T(WORKSPACE_TEMPLATE_CATEGORIES[category].zh, WORKSPACE_TEMPLATE_CATEGORIES[category].en)}</button>)}
+          {(Object.keys(WORKSPACE_TEMPLATE_CATEGORIES) as WorkspaceTemplateCategory[]).map((category) => <button type="button" key={category} onClick={() => setTemplateFilter(category)} className={`rounded-full px-3 py-1 text-xs ${templateFilter === category ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-300"}`}>{T(WORKSPACE_TEMPLATE_CATEGORIES[category].zh, WORKSPACE_TEMPLATE_CATEGORIES[category].en)} · {foundry.workspaceTemplates.filter((template) => template.category === category).length}</button>)}
         </div>
+        <p className="mt-3 text-xs text-slate-500">{T(`当前显示 ${shownTemplates.length} 个场景模板`, `${shownTemplates.length} scenario templates shown`)}</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {shownTemplates.map((template) => {
             const active = form.templateId === template.id && !form.id;
             return <button key={template.id} type="button" onClick={() => applyTemplate(template)} className={`rounded-xl border p-4 text-left transition ${active ? "border-indigo-400 bg-indigo-950/40" : "border-slate-800 bg-slate-900/50 hover:border-slate-600"}`}>
               <div className="flex items-start justify-between gap-2"><p className="text-sm font-semibold text-slate-100">{T(template.name.zh, template.name.en)}</p><span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">{T(WORKSPACE_TEMPLATE_CATEGORIES[template.category].zh, WORKSPACE_TEMPLATE_CATEGORIES[template.category].en)}</span></div>
               <p className="mt-1 text-xs leading-5 text-slate-400">{T(template.description.zh, template.description.en)}</p>
+              {(template.scenario || template.scale) && <div className="mt-2 flex flex-wrap gap-1.5">
+                {template.scenario && <span className="rounded bg-indigo-950/70 px-2 py-0.5 text-[10px] text-indigo-200">{T(template.scenario.zh, template.scenario.en)}</span>}
+                {template.scale && <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300">{T(template.scale.zh, template.scale.en)}</span>}
+              </div>}
               <p className="mt-3 text-[11px] text-indigo-300">{template.featureIds.length} {T("个预置模块 · 点击载入", "preloaded modules · click to load")}</p>
             </button>;
           })}
+          {shownTemplates.length === 0 && <div className="col-span-full rounded-xl border border-dashed border-slate-700 p-8 text-center text-sm text-slate-400">{T("没有匹配的模板。可清除关键词或切换业务分类。", "No templates match. Clear the query or switch business category.")}</div>}
         </div>
       </Card>
 
@@ -156,7 +184,7 @@ export default function ProjectFoundryClient() {
           {foundry.workspaces.map((workspace) => <button key={workspace.id} type="button" onClick={() => setForm(workspaceForm(workspace))} className={`rounded-xl border p-4 text-left transition ${form.id === workspace.id ? "border-emerald-400 bg-emerald-950/30" : "border-slate-800 bg-slate-900/50 hover:border-slate-600"}`}>
             <p className="text-sm font-medium text-slate-100">{workspace.title}</p>
             <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-400">{workspace.problem}</p>
-            <p className="mt-3 text-[11px] text-emerald-300">{workspace.selectedIds.length} {T("个模块 · 点击继续编辑", "modules · continue editing")}</p>
+            <div className="mt-3 flex items-center justify-between gap-2 text-[11px]"><span className="text-emerald-300">{workspace.selectedIds.length} {T("个模块 · 点击继续编辑", "modules · continue editing")}</span><span className="rounded bg-slate-800 px-2 py-0.5 text-slate-300">{workspace.teamName ? `${T("团队", "Team")}: ${workspace.teamName}` : T("个人", "Personal")}</span></div>
           </button>)}
         </div>
       </section>}
@@ -209,6 +237,14 @@ export default function ProjectFoundryClient() {
                 T("业务流程依赖人工经验，无法沉淀证据、复盘和可复制交付。", "The workflow depends on tacit manual experience and lacks evidence, review, and repeatable delivery."),
               ]}
             />
+          </div>
+          <div className="mt-3">
+            <label className="block text-xs text-slate-400">{T("工作区共享范围", "Workspace access")}</label>
+            <select value={form.teamId ?? ""} onChange={(event) => set({ teamId: event.target.value || null })} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200">
+              <option value="">{T("仅自己可见", "Private to me")}</option>
+              {foundry.teams.map((team) => <option key={team.id} value={team.id}>{T("团队共享", "Shared with team")} · {team.name} ({team.memberCount}/{team.seats})</option>)}
+            </select>
+            <p className="mt-1 text-xs text-slate-500">{T("团队成员可打开并继续修改；每次保存都会增加修订版本并写入审计事件。", "Team members can open and edit it; every save increments the revision and writes an audit event.")}</p>
           </div>
           <div className="mt-3">
             <SuggestionField
@@ -275,7 +311,7 @@ export default function ProjectFoundryClient() {
       {foundry.blueprints.length > 0 && <section className="mt-5">
         <h2 className="mb-2 text-sm font-semibold text-slate-200">{T("已保存的蓝图快照", "Saved blueprint snapshots")}</h2>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {foundry.blueprints.map((saved) => <button key={saved.id} type="button" onClick={() => setForm({ title: saved.title, problem: saved.problem, audience: saved.audience, projectType: saved.projectType, selectedIds: saved.selectedFeatures.map((feature) => feature.id), constraints: saved.constraints })} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-left hover:border-slate-600">
+          {foundry.blueprints.map((saved) => <button key={saved.id} type="button" onClick={() => setForm({ title: saved.title, problem: saved.problem, audience: saved.audience, projectType: saved.projectType, selectedIds: saved.selectedFeatures.map((feature) => feature.id), constraints: saved.constraints, teamId: null })} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-left hover:border-slate-600">
             <p className="text-sm font-medium text-slate-100">{saved.title}</p>
             <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-400">{saved.problem}</p>
             <p className="mt-3 text-[11px] text-indigo-300">{saved.selectedFeatures.length} {T("个模块 · 复制到编辑区", "modules · copy to workspace")}</p>

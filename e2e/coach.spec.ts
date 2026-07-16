@@ -5,31 +5,38 @@ test("coach: create a session and get a grounded reply", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /AI (Coach|教练)/i })).toBeVisible();
 
   await page.getByRole("button", { name: /^(New|新会话)$/ }).click();
-  const input = page.getByLabel(/Message to coach/i);
+  const input = page.getByLabel(/Message to coach|发送给教练的消息/i);
   await expect(input).toBeEnabled();
 
   await input.fill("我的习惯坚持不下去，怎么办？");
   await page.getByRole("button", { name: /^(Send|发送)$/ }).click();
 
   // Mock provider replies deterministically with data-grounded text.
-  await expect(page.locator("section").getByText(/data|score|history|tell me/i).first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator("section").getByText(/data|score|history|tell me|数据|分数|历史|告诉我/i).first()).toBeVisible({ timeout: 20_000 });
 });
 
 test("theme toggle and language switcher persist", async ({ page }) => {
   await page.goto("/dashboard");
+  const mobile = (page.viewportSize()?.width ?? 1280) < 1024;
+  const activeControl = <T extends ReturnType<typeof page.locator>>(controls: T) =>
+    mobile ? controls.first() : controls.last();
 
   // Theme: toggling flips html[data-theme] and survives reload via cookie.
   const before = await page.evaluate(() => document.documentElement.dataset.theme);
-  await page.getByRole("button", { name: /switch to (light|dark) theme/i }).click();
-  const after = await page.evaluate(() => document.documentElement.dataset.theme);
-  expect(after).not.toBe(before);
+  const after = before === "light" ? "dark" : "light";
+  await activeControl(page.locator('button[aria-label^="Switch to"]')).click({ force: true });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", after);
   await page.reload();
-  expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(after);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", after);
 
   // Locale: switching to EN re-renders server copy in English.
-  await page.getByRole("button", { name: /^en$/i }).click();
+  await activeControl(page.locator("button").filter({ hasText: /^EN$/i })).click({ force: true });
+  await expect.poll(() => page.evaluate(() => document.cookie)).toContain("locale=en");
+  await page.reload();
   await expect(page.getByRole("heading", { name: /^Dashboard$/ })).toBeVisible();
-  await page.getByRole("button", { name: /^zh$/i }).click();
+  await activeControl(page.locator("button").filter({ hasText: /^(ZH|中文)$/i })).click({ force: true });
+  await expect.poll(() => page.evaluate(() => document.cookie)).toContain("locale=zh");
+  await page.reload();
   await expect(page.getByRole("heading", { name: /总览/ })).toBeVisible();
 });
 

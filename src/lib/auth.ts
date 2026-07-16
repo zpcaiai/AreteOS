@@ -17,7 +17,7 @@ export async function getUserId(_req?: Request): Promise<string> {
   const sessionUser = await getOptionalUserId();
   if (sessionUser) return sessionUser;
 
-  const devId = process.env.DEV_USER_ID;
+  const devId = process.env.NODE_ENV === "production" ? undefined : process.env.DEV_USER_ID;
   if (!devId) throw new Error("Unauthorized");
   await prisma.user.upsert({
     where: { id: devId },

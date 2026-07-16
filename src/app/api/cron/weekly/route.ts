@@ -6,8 +6,8 @@ import { runWeeklyForAllUsers } from "@/lib/growth-card";
 function authorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
-  const url = new URL(req.url);
-  return url.searchParams.get("secret") === secret || req.headers.get("authorization") === `Bearer ${secret}`;
+  if (req.headers.get("authorization") === `Bearer ${secret}`) return true;
+  return process.env.NODE_ENV !== "production" && new URL(req.url).searchParams.get("secret") === secret;
 }
 
 // GET/POST /api/cron/weekly?secret=... -> generate weekly growth cards for ALL users.

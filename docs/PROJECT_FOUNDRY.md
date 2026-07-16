@@ -58,7 +58,9 @@ product logic.
 ## Ready workspace library
 
 The workspace library is grouped in the UI so a large set remains navigable rather
-than becoming one long list. It currently includes templates for:
+than becoming one long list. The browser supports category counts and full-text
+search across industry, scenario, organization size, audience, problem, and keywords.
+The library currently includes 82 ready-to-edit templates across ten categories:
 
 - **Software & AI**: B2B SaaS MVP, vertical AI copilot, developer tools, enterprise
   automation, and SaaS customer success.

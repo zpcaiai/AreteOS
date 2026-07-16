@@ -5,6 +5,8 @@
 import { prisma } from "../db";
 import { HttpError } from "../http";
 import { TIER_RANK, type Tier } from "../membership/plans";
+import { configuredPaymentProvider, createPaymentCheckout, type PaymentNotification } from "../payments";
+import crypto from "node:crypto";
 
 const DAY_MS = 86_400_000;
 
@@ -13,24 +15,31 @@ export async function createOrder(userId: string, slug: string, quantity = 1) {
   if (!product) throw new HttpError(404, "商品不存在或已下架");
   const qty = Math.max(1, Math.min(99, Math.floor(quantity)));
   const amount = Number(product.price) * qty;
-  const outTradeNo = "EMP" + Date.now() + Math.floor(Math.random() * 1000);
+  const outTradeNo = `EMP${Date.now()}${crypto.randomBytes(5).toString("hex")}`;
+  const provider = configuredPaymentProvider();
   const order = await prisma.storeOrder.create({
     data: {
       userId, productId: product.id, productName: product.name, quantity: qty,
-      amount, currency: product.currency, status: "CREATED", provider: "mock", outTradeNo,
+      amount, currency: product.currency, status: "CREATED", provider, outTradeNo,
     },
   });
-  // In production: create the real payment here and return its payUrl.
-  return { order, payUrl: null as string | null };
+  const checkout = await createPaymentCheckout({ outTradeNo, amount, currency: product.currency, subject: product.name });
+  return { order, payUrl: checkout.payUrl };
 }
 
 /** Mark paid + deliver instantly, atomically. Safe to call twice (gateway retries). */
-export async function payAndFulfill(orderId: string, userId: string) {
+export async function payAndFulfill(orderId: string, userId: string, payment?: PaymentNotification) {
   return prisma.$transaction(async (tx) => {
     const order = await tx.storeOrder.findFirst({ where: { id: orderId, userId }, include: { product: true } });
     if (!order) throw new HttpError(404, "订单不存在");
     if (order.status === "COMPLETED") return order; // idempotent
     if (order.status === "CANCELLED") throw new HttpError(400, "订单已取消");
+    if (payment) {
+      if (payment.outTradeNo !== order.outTradeNo || payment.provider !== order.provider) throw new HttpError(400, "Payment order mismatch");
+      if (payment.currency !== order.currency || Math.round(payment.amount * 100) !== Math.round(Number(order.amount) * 100)) throw new HttpError(400, "Payment amount mismatch");
+      if (!payment.paid) throw new HttpError(400, "Payment is not settled");
+      if (order.providerTransactionId && order.providerTransactionId !== payment.transactionId) throw new HttpError(409, "Payment transaction mismatch");
+    } else if (order.provider !== "mock") throw new HttpError(403, "Verified payment notification required");
 
     const now = new Date();
     const p = order.product;
@@ -75,15 +84,15 @@ export async function payAndFulfill(orderId: string, userId: string) {
 
     return tx.storeOrder.update({
       where: { id: order.id },
-      data: { status: "COMPLETED", paidAt: now, deliveredAt: now, deliveryNote: note },
+      data: { status: "COMPLETED", paidAt: now, deliveredAt: now, deliveryNote: note, providerTransactionId: payment?.transactionId, paymentPayloadHash: payment?.payloadHash },
     });
   });
 }
 
-export async function payAndFulfillByOutTradeNo(outTradeNo: string) {
-  const order = await prisma.storeOrder.findUnique({ where: { outTradeNo } });
+export async function payAndFulfillByOutTradeNo(payment: PaymentNotification) {
+  const order = await prisma.storeOrder.findUnique({ where: { outTradeNo: payment.outTradeNo } });
   if (!order) throw new HttpError(404, "订单不存在");
-  return payAndFulfill(order.id, order.userId);
+  return payAndFulfill(order.id, order.userId, payment);
 }
 
 /** A user's wallet + unlocks, for the store page. */

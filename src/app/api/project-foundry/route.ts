@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { getUserId } from "@/lib/auth";
-import { ok, parseBody, route } from "@/lib/http";
+import { ok, parseBody, requireSameOrigin, route } from "@/lib/http";
+import { persistentRateLimit } from "@/lib/rate-limit";
 import { createProjectBlueprint, listProjectBlueprints, listProjectWorkspaces, projectFoundryCatalog } from "@/lib/project-foundry";
+import { listTeamsForUser } from "@/lib/teams";
 
 const Body = z.object({
   title: z.string().trim().min(2).max(120),
@@ -16,15 +18,18 @@ const Body = z.object({
 export async function GET(req: Request) {
   return route(async () => {
     const userId = await getUserId(req);
-    const [blueprints, workspaces] = await Promise.all([listProjectBlueprints(userId), listProjectWorkspaces(userId)]);
-    return ok({ ...projectFoundryCatalog(), blueprints, workspaces });
+    const [blueprints, workspaces, teams] = await Promise.all([listProjectBlueprints(userId), listProjectWorkspaces(userId), listTeamsForUser(userId)]);
+    return ok({ ...projectFoundryCatalog(), blueprints, workspaces, teams });
   });
 }
 
 /** Create a durable, exportable implementation blueprint from selected modules. */
 export async function POST(req: Request) {
   return route(async () => {
+    requireSameOrigin(req);
     const userId = await getUserId(req);
+    const limited = await persistentRateLimit({ key: `foundry-blueprint:${userId}`, limit: 30, windowMs: 60_000 });
+    if (limited) return limited;
     const input = await parseBody(req, Body);
     return ok({ blueprint: await createProjectBlueprint(userId, input) });
   });

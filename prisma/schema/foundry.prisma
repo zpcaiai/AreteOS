@@ -1,0 +1,23 @@
+// Durable personal/team workspaces. Domain events remain the immutable audit log.
+
+model FoundryWorkspace {
+  id          String   @id @default(cuid())
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  teamId      String?
+  team        Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  templateId  String?
+  title       String
+  problem     String
+  audience    String
+  projectType String
+  selectedIds Json
+  constraints String   @default("")
+  revision    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId, updatedAt])
+  @@index([teamId, updatedAt])
+  @@map("foundry_workspaces")
+}

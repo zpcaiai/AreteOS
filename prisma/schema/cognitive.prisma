@@ -20,15 +20,16 @@ enum CogCategory {
 }
 
 model CogModel {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  category    CogCategory @default(GENERAL)
-  summary     String   @default("")
-  whenToUse   String   @default("")
-  examples    String[] @default([])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String      @id @default(cuid())
+  slug      String      @unique
+  name      String
+  category  CogCategory @default(GENERAL)
+  summary   String      @default("")
+  whenToUse String      @default("")
+  examples  String[]    @default([])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
   @@index([category])
   @@map("cog_models")
 }
@@ -39,16 +40,18 @@ model CogModelRelationship {
   toSlug    String
   relation  String   @default("relates-to")
   createdAt DateTime @default(now())
+
   @@index([fromSlug])
   @@map("cog_model_relationships")
 }
 
 model CogModelCluster {
-  id        String   @id @default(cuid())
-  name      String
-  purpose   String   @default("")
+  id         String   @id @default(cuid())
+  name       String
+  purpose    String   @default("")
   modelSlugs String[] @default([])
-  createdAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
   @@map("cog_model_clusters")
 }
 
@@ -57,6 +60,7 @@ model CogModelExample {
   modelSlug String
   example   String
   createdAt DateTime @default(now())
+
   @@index([modelSlug])
   @@map("cog_model_examples")
 }
@@ -67,27 +71,30 @@ model DecisionLens {
   name      String
   question  String   @default("")
   createdAt DateTime @default(now())
+
   @@map("cog_decision_lenses")
 }
 
 model DecisionLensResult {
-  id        String   @id @default(cuid())
-  userId    String
-  decision  String
-  lenses    Json?
-  confidence Float   @default(0)
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  decision   String
+  lenses     Json?
+  confidence Float    @default(0)
+  createdAt  DateTime @default(now())
+
   @@index([userId])
   @@map("cog_decision_lens_results")
 }
 
 model Bias {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  description String @default("")
-  correction String  @default("")
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String   @default("")
+  correction  String   @default("")
+  createdAt   DateTime @default(now())
+
   @@map("cog_biases")
 }
 
@@ -99,60 +106,65 @@ model BiasEvent {
   context   String   @default("")
   severity  Float    @default(0)
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("cog_bias_events")
 }
 
 model JudgmentProfile {
-  id        String   @id @default(cuid())
-  userId    String
-  judgmentScore Float @default(0)
-  blindSpots String[] @default([])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  userId        String
+  judgmentScore Float    @default(0)
+  blindSpots    String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   @@index([userId])
   @@map("cog_judgment_profiles")
 }
 
 model JudgmentAssessment {
-  id            String   @id @default(cuid())
-  userId        String
-  problemFraming Float   @default(0)
-  evidenceQuality Float  @default(0)
-  modelDiversity Float   @default(0)
-  biasResistance Float   @default(0)
-  longTermThinking Float @default(0)
-  secondOrderThinking Float @default(0)
-  riskAwareness Float    @default(0)
-  decisionClarity Float  @default(0)
-  judgmentScore Float    @default(0)
-  createdAt     DateTime @default(now())
+  id                  String   @id @default(cuid())
+  userId              String
+  problemFraming      Float    @default(0)
+  evidenceQuality     Float    @default(0)
+  modelDiversity      Float    @default(0)
+  biasResistance      Float    @default(0)
+  longTermThinking    Float    @default(0)
+  secondOrderThinking Float    @default(0)
+  riskAwareness       Float    @default(0)
+  decisionClarity     Float    @default(0)
+  judgmentScore       Float    @default(0)
+  createdAt           DateTime @default(now())
+
   @@index([userId])
   @@index([createdAt])
   @@map("cog_judgment_assessments")
 }
 
 model DecisionJournal {
-  id            String   @id @default(cuid())
-  userId        String
-  decision      String
-  context       String   @default("")
-  expectedOutcome String @default("")
-  actualOutcome String   @default("")
-  modelsUsed    String[] @default([])
-  resolved      Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String   @id @default(cuid())
+  userId          String
+  decision        String
+  context         String   @default("")
+  expectedOutcome String   @default("")
+  actualOutcome   String   @default("")
+  modelsUsed      String[] @default([])
+  resolved        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
   @@index([userId])
   @@map("cog_decision_journals")
 }
 
 model DecisionAssumption {
-  id        String   @id @default(cuid())
-  journalId String
+  id         String   @id @default(cuid())
+  journalId  String
   assumption String
-  heldTrue  Boolean? 
-  createdAt DateTime @default(now())
+  heldTrue   Boolean?
+  createdAt  DateTime @default(now())
+
   @@index([journalId])
   @@map("cog_decision_assumptions")
 }
@@ -163,31 +175,34 @@ model DecisionOutcome {
   outcome   String
   surprise  Float    @default(0)
   createdAt DateTime @default(now())
+
   @@index([journalId])
   @@map("cog_decision_outcomes")
 }
 
 model CogDecisionReview {
-  id        String   @id @default(cuid())
-  userId    String
-  journalId String
-  lessons   String[] @default([])
-  failedModel String  @default("")
+  id               String   @id @default(cuid())
+  userId           String
+  journalId        String
+  lessons          String[] @default([])
+  failedModel      String   @default("")
   wrongAssumptions String[] @default([])
-  createdAt DateTime @default(now())
+  createdAt        DateTime @default(now())
+
   @@index([userId])
   @@index([journalId])
   @@map("cog_decision_reviews")
 }
 
 model Latticework {
-  id        String   @id @default(cuid())
-  userId    String
-  goal      String
-  blindSpots String[] @default([])
-  synergyNote String  @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  userId      String
+  goal        String
+  blindSpots  String[] @default([])
+  synergyNote String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   @@index([userId])
   @@map("cog_latticeworks")
 }
@@ -199,6 +214,7 @@ model LatticeworkNode {
   modelName     String
   category      String   @default("")
   createdAt     DateTime @default(now())
+
   @@index([latticeworkId])
   @@map("cog_latticework_nodes")
 }
@@ -210,23 +226,25 @@ model LatticeworkEdge {
   toModel       String
   relation      String   @default("")
   createdAt     DateTime @default(now())
+
   @@index([latticeworkId])
   @@map("cog_latticework_edges")
 }
 
 model CognitiveProfile {
-  id            String   @id @default(cuid())
-  userId        String
-  thinkingStyle String   @default("")
-  decisionStyle String   @default("")
-  learningStyle String   @default("")
-  reasoningStyle String  @default("")
-  riskStyle     String   @default("")
-  strengths     String[] @default([])
-  weaknesses    String[] @default([])
-  globalScore   Float    @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String   @id @default(cuid())
+  userId         String
+  thinkingStyle  String   @default("")
+  decisionStyle  String   @default("")
+  learningStyle  String   @default("")
+  reasoningStyle String   @default("")
+  riskStyle      String   @default("")
+  strengths      String[] @default([])
+  weaknesses     String[] @default([])
+  globalScore    Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
   @@index([userId])
   @@map("cog_cognitive_profiles")
 }
@@ -237,6 +255,7 @@ model ThinkingPattern {
   pattern   String
   helpful   Boolean  @default(true)
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("cog_thinking_patterns")
 }
@@ -247,43 +266,47 @@ model ReasoningStyle {
   style     String
   note      String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("cog_reasoning_styles")
 }
 
 model UncertaintyAssessment {
-  id            String   @id @default(cuid())
-  userId        String
-  robustness    Float    @default(0)
-  fragility     Float    @default(0)
-  optionality   Float    @default(0)
-  tailRiskAwareness Float @default(0)
-  uncertaintyScore Float @default(0)
-  profile       String   @default("")
-  createdAt     DateTime @default(now())
+  id                String   @id @default(cuid())
+  userId            String
+  robustness        Float    @default(0)
+  fragility         Float    @default(0)
+  optionality       Float    @default(0)
+  tailRiskAwareness Float    @default(0)
+  uncertaintyScore  Float    @default(0)
+  profile           String   @default("")
+  createdAt         DateTime @default(now())
+
   @@index([userId])
   @@index([createdAt])
   @@map("cog_uncertainty_assessments")
 }
 
 model Optionality {
-  id        String   @id @default(cuid())
-  userId    String
-  option    String
-  upside    String   @default("")
-  cappedDownside Boolean @default(true)
-  createdAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  option         String
+  upside         String   @default("")
+  cappedDownside Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
   @@index([userId])
   @@map("cog_optionalities")
 }
 
 model TailRisk {
-  id        String   @id @default(cuid())
-  userId    String
-  risk      String
-  exposure  Float    @default(0)
-  mitigation String  @default("")
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  risk       String
+  exposure   Float    @default(0)
+  mitigation String   @default("")
+  createdAt  DateTime @default(now())
+
   @@index([userId])
   @@map("cog_tail_risks")
 }
@@ -294,6 +317,7 @@ model Diagnosis {
   problem   String
   diagnosis String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("cog_diagnoses")
 }
@@ -303,6 +327,7 @@ model CogRootCause {
   diagnosisId String
   rootCause   String
   createdAt   DateTime @default(now())
+
   @@index([diagnosisId])
   @@map("cog_root_causes")
 }
@@ -313,6 +338,7 @@ model LeveragePoint {
   leverage    String
   impact      Float    @default(0)
   createdAt   DateTime @default(now())
+
   @@index([diagnosisId])
   @@map("cog_leverage_points")
 }
@@ -323,6 +349,7 @@ model WisdomInsight {
   insight   String
   basis     String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@index([createdAt])
   @@map("cog_wisdom_insights")
@@ -334,6 +361,7 @@ model PersonalPrinciple {
   principle String
   rationale String   @default("")
   createdAt DateTime @default(now())
+
   @@index([userId])
   @@map("cog_personal_principles")
 }

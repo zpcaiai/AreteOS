@@ -18,6 +18,7 @@ export default function CommandPalette() {
   const label = (it: NavItem) => (it.labelKey ? t(it.labelKey) : it.label);
 
   useEffect(() => {
+    document.documentElement.dataset.commandPaletteReady = "true";
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -27,7 +28,7 @@ export default function CommandPalette() {
       }
     };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); delete document.documentElement.dataset.commandPaletteReady; };
   }, []);
 
   useEffect(() => {

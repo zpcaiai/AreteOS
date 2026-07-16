@@ -20,6 +20,9 @@ export default function AccountPage() {
   const mem = useApi<{ count: number }>("/api/account/memory");
   const [confirmMem, setConfirmMem] = useState(false);
   const clearMem = useApiMutation<{ confirm: true }, { deleted: number }>("/api/account/memory", { invalidate: ["/api/account/memory"] });
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const deleteAccount = useApiMutation<{ password: string; confirmation: "DELETE MY ACCOUNT" }, { ok: true; deletedRecords: number }>("/api/account/delete");
   const e = q.data?.explanation;
 
   return (
@@ -80,6 +83,20 @@ export default function AccountPage() {
           </button>
           {reset.data && <p className="mt-2 text-sm text-emerald-300">{T("已清除", "Deleted")} {reset.data.deleted} {T("条事件。", "events.")}</p>}
           {reset.error && <p className="mt-2 text-sm text-rose-400" role="alert">{reset.error.message}</p>}
+        </Card>
+      </div>
+
+      <div className="mt-4">
+        <Card title={T("永久删除账户", "Permanently delete account")} accent="#dc2626">
+          <p className="text-sm leading-6 text-slate-300">{T("这会立即删除账户身份、工作区、AI 记忆、成长记录、订单与团队归属，且无法恢复。建议先导出数据。为防误操作，请输入密码和确认短语。", "This immediately erases your identity, workspaces, AI memory, growth records, orders, and team ownership. It cannot be undone. Export first, then enter your password and confirmation phrase.")}</p>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <input type="password" autoComplete="current-password" value={deletePassword} onChange={(event) => setDeletePassword(event.target.value)} placeholder={T("当前密码", "Current password")} className="rounded-lg border border-rose-900 bg-slate-950 px-3 py-2 text-sm" />
+            <input value={deleteConfirmation} onChange={(event) => setDeleteConfirmation(event.target.value)} placeholder="DELETE MY ACCOUNT" className="rounded-lg border border-rose-900 bg-slate-950 px-3 py-2 text-sm" />
+          </div>
+          <button type="button" onClick={() => deleteAccount.mutate({ password: deletePassword, confirmation: "DELETE MY ACCOUNT" }, { onSuccess: () => { window.location.href = "/login"; } })} disabled={!deletePassword || deleteConfirmation !== "DELETE MY ACCOUNT" || deleteAccount.isPending} className="mt-3 rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50">
+            {deleteAccount.isPending ? T("正在永久删除…", "Deleting permanently…") : T("永久删除我的账户", "Permanently delete my account")}
+          </button>
+          {deleteAccount.error && <p role="alert" className="mt-2 text-sm text-rose-400">{deleteAccount.error.message}</p>}
         </Card>
       </div>
     </div>

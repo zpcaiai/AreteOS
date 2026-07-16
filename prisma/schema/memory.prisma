@@ -9,23 +9,23 @@ enum PersonalMemoryKind {
 }
 
 model PersonalMemory {
-  id          String             @id @default(cuid())
-  userId      String             @map("user_id")
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind        PersonalMemoryKind @default(GENERAL)
-  sourceType  String             @default("") @map("source_type")
-  sourceId    String             @default("") @map("source_id")
-  title       String             @default("")
-  content     String
-  embedding   Unsupported("vector(1536)")?
-  metadata    Json?
-  importance  Float              @default(0.5)
-  occurredAt  DateTime?          @map("occurred_at")
-  createdAt   DateTime           @default(now()) @map("created_at")
-  updatedAt   DateTime           @updatedAt @map("updated_at")
+  id         String                       @id @default(cuid())
+  userId     String                       @map("user_id")
+  user       User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind       PersonalMemoryKind           @default(GENERAL)
+  sourceType String                       @default("") @map("source_type")
+  sourceId   String                       @default("") @map("source_id")
+  title      String                       @default("")
+  content    String
+  embedding  Unsupported("vector(1536)")?
+  metadata   Json?
+  importance Float                        @default(0.5)
+  occurredAt DateTime?                    @map("occurred_at")
+  createdAt  DateTime                     @default(now()) @map("created_at")
+  updatedAt  DateTime                     @updatedAt @map("updated_at")
 
+  @@unique([userId, sourceType, sourceId, kind])
   @@index([userId, kind, createdAt])
   @@index([sourceType, sourceId])
-  @@unique([userId, sourceType, sourceId, kind])
   @@map("personal_memories")
 }

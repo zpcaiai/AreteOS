@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getUserId } from "@/lib/auth";
-import { ok, created, parseBody, route } from "@/lib/http";
+import { ok, created, parseBody, requireSameOrigin, route } from "@/lib/http";
+import { persistentRateLimit } from "@/lib/rate-limit";
 import { addMemberByEmail, getTeamDetail, removeMember } from "@/lib/teams";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -13,7 +14,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   return route(async () => {
+    requireSameOrigin(req);
     const userId = await getUserId(req);
+    const limited = await persistentRateLimit({ key: `team-member:${userId}`, limit: 30, windowMs: 60 * 60_000 });
+    if (limited) return limited;
     const { id } = await params;
     const body = await parseBody(req, z.object({ email: z.string().email() }));
     return created(await addMemberByEmail(id, userId, body.email));
@@ -22,6 +26,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   return route(async () => {
+    requireSameOrigin(req);
     const userId = await getUserId(req);
     const { id } = await params;
     const body = await parseBody(req, z.object({ userId: z.string().min(1) }));

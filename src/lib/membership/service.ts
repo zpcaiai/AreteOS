@@ -2,6 +2,7 @@ import { prisma } from "../db";
 import { HttpError } from "../http";
 import { PERIOD_DAYS, TIER_RANK, hasFeature, type Tier, type Period } from "./plans";
 import { teamGrantedTier } from "../teams";
+import type { PaymentNotification } from "../payments";
 
 export interface ActiveMembership {
   tier: Tier;
@@ -49,27 +50,30 @@ export async function requireFeature(userId: string, featureKey: string): Promis
 }
 
 /** Mark an order paid and (re)activate the membership, stacking remaining time. */
-export async function activateOrder(orderId: string, userId: string) {
-  const order = await prisma.membershipOrder.findFirst({ where: { id: orderId, userId } });
-  if (!order) throw new HttpError(404, "订单不存在");
-  if (order.status !== "PAID") {
-    await prisma.membershipOrder.update({ where: { id: order.id }, data: { status: "PAID", paidAt: new Date() } });
-  }
-  const existing = await prisma.membership.findUnique({ where: { userId } });
-  const base = existing?.expiresAt && existing.expiresAt.getTime() > Date.now() && existing.tier === order.tier
-    ? existing.expiresAt.getTime()
-    : Date.now();
-  const expiresAt = new Date(base + PERIOD_DAYS[order.period as Period] * 86_400_000);
-  const membership = await prisma.membership.upsert({
-    where: { userId },
-    update: { tier: order.tier, period: order.period, status: "ACTIVE", expiresAt },
-    create: { userId, tier: order.tier, period: order.period, status: "ACTIVE", expiresAt },
+export async function activateOrder(orderId: string, userId: string, payment?: PaymentNotification) {
+  return prisma.$transaction(async (tx) => {
+    const order = await tx.membershipOrder.findFirst({ where: { id: orderId, userId } });
+    if (!order) throw new HttpError(404, "订单不存在");
+    if (payment) {
+      if (payment.outTradeNo !== order.outTradeNo || payment.provider !== order.provider) throw new HttpError(400, "Payment order mismatch");
+      if (payment.currency !== order.currency || Math.round(payment.amount * 100) !== Math.round(Number(order.amount) * 100)) throw new HttpError(400, "Payment amount mismatch");
+      if (!payment.paid) throw new HttpError(400, "Payment is not settled");
+      if (order.providerTransactionId && order.providerTransactionId !== payment.transactionId) throw new HttpError(409, "Payment transaction mismatch");
+    } else if (order.provider !== "mock") throw new HttpError(403, "Verified payment notification required");
+
+    const existing = await tx.membership.findUnique({ where: { userId } });
+    if (order.status === "PAID") return { order, membership: existing };
+    const now = new Date();
+    const base = existing?.expiresAt && existing.expiresAt.getTime() > now.getTime() && existing.tier === order.tier ? existing.expiresAt.getTime() : now.getTime();
+    const expiresAt = new Date(base + PERIOD_DAYS[order.period as Period] * 86_400_000);
+    const paidOrder = await tx.membershipOrder.update({ where: { id: order.id }, data: { status: "PAID", paidAt: now, providerTransactionId: payment?.transactionId, paymentPayloadHash: payment?.payloadHash } });
+    const membership = await tx.membership.upsert({ where: { userId }, update: { tier: order.tier, period: order.period, status: "ACTIVE", expiresAt }, create: { userId, tier: order.tier, period: order.period, status: "ACTIVE", expiresAt } });
+    return { order: paidOrder, membership };
   });
-  return { order, membership };
 }
 
-export async function activateOrderByOutTradeNo(outTradeNo: string) {
-  const order = await prisma.membershipOrder.findUnique({ where: { outTradeNo } });
+export async function activateOrderByOutTradeNo(payment: PaymentNotification) {
+  const order = await prisma.membershipOrder.findUnique({ where: { outTradeNo: payment.outTradeNo } });
   if (!order) throw new HttpError(404, "订单不存在");
-  return activateOrder(order.id, order.userId);
+  return activateOrder(order.id, order.userId, payment);
 }
