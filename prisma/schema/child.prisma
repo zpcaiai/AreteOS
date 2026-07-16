@@ -35,6 +35,7 @@ model ChildProfile {
   userId           String // parent/guardian account
   name             String
   age              Int                @default(0)
+  guardianConsentId String?
   interests        String[]           @default([])
   primaryIdentity  ChildIdentityKind?
   emergingIdentity ChildIdentityKind?
@@ -43,6 +44,7 @@ model ChildProfile {
   updatedAt        DateTime           @updatedAt
 
   @@index([userId])
+  @@index([guardianConsentId])
   @@map("child_profiles")
 }
 

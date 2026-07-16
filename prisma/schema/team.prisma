@@ -26,7 +26,7 @@ model TeamMember {
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      String   @default("member") // owner | member
+  role      String   @default("member") // owner | admin | member | viewer
   createdAt DateTime @default(now())
 
   @@unique([teamId, userId])

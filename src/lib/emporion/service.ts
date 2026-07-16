@@ -5,7 +5,7 @@
 import { prisma } from "../db";
 import { HttpError } from "../http";
 import { TIER_RANK, type Tier } from "../membership/plans";
-import { configuredPaymentProvider, createPaymentCheckout, type PaymentNotification } from "../payments";
+import { configuredPaymentProvider, createPaymentCheckout, refundPayment, type PaymentNotification } from "../payments";
 import crypto from "node:crypto";
 
 const DAY_MS = 86_400_000;
@@ -93,6 +93,50 @@ export async function payAndFulfillByOutTradeNo(payment: PaymentNotification) {
   const order = await prisma.storeOrder.findUnique({ where: { outTradeNo: payment.outTradeNo } });
   if (!order) throw new HttpError(404, "订单不存在");
   return payAndFulfill(order.id, order.userId, payment);
+}
+
+/** Provider refund first, then atomically revoke the delivered entitlement. */
+export async function refundAndRevokeStoreOrder(orderId: string, reason: string) {
+  const order = await prisma.storeOrder.findUnique({ where: { id: orderId }, include: { product: true } });
+  if (!order) throw new HttpError(404, "订单不存在");
+  if (order.status !== "COMPLETED" || !order.paidAt) throw new HttpError(400, "Only completed paid orders can be refunded");
+  if (order.provider !== "alipay" && order.provider !== "wechat") throw new HttpError(400, "This order has no refundable production payment");
+  const refundNo = `REF${Date.now()}${crypto.randomBytes(5).toString("hex")}`;
+  const provider = await refundPayment({
+    provider: order.provider,
+    outTradeNo: order.outTradeNo,
+    amount: Number(order.amount),
+    currency: order.currency,
+    reason,
+    refundNo,
+  });
+  return prisma.$transaction(async (tx) => {
+    const current = await tx.storeOrder.findUnique({ where: { id: order.id }, include: { product: true } });
+    if (!current || current.status !== "COMPLETED") throw new HttpError(409, "Order changed while refunding");
+    const p = current.product;
+    if (p.kind === "CREDITS") {
+      const credits = p.grantCredits * current.quantity;
+      const wallet = await tx.userCredit.findUnique({ where: { userId: current.userId } });
+      if (!wallet || wallet.balance < credits) throw new HttpError(409, "Purchased credits have already been used; manual resolution is required");
+      await tx.userCredit.update({ where: { userId: current.userId }, data: { balance: { decrement: credits } } });
+      await tx.creditLedger.create({ data: { userId: current.userId, delta: -credits, reason: `退款 ${p.name}`, orderId: current.id } });
+    } else if (p.kind === "CONTENT" && p.grantContentKey) {
+      await tx.contentUnlock.deleteMany({ where: { userId: current.userId, contentKey: p.grantContentKey, orderId: current.id } });
+    } else if (p.kind === "MEMBERSHIP_DAYS" && p.grantTier) {
+      const membership = await tx.membership.findUnique({ where: { userId: current.userId } });
+      if (membership?.tier === p.grantTier && membership.expiresAt) {
+        const reduced = new Date(Math.max(Date.now(), membership.expiresAt.getTime() - p.grantDays * current.quantity * DAY_MS));
+        await tx.membership.update({ where: { userId: current.userId }, data: { expiresAt: reduced, status: reduced.getTime() <= Date.now() ? "EXPIRED" : membership.status } });
+      }
+    }
+    return tx.storeOrder.update({
+      where: { id: current.id },
+      data: {
+        status: "CANCELLED",
+        deliveryNote: `${current.deliveryNote ? `${current.deliveryNote} · ` : ""}退款 ${refundNo} (${provider.providerRefundId}, ${provider.status}): ${reason}`,
+      },
+    });
+  });
 }
 
 /** A user's wallet + unlocks, for the store page. */

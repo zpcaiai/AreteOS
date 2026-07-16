@@ -43,6 +43,10 @@ async function personalMembership(userId: string): Promise<ActiveMembership> {
 
 /** Throw 402 if the user's active tier doesn't include the feature. */
 export async function requireFeature(userId: string, featureKey: string): Promise<void> {
+  if (featureKey === "child") {
+    const { requireGuardianConsent } = await import("../guardian-consent");
+    await requireGuardianConsent(userId);
+  }
   const { tier } = await getActiveMembership(userId);
   if (!hasFeature(tier, featureKey)) {
     throw new HttpError(402, `该功能需要升级会员（${featureKey}）`);

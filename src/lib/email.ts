@@ -1,6 +1,6 @@
 const siteUrl = () => process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-async function send(to: string, subject: string, html: string) {
+export async function sendTransactionalEmail(to: string, subject: string, html: string) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.AUTH_EMAIL_FROM;
   if (!apiKey || !from) {
@@ -18,12 +18,19 @@ async function send(to: string, subject: string, html: string) {
 
 export async function sendVerificationEmail(email: string, token: string) {
   const link = `${siteUrl()}/verify-email?token=${encodeURIComponent(token)}`;
-  await send(email, "Verify your Arete account", `<p>Confirm your email to activate your Arete account.</p><p><a href="${link}">Verify email</a></p><p>This link expires in 24 hours.</p>`);
+  await sendTransactionalEmail(email, "Verify your Arete account", `<p>Confirm your email to activate your Arete account.</p><p><a href="${link}">Verify email</a></p><p>This link expires in 24 hours.</p>`);
   return link;
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   const link = `${siteUrl()}/reset-password?token=${encodeURIComponent(token)}`;
-  await send(email, "Reset your Arete password", `<p>A password reset was requested for your Arete account.</p><p><a href="${link}">Reset password</a></p><p>This link expires in 30 minutes. Ignore this email if you did not request it.</p>`);
+  await sendTransactionalEmail(email, "Reset your Arete password", `<p>A password reset was requested for your Arete account.</p><p><a href="${link}">Reset password</a></p><p>This link expires in 30 minutes. Ignore this email if you did not request it.</p>`);
+  return link;
+}
+
+export async function sendRegistrationInviteEmail(email: string, token: string, teamName?: string) {
+  const link = `${siteUrl()}/login?invite=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+  const context = teamName ? ` to join ${teamName}` : "";
+  await sendTransactionalEmail(email, "You are invited to Arete", `<p>You have been invited${context}.</p><p><a href="${link}">Accept invitation</a></p><p>This link expires in 7 days and can be used once.</p>`);
   return link;
 }

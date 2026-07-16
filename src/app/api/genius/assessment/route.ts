@@ -4,12 +4,14 @@ import { getUserId } from "@/lib/auth";
 import { ok, created, parseBody, route, HttpError } from "@/lib/http";
 import { requireFeature } from "@/lib/membership/service";
 import { childAssessmentScore } from "@/lib/genius/scoring";
+import { requireGuardianConsent } from "@/lib/guardian-consent";
 
 const s = z.number().min(0).max(1).default(0);
 
 export async function GET(req: Request) {
   return route(async () => {
     const userId = await getUserId(req);
+    await requireGuardianConsent(userId);
     const childId = new URL(req.url).searchParams.get("childId") ?? "";
     if (!(await prisma.childProfile.findFirst({ where: { id: childId, userId } }))) throw new HttpError(404, "Child not found");
     const assessments = await prisma.childAssessment.findMany({ where: { childId }, orderBy: { createdAt: "desc" }, take: 30 });

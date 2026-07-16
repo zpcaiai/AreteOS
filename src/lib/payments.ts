@@ -7,6 +7,7 @@ export interface PaymentNotification {
   amount: number; currency: string; paid: boolean; payloadHash: string;
 }
 interface CheckoutInput { outTradeNo: string; amount: number; currency: string; subject: string }
+interface RefundInput { provider: PaymentProvider; outTradeNo: string; amount: number; currency: string; reason: string; refundNo: string }
 
 const siteUrl = () => process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "http://localhost:3000";
 const sha256 = (value: string) => crypto.createHash("sha256").update(value).digest("hex");
@@ -17,6 +18,9 @@ const required = (name: string) => {
 };
 
 export function configuredPaymentProvider(): PaymentProvider | "mock" {
+  if (process.env.NODE_ENV === "production" && process.env.PAYMENTS_ENABLED !== "true") {
+    throw new HttpError(503, "Payments are currently unavailable (disabled for the current release profile)");
+  }
   const value = process.env.PAYMENT_PROVIDER?.toLowerCase();
   if (value === "alipay" || value === "wechat") return value;
   if (value === "mock" && process.env.NODE_ENV !== "production" && process.env.PAYMENT_MOCK_ENABLED === "true") return "mock";
@@ -64,6 +68,68 @@ export async function createPaymentCheckout(input: CheckoutInput) {
   const provider = configuredPaymentProvider();
   if (provider === "mock") return { provider, payUrl: null as string | null };
   return { provider, payUrl: provider === "alipay" ? await createAlipayCheckout(input) : await createWechatCheckout(input) };
+}
+
+async function refundAlipay(input: RefundInput) {
+  if (input.currency !== "CNY") throw new HttpError(400, "Alipay refund requires CNY");
+  const params: Record<string, string> = {
+    app_id: required("ALIPAY_APP_ID"),
+    method: "alipay.trade.refund",
+    format: "JSON",
+    charset: "utf-8",
+    sign_type: "RSA2",
+    timestamp: new Date().toISOString().replace("T", " ").slice(0, 19),
+    version: "1.0",
+    biz_content: JSON.stringify({
+      out_trade_no: input.outTradeNo,
+      refund_amount: input.amount.toFixed(2),
+      refund_reason: input.reason.slice(0, 256),
+      out_request_no: input.refundNo,
+    }),
+  };
+  const content = Object.keys(params).sort().map((key) => `${key}=${params[key]}`).join("&");
+  params.sign = rsaSign(content, required("ALIPAY_PRIVATE_KEY"));
+  const response = await fetch(`${process.env.ALIPAY_GATEWAY || "https://openapi.alipay.com/gateway.do"}?${new URLSearchParams(params)}`);
+  const payload = await response.json().catch(() => ({})) as Record<string, { code?: string; msg?: string; sub_msg?: string; trade_no?: string }>;
+  const result = payload.alipay_trade_refund_response;
+  if (!response.ok || result?.code !== "10000") throw new HttpError(502, `Alipay refund failed: ${result?.sub_msg || result?.msg || response.status}`);
+  return { providerRefundId: result.trade_no || input.refundNo, status: "SUCCESS" };
+}
+
+async function refundWechat(input: RefundInput) {
+  if (input.currency !== "CNY") throw new HttpError(400, "WeChat Pay refund requires CNY");
+  const pathname = "/v3/refund/domestic/refunds";
+  const notifyUrl = process.env.WECHAT_PAY_REFUND_NOTIFY_URL;
+  const body = JSON.stringify({
+    out_trade_no: input.outTradeNo,
+    out_refund_no: input.refundNo,
+    reason: input.reason.slice(0, 80),
+    ...(notifyUrl ? { notify_url: notifyUrl } : {}),
+    amount: {
+      refund: Math.round(input.amount * 100),
+      total: Math.round(input.amount * 100),
+      currency: input.currency,
+    },
+  });
+  const response = await fetch(`https://api.mch.weixin.qq.com${pathname}`, {
+    method: "POST",
+    headers: {
+      Authorization: wechatAuthorization("POST", pathname, body),
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "User-Agent": "AreteOS/1.0",
+    },
+    body,
+  });
+  const payload = await response.json().catch(() => ({})) as { refund_id?: string; status?: string; message?: string };
+  if (!response.ok || !payload.refund_id) throw new HttpError(502, `WeChat Pay refund failed: ${payload.message || response.status}`);
+  return { providerRefundId: payload.refund_id, status: payload.status || "PROCESSING" };
+}
+
+export async function refundPayment(input: RefundInput) {
+  if (input.amount <= 0 || !Number.isFinite(input.amount)) throw new HttpError(400, "Refund amount is invalid");
+  if (process.env.PAYMENT_REFUNDS_ENABLED !== "true") throw new HttpError(503, "Provider refunds are disabled");
+  return input.provider === "alipay" ? refundAlipay(input) : refundWechat(input);
 }
 
 function parseAlipay(raw: string): PaymentNotification {

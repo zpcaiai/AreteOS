@@ -129,6 +129,7 @@ model User {
   authSessions      AuthSession[]
   authTokens        AuthToken[]
   legalConsents     LegalConsent[]
+  guardianConsents  GuardianConsent[]
   ownedTeams        Team[]             @relation("TeamOwner")
   teamMemberships   TeamMember[]
   foundryWorkspaces FoundryWorkspace[]

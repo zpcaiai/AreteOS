@@ -9,9 +9,16 @@ const PUBLIC_PREFIXES = [
 ];
 const PENDING_CLINICAL_PAGES = ["/healing", "/healing-os", "/core-belief", "/cbt", "/emotion-regulation", "/stabilization", "/parts-work", "/exposure", "/identity-rebuild", "/healing-timeline", "/relapse-prevention"];
 const PENDING_CLINICAL_APIS = ["/api/healing", "/api/core-belief", "/api/cbt", "/api/emotion-regulation", "/api/trauma-stabilization", "/api/parts-work", "/api/exposure", "/api/identity-reconstruction", "/api/identity-evidence", "/api/healing-timeline", "/api/relapse-prevention", "/api/relapse-checkin"];
+const CHILD_PAGES = ["/genius", "/genius-kids"];
+const CHILD_APIS = ["/api/genius"];
+const PAYMENT_APIS = ["/api/membership/checkout", "/api/membership/activate", "/api/emporion/checkout", "/api/emporion/pay"];
 
 function isPendingClinicalPath(pathname: string) {
   const prefixes = pathname.startsWith("/api/") ? PENDING_CLINICAL_APIS : PENDING_CLINICAL_PAGES;
+  return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
+function matches(pathname: string, prefixes: string[]) {
   return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
@@ -44,12 +51,22 @@ export function middleware(req: NextRequest) {
   if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return secure(pass(req, nonce), nonce);
 
   if (req.cookies.get("arete_session")) {
-    if (process.env.NODE_ENV === "production" && process.env.CLINICAL_PREVIEW_ENABLED !== "true" && isPendingClinicalPath(pathname)) {
+    if (process.env.NODE_ENV === "production" && process.env.CLINICAL_FEATURE_ENABLED !== "true" && process.env.CLINICAL_PREVIEW_ENABLED !== "true" && isPendingClinicalPath(pathname)) {
       if (pathname.startsWith("/api/")) return secure(NextResponse.json({ error: "This clinical module is unavailable pending licensed expert review", code: "CLINICAL_REVIEW_PENDING" }, { status: 403 }), nonce);
       const safety = req.nextUrl.clone();
       safety.pathname = "/safety";
       safety.searchParams.set("notice", "clinical-review-pending");
       return secure(NextResponse.redirect(safety), nonce);
+    }
+    if (process.env.NODE_ENV === "production" && process.env.CHILD_FEATURE_ENABLED !== "true" && matches(pathname, pathname.startsWith("/api/") ? CHILD_APIS : CHILD_PAGES)) {
+      if (pathname.startsWith("/api/")) return secure(NextResponse.json({ error: "Child features are disabled pending safeguarding and privacy review", code: "CHILD_FEATURE_DISABLED" }, { status: 403 }), nonce);
+      const dashboard = req.nextUrl.clone();
+      dashboard.pathname = "/dashboard";
+      dashboard.searchParams.set("notice", "child-feature-disabled");
+      return secure(NextResponse.redirect(dashboard), nonce);
+    }
+    if (process.env.NODE_ENV === "production" && process.env.PAYMENTS_ENABLED !== "true" && matches(pathname, PAYMENT_APIS)) {
+      return secure(NextResponse.json({ error: "Payments are disabled for the current release profile", code: "PAYMENTS_DISABLED" }, { status: 403 }), nonce);
     }
     return secure(pass(req, nonce), nonce);
   }

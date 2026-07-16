@@ -23,6 +23,14 @@ export default function AccountPage() {
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const deleteAccount = useApiMutation<{ password: string; confirmation: "DELETE MY ACCOUNT" }, { ok: true; deletedRecords: number }>("/api/account/delete");
+  const guardian = useApi<{ consent: { id: string; guardianName: string; relationship: string; version: string; acceptedAt: string } | null }>("/api/account/guardian-consent");
+  const [guardianName, setGuardianName] = useState("");
+  const [guardianRelationship, setGuardianRelationship] = useState<"parent" | "legal_guardian" | "authorized_caregiver">("parent");
+  const guardianConsent = useApiMutation<
+    { guardianName: string; relationship: "parent" | "legal_guardian" | "authorized_caregiver"; confirmAdult: true; acceptChildPrivacy: true },
+    { consent: { id: string; version: string; acceptedAt: string } }
+  >("/api/account/guardian-consent", { invalidate: ["/api/account/guardian-consent"] });
+  const revokeGuardian = useApiMutation<Record<string, never>, { revoked: number }>("/api/account/guardian-consent", { method: "DELETE", invalidate: ["/api/account/guardian-consent"] });
   const e = q.data?.explanation;
 
   return (
@@ -67,6 +75,32 @@ export default function AccountPage() {
           </button>
           {clearMem.data && <p className="mt-2 text-sm text-emerald-300">{T("已清除", "Forgot")} {clearMem.data.deleted} {T("条记忆。", "memories.")}</p>}
           {clearMem.error && <p className="mt-2 text-sm text-rose-400" role="alert">{clearMem.error.message}</p>}
+        </Card>
+      </div>
+
+      <div className="mt-4">
+        <Card title={T("家庭功能与监护人同意", "Family features and guardian consent")} accent="#38bdf8">
+          {guardian.data?.consent ? (
+            <div>
+              <p className="text-sm text-slate-300">{T("当前同意记录", "Active consent")}: {guardian.data.consent.guardianName} · {guardian.data.consent.relationship} · {guardian.data.consent.version}</p>
+              <p className="mt-1 text-xs text-slate-500">{T("撤回后，儿童资料保留但家庭功能立即停止访问，直到重新完成同意。", "Revoking immediately blocks family-feature access until consent is completed again; existing records remain available for export/deletion.")}</p>
+              <button onClick={() => revokeGuardian.mutate({})} disabled={revokeGuardian.isPending} className="mt-2 rounded-lg border border-rose-800 px-3 py-2 text-sm text-rose-300 hover:bg-rose-950/50 disabled:opacity-50">{T("撤回监护人同意", "Revoke guardian consent")}</button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-slate-300">{T("只有年满 18 周岁的父母、法定监护人或获授权照护者可以启用家庭功能。儿童不得自行注册或管理账户。", "Only an adult parent, legal guardian, or authorized caregiver may enable family features. Children cannot register or administer accounts.")}</p>
+              <div className="mt-3 grid gap-2 md:grid-cols-2">
+                <input value={guardianName} onChange={(event) => setGuardianName(event.target.value)} placeholder={T("监护人真实姓名", "Guardian legal name")} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm" />
+                <select value={guardianRelationship} onChange={(event) => setGuardianRelationship(event.target.value as typeof guardianRelationship)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm">
+                  <option value="parent">{T("父母", "Parent")}</option>
+                  <option value="legal_guardian">{T("法定监护人", "Legal guardian")}</option>
+                  <option value="authorized_caregiver">{T("获授权照护者", "Authorized caregiver")}</option>
+                </select>
+              </div>
+              <button onClick={() => guardianName.trim() && guardianConsent.mutate({ guardianName, relationship: guardianRelationship, confirmAdult: true, acceptChildPrivacy: true })} disabled={!guardianName.trim() || guardianConsent.isPending} className="mt-3 rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white hover:bg-sky-600 disabled:opacity-50">{T("确认成年人身份并同意儿童隐私规则", "Confirm adult status and accept child privacy rules")}</button>
+            </div>
+          )}
+          {(guardianConsent.error || revokeGuardian.error) && <p className="mt-2 text-sm text-rose-400" role="alert">{(guardianConsent.error || revokeGuardian.error)?.message}</p>}
         </Card>
       </div>
 

@@ -11,11 +11,13 @@ A customer release is allowed only when all items are green:
 5. Every clinical module listed in `docs/clinical-review.md` has named expert approval. The automated gate checks structure; it does not replace human review.
 6. The privacy policy and terms contain the actual legal entity, address, support/privacy contact, region-specific refund rules, governing law, subprocessors, and data regions.
 7. Alipay or WeChat Pay sandbox and production tests prove: correct amount, duplicate notification idempotency, invalid signature rejection, refund/chargeback handling, and reconciliation.
+8. `npm run check:release -- --profile=<profile>` passes in the exact production
+   environment. External attestations are ISO timestamps and expire automatically.
 
 ## Deployment
 
 1. Take a Neon restore point/snapshot according to the current plan and record the current commit SHA.
-2. Push the reviewed commit to `main`. GitHub Actions runs all release gates, then applies migrations with the `Production` Environment secret `NEON_DIRECT_URL`. Confirm both `Deploy migrations to Neon` steps are green before shifting traffic.
+2. Push the reviewed commit to `main`. GitHub Actions runs all code gates, then applies migrations with the `Production` Environment secret `NEON_DIRECT_URL`. Confirm `Deploy migrations to Neon` is green before shifting traffic. Vercel does not receive the direct database credential and does not run migrations during build.
 3. Deploy the immutable build. Verify `/api/health`, login, email verification, password reset, a personal workspace, a team workspace, checkout, and signed webhook settlement.
 4. Review error rate, p95 latency, database connections, email delivery and payment reconciliation for at least 30 minutes.
 5. Roll back application traffic on regression. Database migrations in this repository are forward-only; restore the snapshot only through the database incident procedure.
@@ -40,3 +42,19 @@ A customer release is allowed only when all items are green:
 - Weekly: dependency and secret scanning, stale session/token cleanup, rate-limit bucket cleanup, restore telemetry review.
 - Monthly: access review, subprocessor/configuration audit and data-retention deletion job.
 - Quarterly: restore drill, incident exercise, threat-model review and clinical safety review.
+
+## Release profiles
+
+- `pilot`: closed or invitation-only registration; payments, clinical and child
+  features disabled. Requires a real AI provider and production runtime controls.
+- `paid`: adds real legal terms, transactional email, payment/refund evidence,
+  real-provider AI evaluation, recovery, incident and security attestations.
+- `clinical`: paid requirements plus named clinician sign-off for every promoted
+  module and current regional crisis-resource verification.
+- `family`: paid requirements plus guardian-consent enforcement and current child
+  safeguarding/privacy reviews.
+- `enterprise`: paid requirements plus owner/admin/member/viewer RBAC and a current
+  access review.
+
+Never change the profile merely to make the gate green. Disable unavailable features
+and launch the narrower profile instead.

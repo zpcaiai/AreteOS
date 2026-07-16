@@ -45,6 +45,39 @@ model LegalConsent {
   @@map("legal_consents")
 }
 
+model RegistrationInvite {
+  id          String    @id @default(cuid())
+  email       String
+  tokenHash   String    @unique
+  invitedById String
+  teamId      String?
+  teamRole    String    @default("member")
+  expiresAt   DateTime
+  usedAt      DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email, expiresAt])
+  @@index([teamId])
+  @@map("registration_invites")
+}
+
+model GuardianConsent {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guardianName String
+  relationship String
+  version      String
+  acceptedAt   DateTime  @default(now())
+  revokedAt    DateTime?
+  ipHash       String?
+  userAgent    String?
+
+  @@index([userId, acceptedAt])
+  @@map("guardian_consents")
+}
+
 model RateLimitBucket {
   key         String   @id
   count       Int      @default(0)

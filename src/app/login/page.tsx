@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -14,6 +14,19 @@ export default function LoginPage() {
   const [notice, setNotice] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [inviteToken, setInviteToken] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const invite = params.get("invite");
+    const invitedEmail = params.get("email");
+    if (invite) {
+      setInviteToken(invite);
+      setEmail(invitedEmail || "");
+      setMode("register");
+      setNotice("请设置密码以接受一次性邀请。");
+    }
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,7 +35,7 @@ export default function LoginPage() {
       const res = await fetch(`/api/auth/${mode}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(mode === "register" ? { email, password, name, acceptTerms } : { email, password }),
+        body: JSON.stringify(mode === "register" ? { email, password, name, acceptTerms, ...(inviteToken ? { inviteToken } : {}) } : { email, password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t("login.failed"));
@@ -45,6 +58,7 @@ export default function LoginPage() {
       <h1 className="text-2xl font-bold tracking-wide font-serif">ARETE</h1>
       <p className="mb-1 text-xs italic text-slate-500">{t("common.appTagline")}</p>
       <p className="mb-6 text-sm text-slate-400">{mode === "login" ? t("login.continue") : t("login.create")}</p>
+      {inviteToken && <p className="mb-4 rounded-lg border border-indigo-800 bg-indigo-950/40 p-2 text-xs text-indigo-200">一次性团队邀请将在注册完成后自动加入对应工作区。</p>}
       <form onSubmit={submit} className="space-y-3">
         {mode === "register" && (
           <input className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm" placeholder={t("login.name")} aria-label={t("login.name")} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />

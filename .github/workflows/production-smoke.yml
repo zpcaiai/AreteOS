@@ -1,0 +1,30 @@
+name: Production smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Expected deployed commit SHA
+        required: false
+  schedule:
+    - cron: "17 * * * *"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+      EXPECTED_COMMIT_SHA: ${{ inputs.expected_commit }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Require canonical production URL
+        run: test -n "$PRODUCTION_URL"
+      - name: Verify deployed application
+        run: npm run smoke:production

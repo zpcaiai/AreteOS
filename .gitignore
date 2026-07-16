@@ -10,3 +10,4 @@ playwright-report/
 .env.production
 .env.production.local
 .env*.local
+.vercel

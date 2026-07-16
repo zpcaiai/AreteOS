@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run prisma:generate
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       # PersonalMemory.embedding needs the pgvector extension before migrations run.
@@ -67,7 +67,7 @@ jobs:
       - run: npm run db:migrate:deploy
       - run: npm run db:migrate:status
       - name: Verify critical production tables
-        run: PGPASSWORD=postgres psql -h localhost -U postgres -d mission_os -v ON_ERROR_STOP=1 -c "SELECT 1 FROM users, auth_sessions, rate_limit_buckets, foundry_workspaces LIMIT 0"
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d mission_os -v ON_ERROR_STOP=1 -c "SELECT 1 FROM users, auth_sessions, rate_limit_buckets, foundry_workspaces, registration_invites, guardian_consents LIMIT 0"
       - run: npm run build
 
   # End-to-end smoke tests. Runs the app against a seeded database.
@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - name: Enable pgvector
@@ -133,7 +133,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       - name: Validate migration secret
@@ -156,5 +156,5 @@ jobs:
       - name: Verify critical production tables
         shell: bash
         run: |
-          printf '%s\n' 'SELECT 1 FROM users, auth_sessions, rate_limit_buckets, foundry_workspaces LIMIT 0;' \
+          printf '%s\n' 'SELECT 1 FROM users, auth_sessions, rate_limit_buckets, foundry_workspaces, registration_invites, guardian_consents LIMIT 0;' \
             | npx prisma db execute --url "$DIRECT_URL" --stdin
