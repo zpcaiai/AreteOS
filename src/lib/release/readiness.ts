@@ -82,14 +82,20 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
       ? { id: "real-ai-provider", category: "ai", status: "pass", message: `A real AI provider is selected (${env.AI_PROVIDER})` }
       : { id: "real-ai-provider", category: "ai", status: "fail", message: "A real AI provider is required", remediation: "Configure AI_PROVIDER and its provider credentials" },
   ];
-  const aiCredential = env.AI_PROVIDER === "openai"
-    ? ["OPENAI_API_KEY"]
-    : env.AI_PROVIDER === "anthropic"
-      ? ["ANTHROPIC_API_KEY"]
-      : env.AI_PROVIDER === "ollama"
-        ? ["OLLAMA_BASE_URL"]
-        : ["AI_PROVIDER"];
-  checks.push(required("ai-credentials", "ai", aiCredential, env, "AI provider credentials are configured"));
+  if (env.AI_PROVIDER === "gateway") {
+    checks.push(env.VERCEL === "1" || present("VERCEL_OIDC_TOKEN", env) || present("AI_GATEWAY_API_KEY", env)
+      ? { id: "ai-credentials", category: "ai", status: "pass", message: "Vercel AI Gateway authentication is available" }
+      : { id: "ai-credentials", category: "ai", status: "fail", message: "AI Gateway authentication is unavailable", remediation: "Deploy on Vercel with OIDC or set AI_GATEWAY_API_KEY" });
+  } else {
+    const aiCredential = env.AI_PROVIDER === "openai"
+      ? ["OPENAI_API_KEY"]
+      : env.AI_PROVIDER === "anthropic"
+        ? ["ANTHROPIC_API_KEY"]
+        : env.AI_PROVIDER === "ollama"
+          ? ["OLLAMA_BASE_URL"]
+          : ["AI_PROVIDER"];
+    checks.push(required("ai-credentials", "ai", aiCredential, env, "AI provider credentials are configured"));
+  }
 
   if (registrationMode !== "closed" || truthy(env.AUTH_REQUIRE_EMAIL_VERIFICATION)) {
     checks.push(required("transactional-email", "runtime", ["RESEND_API_KEY", "AUTH_EMAIL_FROM"], env, "Transactional email is configured"));

@@ -1,5 +1,6 @@
 // Provider-agnostic LLM access. Zero-dependency (uses fetch) so it runs on the
 // edge or node. Switch via AI_PROVIDER = openai | anthropic | ollama | mock.
+import { generateText } from "ai";
 
 export interface CompleteParams {
   system: string;
@@ -120,6 +121,26 @@ class OllamaProvider implements LLMProvider {
   }
 }
 
+/** Vercel AI Gateway. Uses short-lived Vercel OIDC on deployments by default. */
+class VercelGatewayProvider implements LLMProvider {
+  readonly name = "gateway";
+  constructor(private model: string) {}
+  async complete({ system, user, json, responseSchema, temperature = 0.4 }: CompleteParams): Promise<string> {
+    const structured = responseSchema
+      ? `\nReturn only JSON matching this JSON Schema exactly:\n${JSON.stringify(responseSchema.schema)}`
+      : json
+        ? "\nReturn only a valid JSON object with no Markdown fence."
+        : "";
+    const result = await generateText({
+      model: this.model,
+      system: `${system}${structured}`,
+      prompt: user,
+      temperature,
+    });
+    return result.text;
+  }
+}
+
 /** Mock provider: returns the sentinel so agents fall back to their example output. */
 class MockProvider implements LLMProvider {
   readonly name = "mock";
@@ -138,6 +159,8 @@ export function getProvider(): LLMProvider {
     cached = new OpenAIProvider(process.env.OPENAI_API_KEY, process.env.OPENAI_MODEL ?? "gpt-4o");
   } else if (provider === "anthropic" && process.env.ANTHROPIC_API_KEY) {
     cached = new AnthropicProvider(process.env.ANTHROPIC_API_KEY, process.env.ANTHROPIC_MODEL ?? "claude-3-5-sonnet-latest");
+  } else if (provider === "gateway" && (process.env.VERCEL_OIDC_TOKEN || process.env.AI_GATEWAY_API_KEY || process.env.VERCEL === "1")) {
+    cached = new VercelGatewayProvider(process.env.AI_GATEWAY_MODEL ?? "openai/gpt-5.4");
   } else if (provider === "ollama") {
     cached = new OllamaProvider(process.env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434", process.env.OLLAMA_MODEL ?? "llama3.1");
   } else {

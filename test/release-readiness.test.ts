@@ -36,6 +36,13 @@ describe("release readiness", () => {
     expect(report.failed).toContain("ai-evaluation");
   });
 
+  it("accepts Vercel AI Gateway OIDC without a long-lived provider key", () => {
+    const env = { ...base(), AI_PROVIDER: "gateway", OPENAI_API_KEY: "", VERCEL: "1" };
+    const report = releaseReadiness(env, "pilot");
+    expect(report.ready).toBe(true);
+    expect(report.checks.find((check) => check.id === "ai-credentials")?.status).toBe("pass");
+  });
+
   it("fails clinical promotion while expert reviews are pending", () => {
     const env = { ...base(), CLINICAL_FEATURE_ENABLED: "true", CRISIS_RESOURCES_VERIFIED_AT: new Date().toISOString() };
     const report = releaseReadiness(env, "clinical");
