@@ -41,8 +41,10 @@ export function RefundButton({ orderId, status }: { orderId: string; status: str
   if (status === "CANCELLED") return <span className="text-xs text-slate-500">已取消</span>;
   async function refund() {
     if (!confirm("确认退款/取消该订单?")) return;
+    const reason = prompt("请输入退款/取消原因（至少 3 个字符）", "客户申请退款");
+    if (!reason || reason.trim().length < 3) return;
     setBusy(true);
-    try { await call(`/api/admin/orders/${orderId}/refund`, {}); router.refresh(); }
+    try { await call(`/api/admin/orders/${orderId}/refund`, { reason: reason.trim() }); router.refresh(); }
     catch (e) { alert(e instanceof Error ? e.message : "失败"); }
     finally { setBusy(false); }
   }

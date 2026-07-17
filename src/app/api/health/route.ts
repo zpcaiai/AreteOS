@@ -17,7 +17,9 @@ export async function GET() {
         AND to_regclass('public.rate_limit_buckets') IS NOT NULL
         AND to_regclass('public.foundry_workspaces') IS NOT NULL
         AND to_regclass('public.registration_invites') IS NOT NULL
-        AND to_regclass('public.guardian_consents') IS NOT NULL AS ready
+        AND to_regclass('public.guardian_consents') IS NOT NULL
+        AND to_regclass('public.security_audit_events') IS NOT NULL
+        AND to_regclass('public.workspace_template_feedback') IS NOT NULL AS ready
     `);
     schema = row?.ready === true;
   } catch { /* exposed only as a boolean */ }
@@ -30,7 +32,7 @@ export async function GET() {
     checks: { database, schema, configuration: runtime.ready },
     failedChecks: runtime.failed,
     releaseProfile: runtime.profile,
-    version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) || process.env.npm_package_version || "development",
+    version: process.env.APP_VERSION?.slice(0, 12) || process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) || process.env.npm_package_version || "development",
     latencyMs: Date.now() - startedAt,
     timestamp: new Date().toISOString(),
   }, { status: ready ? 200 : 503, headers: { "Cache-Control": "no-store" } });

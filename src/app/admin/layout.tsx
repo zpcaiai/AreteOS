@@ -8,7 +8,7 @@ export const generateMetadata = titleMeta("Arete 管理后台", "Arete Admin");
 const NAV: [string, string][] = [
   ["/admin", "总览"], ["/admin/users", "用户"], ["/admin/orders", "订单"],
   ["/admin/products", "商品"], ["/admin/memberships", "会员发放"], ["/admin/community", "社区审核"],
-  ["/admin/release", "发布门禁"],
+  ["/admin/release", "发布门禁"], ["/admin/templates", "模板反馈"], ["/admin/audit", "安全审计"],
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

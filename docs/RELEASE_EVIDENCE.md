@@ -23,6 +23,7 @@ application repository.
 | `CHILD_SAFETY_REVIEWED_AT` | Child safeguarding review completed | 365 days |
 | `CHILD_PRIVACY_REVIEWED_AT` | Child privacy and guardian-consent review completed | 365 days |
 | `ACCESS_REVIEW_ATTESTED_AT` | Enterprise roles, team membership and administrator access reviewed | 90 days |
+| `RETENTION_JOB_VERIFIED_AT` | Scheduled cleanup was run against production-like data and its deletion counts reviewed | 100 days |
 
 ## Fail-closed defaults
 
@@ -32,3 +33,5 @@ application repository.
 - Child features and guardian consent are disabled.
 - The paid, clinical, family and enterprise gates stay red until real evidence is
   supplied. Automated tests never manufacture these approvals.
+- Every profile stays red while terms/privacy versions contain `draft`, operator
+  details are blank, or retention windows are not explicit.

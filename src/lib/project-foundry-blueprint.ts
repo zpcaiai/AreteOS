@@ -43,6 +43,7 @@ export interface ProjectWorkspace extends ProjectBriefInput {
   ownerId?: string;
   teamName?: string;
   revision?: number;
+  templateVersion?: number;
   updatedAt: number;
 }
 

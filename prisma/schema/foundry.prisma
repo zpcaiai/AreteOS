@@ -1,23 +1,44 @@
 // Durable personal/team workspaces. Domain events remain the immutable audit log.
 
 model FoundryWorkspace {
-  id          String   @id @default(cuid())
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  teamId      String?
-  team        Team?    @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  templateId  String?
-  title       String
-  problem     String
-  audience    String
-  projectType String
-  selectedIds Json
-  constraints String   @default("")
-  revision    Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String                      @id @default(cuid())
+  ownerId         String
+  owner           User                        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  teamId          String?
+  team            Team?                       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  templateId      String?
+  title           String
+  problem         String
+  audience        String
+  projectType     String
+  selectedIds     Json
+  constraints     String                      @default("")
+  templateVersion Int                         @default(1)
+  revision        Int                         @default(1)
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+  feedback        WorkspaceTemplateFeedback[]
 
   @@index([ownerId, updatedAt])
   @@index([teamId, updatedAt])
   @@map("foundry_workspaces")
+}
+
+model WorkspaceTemplateFeedback {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId     String
+  workspace       FoundryWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  templateId      String
+  templateVersion Int
+  rating          Int
+  outcome         String           @default("")
+  comment         String           @default("")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([userId, workspaceId])
+  @@index([templateId, templateVersion, createdAt])
+  @@map("workspace_template_feedback")
 }

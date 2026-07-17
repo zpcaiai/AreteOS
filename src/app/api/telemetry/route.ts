@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getUserId } from "@/lib/auth";
-import { ok, parseBody, route } from "@/lib/http";
-import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { ok, parseBody, requireSameOrigin, route } from "@/lib/http";
+import { persistentRateLimit } from "@/lib/rate-limit";
 import { requireAdmin } from "@/lib/admin/auth";
 import { CLIENT_EVENTS, telemetrySummary, track } from "@/lib/telemetry";
 
@@ -14,10 +14,10 @@ const bodySchema = z.object({
 /** Client-side product telemetry ingestion. Best-effort, rate-limited, whitelist-only. */
 export async function POST(req: Request) {
   return route(async () => {
-    const limited = rateLimit({ key: `telemetry:${clientIp(req)}`, limit: 240, windowMs: 60_000 });
-    if (limited) return limited;
-
+    requireSameOrigin(req);
     const userId = await getUserId(req);
+    const limited = await persistentRateLimit({ key: `telemetry:${userId}`, limit: 240, windowMs: 60_000 });
+    if (limited) return limited;
     const body = await parseBody(req, bodySchema);
     await track({ userId, name: body.name, props: body.props ?? null, sessionId: body.sessionId ?? null });
     return ok({ ok: true }, { status: 202 });

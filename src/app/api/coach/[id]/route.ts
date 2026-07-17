@@ -1,8 +1,8 @@
 import { getUserId } from "@/lib/auth";
 import { CoachMessageSchema } from "@/lib/schemas";
-import { ok, parseBody, route } from "@/lib/http";
+import { ok, parseBody, requireSameOrigin, route } from "@/lib/http";
 import { getSession, sendMessage, archiveSession } from "@/lib/coach";
-import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { persistentRateLimit } from "@/lib/rate-limit";
 
 // GET    /api/coach/:id   -> session + messages
 // POST   /api/coach/:id   -> send a message, returns the coach's reply
@@ -17,11 +17,12 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   return route(async () => {
+    requireSameOrigin(req);
     const userId = await getUserId(req);
     const { id } = await ctx.params;
 
-    const limited = rateLimit({
-      key: `coach:${userId}:${clientIp(req)}`,
+    const limited = await persistentRateLimit({
+      key: `coach:${userId}`,
       limit: Number(process.env.COACH_RATE_LIMIT ?? "20"),
       windowMs: Number(process.env.COACH_RATE_WINDOW_MS ?? "60000"),
     });
@@ -55,6 +56,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
 export async function DELETE(req: Request, ctx: { params: Promise<{ id: string }> }) {
   return route(async () => {
+    requireSameOrigin(req);
     const userId = await getUserId(req);
     const { id } = await ctx.params;
     await archiveSession(userId, id);

@@ -1,13 +1,15 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "./db";
+import { privacyHash } from "./session";
 
 const PRIVATE_TABLES = new Set(["auth_sessions", "auth_tokens", "rate_limit_buckets"]);
+const RETAINED_AUDIT_TABLES = new Set(["security_audit_events"]);
 const quoteIdentifier = (name: string) => `"${name.replaceAll('"', '""')}"`;
 
 async function userDataTables(tx: Prisma.TransactionClient | typeof prisma) {
   const rows = await tx.$queryRaw<Array<{ table_name: string; column_name: string }>>(Prisma.sql`
     SELECT table_name, column_name FROM information_schema.columns
-    WHERE table_schema = 'public' AND column_name IN ('userId', 'ownerId')
+    WHERE table_schema = 'public' AND column_name IN ('userId', 'ownerId', 'actorId')
     ORDER BY table_name, column_name
   `);
   const grouped = new Map<string, string[]>();
@@ -32,6 +34,7 @@ export async function exportAllUserData(userId: string) {
 
 /** Erase all user-owned records and the identity record in one transaction. */
 export async function deleteEntireAccount(userId: string) {
+  const deletedActorId = `deleted:${privacyHash(userId)}`;
   return prisma.$transaction(async (tx) => {
     const tables = await userDataTables(tx);
     let deletedRecords = 0;
@@ -39,8 +42,10 @@ export async function deleteEntireAccount(userId: string) {
     // by the schema's ON DELETE CASCADE constraints when the user is deleted.
     for (const { table, columns } of tables) {
       if (table === "users") continue;
+      if (RETAINED_AUDIT_TABLES.has(table)) continue;
       deletedRecords += await tx.$executeRawUnsafe(`DELETE FROM ${quoteIdentifier(table)} WHERE ${ownershipClause(columns)}`, ...columns.map(() => userId));
     }
+    await tx.securityAuditEvent.updateMany({ where: { actorId: userId }, data: { actorId: deletedActorId } });
     await tx.user.delete({ where: { id: userId } });
     return { deletedRecords: deletedRecords + 1 };
   }, { timeout: 30_000 });

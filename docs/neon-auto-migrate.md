@@ -1,6 +1,7 @@
 # Neon migrations
 
-Production Neon is migrated automatically after every push to `main`.
+Production Neon is migrated automatically after every successful push to `main`,
+before any Vercel candidate may be promoted.
 
 The GitHub Actions `Deploy migrations to Neon` job waits for type checks, unit
 tests, a clean-database build, clinical gates, dependency audit, and production
@@ -29,20 +30,17 @@ The workflow serializes `main` pushes and does not cancel a migration in
 progress. A missing or pooled `NEON_DIRECT_URL` fails closed before touching the
 database. Production is never seeded automatically.
 
-Vercel remains a second fail-safe. The `vercel-build` script runs:
+Vercel remains a second fail-safe. The `vercel-build` script only generates the
+client and builds the application:
 
 ```
-prisma generate && prisma migrate deploy && next build
+prisma generate && next build
 ```
 
-so a Vercel Git deployment cannot publish application code against a missing
-schema even if its deployment races the GitHub release gate. `migrate deploy`
-only applies pending migrations, so the second invocation is a no-op after a
-successful GitHub deployment.
-
-> The build now **fails** if `migrate deploy` fails. Previously it was
-> `prisma migrate deploy || echo "…"`, which swallowed the error and let deploys ship
-> against an un-migrated database.
+The Vercel Git integration is disconnected. GitHub Actions is the only production
+publisher: tests → Neon migration using the direct URL → unaliased candidate →
+candidate health checks → promotion. This removes the build/migration race and
+keeps the direct database credential out of Vercel.
 
 ## Required once: `migration_lock.toml`
 
@@ -83,5 +81,5 @@ database. A genuinely empty database is still allowed to run all migrations.
 ```bash
 npm run db:migrate        # create a migration locally (docker)
 git commit -am "…"
-git push                  # main CI gates → Neon migration; Vercel also fails closed
+git push                  # main CI gates → Neon migration → candidate → promotion
 ```

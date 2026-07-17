@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write
     env:
       PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
       EXPECTED_COMMIT_SHA: ${{ inputs.expected_commit }}
@@ -27,4 +28,27 @@ jobs:
       - name: Require canonical production URL
         run: test -n "$PRODUCTION_URL"
       - name: Verify deployed application
+        id: production-smoke
+        continue-on-error: true
         run: npm run smoke:production
+      - name: Open or update production incident
+        if: steps.production-smoke.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh label create production-alert --color D73A4A --description "Automated production availability alert" --force
+          issue="$(gh issue list --label production-alert --state open --search 'Production smoke is failing in:title' --json number --jq '.[0].number // empty' 2>/dev/null || true)"
+          body="Production smoke failed at ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. Commit: ${GITHUB_SHA}."
+          if [ -n "$issue" ]; then gh issue comment "$issue" --body "$body"; else gh issue create --title "Production smoke is failing" --label production-alert --body "$body"; fi
+      - name: Close recovered production incident
+        if: steps.production-smoke.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          issue="$(gh issue list --label production-alert --state open --search 'Production smoke is failing in:title' --json number --jq '.[0].number // empty' 2>/dev/null || true)"
+          if [ -n "$issue" ]; then gh issue close "$issue" --comment "Production smoke recovered in ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}."; fi
+      - name: Fail workflow after incident routing
+        if: steps.production-smoke.outcome == 'failure'
+        run: exit 1

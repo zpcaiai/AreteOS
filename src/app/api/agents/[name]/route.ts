@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { AGENTS, type AgentName } from "@/lib/agents/registry";
-import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { persistentRateLimit } from "@/lib/rate-limit";
 import { reportError } from "@/lib/logger";
+import { getUserId } from "@/lib/auth";
+import { requireSameOrigin, route } from "@/lib/http";
 
 const MAX_AGENT_BODY_CHARS = Number(process.env.MAX_AGENT_BODY_CHARS ?? "24000");
 
@@ -61,32 +63,36 @@ export async function GET() {
 }
 
 export async function POST(req: Request, ctx: { params: Promise<{ name: string }> }) {
-  const { name } = await ctx.params;
-  const agent = AGENTS[name as AgentName];
-  if (!agent) return NextResponse.json({ error: `Unknown agent: ${name}` }, { status: 404 });
+  return route(async () => {
+    requireSameOrigin(req);
+    const userId = await getUserId(req);
+    const { name } = await ctx.params;
+    const agent = AGENTS[name as AgentName];
+    if (!agent) return NextResponse.json({ error: `Unknown agent: ${name}` }, { status: 404 });
 
-  const limited = rateLimit({
-    key: `agent:${name}:${clientIp(req)}`,
-    limit: Number(process.env.AGENT_RATE_LIMIT ?? "30"),
-    windowMs: Number(process.env.AGENT_RATE_WINDOW_MS ?? "60000"),
+    const limited = await persistentRateLimit({
+      key: `agent:${name}:${userId}`,
+      limit: Number(process.env.AGENT_RATE_LIMIT ?? "30"),
+      windowMs: Number(process.env.AGENT_RATE_WINDOW_MS ?? "60000"),
+    });
+    if (limited) return limited;
+
+    let input: unknown;
+    try {
+      input = await readJson(req);
+    } catch (e) {
+      if (e instanceof NextResponse) return e;
+      return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 400 });
+    }
+    if (wantsStream(req)) return sse(name, () => agent.run(input as never));
+
+    try {
+      const output = await agent.run(input as never);
+      return NextResponse.json({ agent: name, output });
+    } catch (e) {
+      if (e instanceof NextResponse) return e;
+      reportError(e, { surface: "agent-route", agent: name });
+      return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 400 });
+    }
   });
-  if (limited) return limited;
-
-  let input: unknown;
-  try {
-    input = await readJson(req);
-  } catch (e) {
-    if (e instanceof NextResponse) return e;
-    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 400 });
-  }
-  if (wantsStream(req)) return sse(name, () => agent.run(input as never));
-
-  try {
-    const output = await agent.run(input as never);
-    return NextResponse.json({ agent: name, output });
-  } catch (e) {
-    if (e instanceof NextResponse) return e;
-    reportError(e, { surface: "agent-route", agent: name });
-    return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 400 });
-  }
 }

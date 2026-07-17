@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin/auth";
 import { sendRegistrationInviteEmail } from "@/lib/email";
 import { created, ok, parseBody, requireSameOrigin, route } from "@/lib/http";
 import { createRegistrationInvite, revokeRegistrationInvite } from "@/lib/registration-invites";
+import { writeSecurityAudit } from "@/lib/security-audit";
 
 export async function GET() {
   return route(async () => {
@@ -34,6 +35,7 @@ export async function POST(req: Request) {
       await prisma.registrationInvite.update({ where: { id: invite.id }, data: { revokedAt: new Date() } });
       throw error;
     }
+    await writeSecurityAudit(req, { actorId: adminId, action: "invite.create", targetType: "registration_invite", targetId: invite.id, metadata: { teamRole: body.teamRole } });
     return created({
       invite: { id: invite.id, email: invite.email, expiresAt: invite.expiresAt },
       ...(process.env.NODE_ENV !== "production" ? { debugLink: link } : {}),
@@ -46,6 +48,8 @@ export async function DELETE(req: Request) {
     requireSameOrigin(req);
     const adminId = await requireAdmin();
     const body = await parseBody(req, z.object({ id: z.string().min(1) }));
-    return ok(await revokeRegistrationInvite(body.id, adminId));
+    const result = await revokeRegistrationInvite(body.id, adminId);
+    await writeSecurityAudit(req, { actorId: adminId, action: "invite.revoke", targetType: "registration_invite", targetId: body.id });
+    return ok(result);
   });
 }

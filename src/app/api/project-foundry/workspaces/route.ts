@@ -3,10 +3,13 @@ import { getUserId } from "@/lib/auth";
 import { ok, parseBody, requireSameOrigin, route } from "@/lib/http";
 import { persistentRateLimit } from "@/lib/rate-limit";
 import { saveProjectWorkspace } from "@/lib/project-foundry";
+import { track } from "@/lib/telemetry";
+import { WORKSPACE_TEMPLATE_VERSION } from "@/lib/project-foundry-catalog";
 
 const Body = z.object({
   id: z.string().uuid().optional(),
   templateId: z.string().min(1).max(80).optional(),
+  templateVersion: z.number().int().min(1).max(WORKSPACE_TEMPLATE_VERSION).optional(),
   teamId: z.string().min(1).max(100).nullable().optional(),
   title: z.string().trim().min(2).max(120),
   problem: z.string().trim().min(10).max(2000),
@@ -24,6 +27,8 @@ export async function POST(req: Request) {
     const limited = await persistentRateLimit({ key: `foundry-save:${userId}`, limit: 60, windowMs: 60_000 });
     if (limited) return limited;
     const input = await parseBody(req, Body);
-    return ok({ workspace: await saveProjectWorkspace(userId, input) });
+    const workspace = await saveProjectWorkspace(userId, input);
+    await track({ userId, name: "foundry_workspace_saved", props: { templateId: workspace.templateId, templateVersion: workspace.templateVersion, revision: workspace.revision } });
+    return ok({ workspace });
   });
 }

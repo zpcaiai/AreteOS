@@ -1,5 +1,8 @@
 import { EXTENDED_WORKSPACE_TEMPLATES } from "./project-foundry-templates-extended";
 
+/** Increment when template semantics change; saved workspaces retain their source version. */
+export const WORKSPACE_TEMPLATE_VERSION = 1;
+
 // Project Foundry catalog: a composable map from the existing Arete engines to
 // shippable product capabilities. This file is deliberately pure data so the
 // catalog can later power a CLI/scaffolder as well as the in-app planner.

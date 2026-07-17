@@ -98,6 +98,22 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
   }
   checks.push(attestation("ai-runtime", "ai", "AI_RUNTIME_VERIFIED_AT", 7, env, "A real AI request and blocking scenario suite passed recently"));
 
+  checks.push(required(
+    "legal-documents",
+    "legal",
+    ["LEGAL_ENTITY_NAME", "LEGAL_ENTITY_ADDRESS", "SUPPORT_EMAIL", "PRIVACY_EMAIL", "GOVERNING_LAW", "DISPUTE_RESOLUTION", "REFUND_POLICY", "SUBPROCESSORS", "DATA_REGIONS", "TERMS_VERSION", "PRIVACY_VERSION"],
+    env,
+    "Customer-facing legal documents contain the real operator and regional terms",
+  ));
+  const legalVersions = [env.TERMS_VERSION, env.PRIVACY_VERSION];
+  checks.push(legalVersions.every((value) => Boolean(value?.trim()) && !value!.toLowerCase().includes("draft"))
+    ? { id: "legal-version", category: "legal", status: "pass", message: "Published legal document versions are non-draft" }
+    : { id: "legal-version", category: "legal", status: "fail", message: "Legal document versions are missing or still draft", remediation: "Publish counsel-approved TERMS_VERSION and PRIVACY_VERSION without a draft marker" });
+  const retentionDays = [env.ANALYTICS_RETENTION_DAYS, env.SECURITY_AUDIT_RETENTION_DAYS].map(Number);
+  checks.push(present("DATA_RETENTION_POLICY_VERSION", env) && retentionDays.every((days) => Number.isInteger(days) && days >= 1 && days <= 3650)
+    ? { id: "retention-policy", category: "operations", status: "pass", message: "Data retention policy and deletion windows are explicit" }
+    : { id: "retention-policy", category: "operations", status: "fail", message: "Data retention policy or deletion windows are invalid", remediation: "Set DATA_RETENTION_POLICY_VERSION and integer ANALYTICS_RETENTION_DAYS / SECURITY_AUDIT_RETENTION_DAYS between 1 and 3650" });
+
   if (registrationMode !== "closed" || truthy(env.AUTH_REQUIRE_EMAIL_VERIFICATION)) {
     checks.push(required("transactional-email", "runtime", ["RESEND_API_KEY", "AUTH_EMAIL_FROM"], env, "Transactional email is configured"));
   } else {
@@ -127,18 +143,12 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
   }
 
   if (paid) {
-    checks.push(required(
-      "legal-documents",
-      "legal",
-      ["LEGAL_ENTITY_NAME", "LEGAL_ENTITY_ADDRESS", "SUPPORT_EMAIL", "PRIVACY_EMAIL", "GOVERNING_LAW", "DISPUTE_RESOLUTION", "REFUND_POLICY", "SUBPROCESSORS", "DATA_REGIONS", "TERMS_VERSION", "PRIVACY_VERSION"],
-      env,
-      "Customer-facing legal documents contain the real operator and regional terms",
-    ));
     checks.push(attestation("legal-review", "legal", "LEGAL_REVIEW_ATTESTED_AT", 365, env, "Qualified legal review is current"));
     checks.push(attestation("ai-evaluation", "ai", "AI_EVAL_ATTESTED_AT", 30, env, "Real-provider safety and quality evaluation is current"));
     checks.push(attestation("restore-drill", "operations", "RESTORE_DRILL_ATTESTED_AT", 100, env, "A production-like restore drill is current"));
     checks.push(attestation("incident-drill", "operations", "INCIDENT_DRILL_ATTESTED_AT", 100, env, "An incident response exercise is current"));
     checks.push(attestation("security-review", "security", "SECURITY_REVIEW_ATTESTED_AT", 180, env, "Security and access-control review is current"));
+    checks.push(attestation("retention-job", "operations", "RETENTION_JOB_VERIFIED_AT", 100, env, "Retention deletion job was verified recently"));
   }
 
   if (clinical || clinicalEnabled) {
@@ -177,7 +187,7 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
 
 export function runtimeReadiness(env: NodeJS.ProcessEnv = process.env) {
   const commercial = releaseReadiness(env, profileFrom(env.RELEASE_PROFILE));
-  const runtimeIds = new Set(["runtime-core", "auth-secret-strength", "registration-mode", "real-ai-provider", "ai-credentials", "ai-runtime", "transactional-email", "observability"]);
+  const runtimeIds = new Set(["runtime-core", "auth-secret-strength", "registration-mode", "real-ai-provider", "ai-credentials", "ai-runtime", "legal-documents", "legal-version", "retention-policy", "transactional-email", "observability"]);
   const checks = commercial.checks.filter((check) => runtimeIds.has(check.id));
   const failed = checks.filter((check) => check.status === "fail").map((check) => check.id);
   return { ready: failed.length === 0, checks, failed, profile: commercial.profile };

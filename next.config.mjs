@@ -13,6 +13,10 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    // Keep static generation within predictable CI/Vercel memory limits.
+    cpus: 2,
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

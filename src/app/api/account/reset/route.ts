@@ -2,6 +2,7 @@ import { z } from "zod";
 import { getUserId } from "@/lib/auth";
 import { ok, parseBody, requireSameOrigin, route } from "@/lib/http";
 import { resetGrowthData } from "@/lib/account-data";
+import { writeSecurityAudit } from "@/lib/security-audit";
 
 const Body = z.object({ confirm: z.literal(true) });
 
@@ -11,6 +12,8 @@ export async function POST(req: Request) {
     requireSameOrigin(req);
     const userId = await getUserId(req);
     await parseBody(req, Body);
-    return ok(await resetGrowthData(userId));
+    const result = await resetGrowthData(userId);
+    await writeSecurityAudit(req, { actorId: userId, action: "account.growth.reset", targetType: "user", targetId: userId });
+    return ok(result);
   });
 }

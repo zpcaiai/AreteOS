@@ -2,7 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+  /* System-first stacks keep production builds deterministic and avoid a
+     network dependency on Google Fonts during CI or disaster recovery. */
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-serif: "EB Garamond", Georgia, Cambria, "Songti SC", serif;
+}
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
   font-family: var(--font-sans), ui-sans-serif, system-ui, "PingFang SC",

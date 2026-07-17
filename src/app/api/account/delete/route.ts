@@ -8,6 +8,7 @@ import { deleteEntireAccount } from "@/lib/data-rights";
 import { parseBody, requireSameOrigin, route } from "@/lib/http";
 import { SESSION_COOKIE } from "@/lib/session";
 import { persistentRateLimit } from "@/lib/rate-limit";
+import { writeSecurityAudit } from "@/lib/security-audit";
 
 export async function POST(req: Request) {
   return route(async () => {
@@ -18,6 +19,7 @@ export async function POST(req: Request) {
     const body = await parseBody(req, z.object({ password: z.string().min(1).max(200), confirmation: z.literal("DELETE MY ACCOUNT") }));
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { passwordHash: true } });
     if (!user || !verifyPassword(body.password, user.passwordHash)) return NextResponse.json({ error: "Password is incorrect" }, { status: 403 });
+    await writeSecurityAudit(req, { actorId: userId, action: "account.delete", targetType: "user", targetId: userId });
     const result = await deleteEntireAccount(userId);
     const store = await cookies();
     store.delete(SESSION_COOKIE);

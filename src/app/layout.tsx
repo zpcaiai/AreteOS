@@ -1,6 +1,5 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { Inter, EB_Garamond } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import Disclaimer from "@/components/Disclaimer";
 import PageTransition from "@/components/PageTransition";
@@ -11,9 +10,6 @@ import WebVitals from "@/components/WebVitals";
 import { cookies } from "next/headers";
 import { getDict } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/client";
-
-const sans = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" });
-const serif = EB_Garamond({ subsets: ["latin"], display: "swap", weight: ["500", "600"], variable: "--font-serif" });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://arete.app";
 
@@ -49,7 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const jar = await cookies();
   const theme = jar.get("theme")?.value === "light" ? "light" : "dark";
   return (
-    <html lang={locale === "zh" ? "zh-CN" : "en"} data-theme={theme} className={`${sans.variable} ${serif.variable}`}>
+    <html lang={locale === "zh" ? "zh-CN" : "en"} data-theme={theme}>
       <body>
         <script
           type="application/ld+json"

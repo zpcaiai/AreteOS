@@ -17,10 +17,11 @@ A customer release is allowed only when all items are green:
 ## Deployment
 
 1. Take a Neon restore point/snapshot according to the current plan and record the current commit SHA.
-2. Push the reviewed commit to `main`. GitHub Actions runs all code gates, then applies migrations with the `Production` Environment secret `NEON_DIRECT_URL`. Confirm `Deploy migrations to Neon` is green before shifting traffic. Vercel does not receive the direct database credential and does not run migrations during build.
-3. Deploy the immutable build. Verify `/api/health`, login, email verification, password reset, a personal workspace, a team workspace, checkout, and signed webhook settlement.
-4. Review error rate, p95 latency, database connections, email delivery and payment reconciliation for at least 30 minutes.
-5. Roll back application traffic on regression. Database migrations in this repository are forward-only; restore the snapshot only through the database incident procedure.
+2. Push the reviewed commit to `main`. GitHub Actions runs all code gates, then applies migrations with the `Production` Environment secret `NEON_DIRECT_URL`. Vercel does not receive the direct database credential and does not run migrations during build.
+3. After Neon is current, CI creates an unaliased production-target Vercel candidate. It checks the protected candidate's health and public pages, then promotes that exact deployment. Vercel's Git integration must remain disconnected so it cannot race the migration gate.
+4. CI verifies the canonical URL and exact commit after promotion. Manually verify login, email verification, password reset, a personal workspace, a team workspace, and any enabled signed payment flow.
+5. Review error rate, p95 latency, database connections, email delivery and payment reconciliation for at least 30 minutes.
+6. Roll back application traffic on regression. Database migrations in this repository are forward-only; restore the snapshot only through the database incident procedure.
 
 ## Backup and restore
 
@@ -38,7 +39,7 @@ A customer release is allowed only when all items are green:
 
 ## Scheduled maintenance
 
-- Daily: payment/order reconciliation, backup status, error budget and failed email review.
+- Daily: payment/order reconciliation, backup status, error budget, failed email review, retention cleanup, and security-audit review.
 - Weekly: dependency and secret scanning, stale session/token cleanup, rate-limit bucket cleanup, restore telemetry review.
 - Monthly: access review, subprocessor/configuration audit and data-retention deletion job.
 - Quarterly: restore drill, incident exercise, threat-model review and clinical safety review.
@@ -46,7 +47,8 @@ A customer release is allowed only when all items are green:
 ## Release profiles
 
 - `pilot`: closed or invitation-only registration; payments, clinical and child
-  features disabled. Requires a real AI provider and production runtime controls.
+  features disabled. Requires a real AI provider, published non-draft legal
+  documents, explicit retention windows, and production runtime controls.
 - `paid`: adds real legal terms, transactional email, payment/refund evidence,
   real-provider AI evaluation, recovery, incident and security attestations.
 - `clinical`: paid requirements plus named clinician sign-off for every promoted

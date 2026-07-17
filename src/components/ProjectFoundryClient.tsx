@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import { Card, PageHeader, ScoreBar, StatGrid } from "@/components/ui";
 import { useApi, useApiMutation } from "@/lib/hooks";
 import { SuggestionField } from "@/components/SuggestionField";
@@ -27,6 +27,7 @@ interface FoundryData {
   blueprints: ProjectBlueprint[];
   workspaces: ProjectWorkspace[];
   teams: { id: string; name: string; role: string; memberCount: number; seats: number }[];
+  workspaceTemplateVersion?: number;
 }
 
 interface Form {
@@ -39,6 +40,7 @@ interface Form {
   selectedIds: string[];
   constraints: string;
   teamId: string | null;
+  templateVersion?: number;
 }
 
 const emptyForm: Form = { title: "", problem: "", audience: "", projectType: "founder", selectedIds: [], constraints: "", teamId: null };
@@ -71,6 +73,7 @@ function workspaceForm(workspace: ProjectWorkspace): Form {
     selectedIds: workspace.selectedIds,
     constraints: workspace.constraints ?? "",
     teamId: workspace.teamId ?? null,
+    templateVersion: workspace.templateVersion,
   };
 }
 
@@ -81,8 +84,11 @@ export default function ProjectFoundryClient() {
   const [filter, setFilter] = useState<FoundryCategory | "all">("all");
   const [templateFilter, setTemplateFilter] = useState<WorkspaceTemplateCategory | "all">("all");
   const [templateQuery, setTemplateQuery] = useState("");
+  const [feedback, setFeedback] = useState({ rating: 0, outcome: "in_progress", comment: "" });
+  const [importError, setImportError] = useState("");
   const create = useApiMutation<Omit<Form, "id" | "templateId" | "teamId">, { blueprint: ProjectBlueprint }>("/api/project-foundry", { invalidate: ["/api/project-foundry"] });
   const saveWorkspace = useApiMutation<Form, { workspace: ProjectWorkspace }>("/api/project-foundry/workspaces", { invalidate: ["/api/project-foundry"] });
+  const submitFeedback = useApiMutation<{ workspaceId: string; rating: number; outcome: string; comment: string }, { feedback: { id: string } }>("/api/project-foundry/feedback");
   const blueprint = create.data?.blueprint;
 
   // The library remains usable when saved data is briefly unavailable. Templates
@@ -128,7 +134,7 @@ export default function ProjectFoundryClient() {
   function save() {
     if (!isReady) return;
     saveWorkspace.mutate(form, {
-      onSuccess: ({ workspace }) => set({ id: workspace.id }),
+      onSuccess: ({ workspace }) => set({ id: workspace.id, templateVersion: workspace.templateVersion }),
     });
   }
 
@@ -141,6 +147,37 @@ export default function ProjectFoundryClient() {
     link.download = `${blueprint.title.replaceAll(/[^a-zA-Z0-9-_]/g, "-").slice(0, 60) || "project"}-blueprint.json`;
     link.click();
     URL.revokeObjectURL(href);
+  }
+
+  function exportWorkspace() {
+    if (!isReady) return;
+    const payload = { format: "arete-workspace-v1", exportedAt: new Date().toISOString(), workspace: { ...form, id: undefined, teamId: null } };
+    const href = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = href;
+    link.download = `${form.title.replaceAll(/[^a-zA-Z0-9-_]/g, "-").slice(0, 60) || "workspace"}.arete.json`;
+    link.click();
+    URL.revokeObjectURL(href);
+  }
+
+  async function importWorkspace(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    try {
+      if (file.size > 256_000) throw new Error(T("文件不能超过 256KB", "File must be under 256KB"));
+      const value = JSON.parse(await file.text()) as { format?: string; workspace?: Partial<Form> };
+      const workspace = value.workspace;
+      const validTypes = new Set(foundry.starterPacks.map((pack) => pack.id));
+      const knownIds = new Set(foundry.features.map((feature) => feature.id));
+      if (value.format !== "arete-workspace-v1" || !workspace || typeof workspace.title !== "string" || typeof workspace.problem !== "string" || typeof workspace.audience !== "string" || !validTypes.has(workspace.projectType as ProjectType) || !Array.isArray(workspace.selectedIds)) throw new Error(T("不是有效的 Arete 工作区文件", "Not a valid Arete workspace file"));
+      const selectedIds = workspace.selectedIds.filter((id): id is string => typeof id === "string" && knownIds.has(id));
+      if (!selectedIds.length) throw new Error(T("文件中没有可用模块", "No supported modules in file"));
+      setForm({ id: undefined, templateId: workspace.templateId, title: workspace.title.slice(0, 120), problem: workspace.problem.slice(0, 2000), audience: workspace.audience.slice(0, 500), projectType: workspace.projectType as ProjectType, selectedIds, constraints: typeof workspace.constraints === "string" ? workspace.constraints.slice(0, 1000) : "", teamId: null, templateVersion: workspace.templateVersion });
+      setImportError("");
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : T("导入失败", "Import failed"));
+    }
   }
 
   return (
@@ -192,9 +229,10 @@ export default function ProjectFoundryClient() {
       <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
         <Card title={T("正在编辑的工作区", "Workspace details")}>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <span className="text-slate-500">{form.id ? T("已打开已保存工作区", "Saved workspace open") : form.templateId ? T("模板已载入，尚未保存为我的工作区", "Template loaded; not yet saved to My Workspaces") : T("可从上方模板开始，或自行配置", "Choose a template above, or configure it yourself")}</span>
-            {form.id && <button type="button" onClick={() => setForm({ ...form, id: undefined })} className="text-indigo-300 hover:text-indigo-200">{T("另存为新的工作区", "Save as a new workspace")}</button>}
+            <span className="text-slate-500">{form.id ? T("已打开已保存工作区", "Saved workspace open") : form.templateId ? T("模板已载入，尚未保存为我的工作区", "Template loaded; not yet saved to My Workspaces") : T("可从上方模板开始，或自行配置", "Choose a template above, or configure it yourself")}{form.templateId ? ` · Template v${form.templateVersion ?? foundry.workspaceTemplateVersion ?? 1}` : ""}</span>
+            <span className="flex gap-3">{form.id && <button type="button" onClick={() => setForm({ ...form, id: undefined })} className="text-indigo-300 hover:text-indigo-200">{T("另存为新的工作区", "Save as a new workspace")}</button>}<button type="button" onClick={exportWorkspace} disabled={!isReady} className="text-sky-300 disabled:opacity-40">{T("导出工作区", "Export workspace")}</button><label className="cursor-pointer text-sky-300">{T("导入工作区", "Import workspace")}<input type="file" accept="application/json,.json" onChange={importWorkspace} className="sr-only" /></label></span>
           </div>
+          {importError && <p role="alert" className="mb-3 text-xs text-rose-400">{importError}</p>}
           <div className="grid gap-3 md:grid-cols-2">
             <SuggestionField
               as="input"
@@ -278,6 +316,14 @@ export default function ProjectFoundryClient() {
           </div>
         </Card>
       </div>
+
+      {form.id && form.templateId && <div className="mt-5"><Card title={T("模板试用反馈", "Template pilot feedback")} accent="#f59e0b">
+        <p className="text-sm text-slate-400">{T("请按真实使用结果评价当前模板；反馈会绑定模板版本，用于下一轮改进。", "Rate the current template from real use; feedback is tied to its version for the next iteration.")}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">{[1, 2, 3, 4, 5].map((rating) => <button type="button" key={rating} onClick={() => setFeedback((current) => ({ ...current, rating }))} className={`h-9 w-9 rounded-lg border text-sm ${feedback.rating === rating ? "border-amber-400 bg-amber-950 text-amber-200" : "border-slate-700 text-slate-400"}`}>{rating}</button>)}<select value={feedback.outcome} onChange={(event) => setFeedback((current) => ({ ...current, outcome: event.target.value }))} className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200"><option value="not_started">{T("尚未开始", "Not started")}</option><option value="in_progress">{T("试用中", "In progress")}</option><option value="useful">{T("已产生效果", "Useful")}</option><option value="not_useful">{T("未解决问题", "Not useful")}</option></select></div>
+        <textarea value={feedback.comment} onChange={(event) => setFeedback((current) => ({ ...current, comment: event.target.value }))} maxLength={1000} rows={3} placeholder={T("哪些预设有效？还缺什么？", "What worked, and what is missing?")} className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm text-slate-200" />
+        <button type="button" disabled={!feedback.rating || submitFeedback.isPending} onClick={() => submitFeedback.mutate({ workspaceId: form.id!, ...feedback })} className="mt-3 rounded-lg border border-amber-500/70 px-4 py-2 text-sm text-amber-200 disabled:opacity-40">{submitFeedback.isPending ? T("提交中…", "Submitting…") : T("提交反馈", "Submit feedback")}</button>
+        {submitFeedback.isSuccess && <span className="ml-3 text-sm text-emerald-400">{T("反馈已保存", "Feedback saved")}</span>}{submitFeedback.error && <p role="alert" className="mt-2 text-sm text-rose-400">{submitFeedback.error.message}</p>}
+      </Card></div>}
 
       {catalog.isError && <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-700/50 bg-amber-950/20 p-3 text-sm text-amber-100" role="status">
         <span>{T("模板与能力目录仍可使用；已保存工作区暂时无法读取或保存。", "Templates and capabilities remain usable; saved workspaces are temporarily unavailable.")}</span>

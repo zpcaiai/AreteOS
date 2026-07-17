@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/admin/auth";
-import { ok, created, parseBody, route } from "@/lib/http";
+import { ok, created, parseBody, requireSameOrigin, route } from "@/lib/http";
+import { writeSecurityAudit } from "@/lib/security-audit";
 
 export async function GET() {
   return route(async () => {
@@ -13,7 +14,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   return route(async () => {
-    await requireAdmin();
+    requireSameOrigin(req);
+    const adminId = await requireAdmin();
     const b = await parseBody(req, z.object({
       slug: z.string().min(1), name: z.string().min(1), description: z.string().default(""),
       kind: z.enum(["MEMBERSHIP_DAYS", "CREDITS", "CONTENT"]),
@@ -25,6 +27,7 @@ export async function POST(req: Request) {
       sortOrder: z.number().int().default(0),
     }));
     const product = await prisma.virtualProduct.create({ data: { ...b, grantTier: b.grantTier ?? null } });
+    await writeSecurityAudit(req, { actorId: adminId, action: "product.create", targetType: "product", targetId: product.id });
     return created({ product });
   });
 }

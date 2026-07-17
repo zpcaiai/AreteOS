@@ -4,7 +4,7 @@
 
 import { prisma } from "./db";
 import { emit } from "./events";
-import { FOUNDRY_FEATURES, STARTER_PACKS, WORKSPACE_TEMPLATES } from "./project-foundry-catalog";
+import { FOUNDRY_FEATURES, STARTER_PACKS, WORKSPACE_TEMPLATES, WORKSPACE_TEMPLATE_VERSION } from "./project-foundry-catalog";
 import {
   buildProjectBlueprint,
   uniqueKnown,
@@ -49,6 +49,7 @@ export async function listProjectBlueprints(userId: string, limit = 12) {
 export async function saveProjectWorkspace(userId: string, input: Omit<ProjectWorkspace, "id" | "updatedAt" | "ownerId" | "teamName" | "revision" | "teamId"> & { id?: string; teamId?: string | null }) {
   const existing = input.id ? await prisma.foundryWorkspace.findUnique({ where: { id: input.id } }) : null;
   if (input.id && !existing) throw new HttpError(404, "工作区不存在");
+  if (input.templateId && !WORKSPACE_TEMPLATES.some((template) => template.id === input.templateId)) throw new HttpError(400, "工作区模板不存在");
   if (existing?.teamId) await requireTeamMember(existing.teamId, userId);
   else if (existing && existing.ownerId !== userId) throw new HttpError(403, "你无权修改该工作区");
   const teamId = input.teamId !== undefined ? input.teamId : existing?.teamId ?? null;
@@ -62,7 +63,7 @@ export async function saveProjectWorkspace(userId: string, input: Omit<ProjectWo
     },
     create: {
       ownerId: userId, teamId, templateId: input.templateId, title: input.title.trim(), problem: input.problem.trim(), audience: input.audience.trim(),
-      projectType: input.projectType, selectedIds: uniqueKnown(input.selectedIds), constraints: input.constraints?.trim() ?? "",
+      projectType: input.projectType, selectedIds: uniqueKnown(input.selectedIds), constraints: input.constraints?.trim() ?? "", templateVersion: input.templateVersion ?? WORKSPACE_TEMPLATE_VERSION,
     },
     include: { team: { select: { name: true } } },
   });
@@ -79,6 +80,7 @@ export async function saveProjectWorkspace(userId: string, input: Omit<ProjectWo
     teamName: saved.team?.name,
     ownerId: saved.ownerId,
     revision: saved.revision,
+    templateVersion: saved.templateVersion,
     updatedAt: saved.updatedAt.getTime(),
   };
   await emit({
@@ -101,7 +103,7 @@ export async function listProjectWorkspaces(userId: string, limit = 24) {
   const current = durable.map((row) => ({
     id: row.id, ownerId: row.ownerId, teamId: row.teamId ?? undefined, teamName: row.team?.name, templateId: row.templateId ?? undefined,
     title: row.title, problem: row.problem, audience: row.audience, projectType: row.projectType as ProjectWorkspace["projectType"],
-    selectedIds: row.selectedIds as string[], constraints: row.constraints, revision: row.revision, updatedAt: row.updatedAt.getTime(),
+    selectedIds: row.selectedIds as string[], constraints: row.constraints, revision: row.revision, templateVersion: row.templateVersion, updatedAt: row.updatedAt.getTime(),
   }));
   if (current.length >= Math.min(Math.max(limit, 1), 50)) return current;
   const rows = await prisma.domainEvent.findMany({
@@ -124,4 +126,5 @@ export const projectFoundryCatalog = () => ({
   features: FOUNDRY_FEATURES,
   starterPacks: STARTER_PACKS,
   workspaceTemplates: WORKSPACE_TEMPLATES,
+  workspaceTemplateVersion: WORKSPACE_TEMPLATE_VERSION,
 });
