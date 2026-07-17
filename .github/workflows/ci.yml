@@ -208,11 +208,11 @@ jobs:
           CANDIDATE_URL: ${{ steps.candidate.outputs.url }}
         shell: bash
         run: |
-          body="$(npx vercel@56.3.1 curl /api/health --deployment "$CANDIDATE_URL" --token "$VERCEL_TOKEN" -- --fail-with-body --silent --show-error)"
+          body="$(npx vercel@56.3.1 curl /api/health --deployment "$CANDIDATE_URL" -- --silent --show-error)"
           BODY="$body" node -e 'const health=JSON.parse(process.env.BODY); if(health.status!=="ready") throw new Error(JSON.stringify(health));'
-          npx vercel@56.3.1 curl /privacy --deployment "$CANDIDATE_URL" --token "$VERCEL_TOKEN" -- --fail --silent --show-error >/dev/null
-          npx vercel@56.3.1 curl /terms --deployment "$CANDIDATE_URL" --token "$VERCEL_TOKEN" -- --fail --silent --show-error >/dev/null
-          npx vercel@56.3.1 curl /login --deployment "$CANDIDATE_URL" --token "$VERCEL_TOKEN" -- --fail --silent --show-error >/dev/null
+          npx vercel@56.3.1 curl /privacy --deployment "$CANDIDATE_URL" -- --fail --silent --show-error >/dev/null
+          npx vercel@56.3.1 curl /terms --deployment "$CANDIDATE_URL" -- --fail --silent --show-error >/dev/null
+          npx vercel@56.3.1 curl /login --deployment "$CANDIDATE_URL" -- --fail --silent --show-error >/dev/null
       - name: Promote verified candidate
         run: npx vercel@56.3.1 promote "${{ steps.candidate.outputs.url }}" --yes --token "$VERCEL_TOKEN"
       - name: Verify canonical production and commit
