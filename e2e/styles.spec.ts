@@ -41,10 +41,10 @@ test("command palette retains backdrop blur and keyboard focus styles", async ({
   const search = dialog.getByRole("combobox");
   await expect(search).toBeFocused();
   await expect(search).toHaveCSS("outline-style", "none");
-  // Tailwind's outline-hidden preserves a transparent outline in forced colors.
+  // Forced colors must expose a visible system-color outline for keyboard users.
   await page.emulateMedia({ forcedColors: "active" });
   await expect(search).toHaveCSS("outline-style", "solid");
-  await expect(search).toHaveCSS("outline-color", "rgba(0, 0, 0, 0)");
+  await expect(search).not.toHaveCSS("outline-color", "rgba(0, 0, 0, 0)");
   await expect(search).toHaveCSS("outline-width", "2px");
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
