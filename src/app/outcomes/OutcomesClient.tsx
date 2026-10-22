@@ -97,7 +97,7 @@ export default function OutcomesClient() {
                     <div className="w-40 shrink-0 text-sm text-slate-300">{L(d.name)}</div>
                     <div className="flex flex-1 items-end gap-0.5" aria-hidden="true">
                       {s.map((v, i) => (
-                        <div key={i} title={String(v)} style={{ height: `${4 + v * 2}px` }} className="w-1.5 rounded-sm bg-indigo-500/60" />
+                        <div key={i} title={String(v)} style={{ height: `${4 + v * 2}px` }} className="w-1.5 rounded-xs bg-indigo-500/60" />
                       ))}
                     </div>
                     <div className="w-28 text-right text-sm tabular-nums">

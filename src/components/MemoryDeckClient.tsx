@@ -71,7 +71,7 @@ export default function MemoryDeckClient() {
                 <p className="mb-3 text-center text-sm text-slate-500">{T("待复习", "Due now")}: {due.length}</p>
                 <button
                   onClick={() => setFlipped((value) => !value)}
-                  className="min-h-64 w-full rounded-xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 to-emerald-500/10 p-6 text-center">
+                  className="min-h-64 w-full rounded-xl border border-indigo-500/30 bg-linear-to-br from-indigo-500/10 to-emerald-500/10 p-6 text-center">
                   <div className="text-lg font-semibold text-slate-100">{current.title}</div>
                   {flipped ? (
                     <p className="mx-auto mt-5 max-w-2xl whitespace-pre-wrap text-base leading-8 text-slate-100">{current.content}</p>

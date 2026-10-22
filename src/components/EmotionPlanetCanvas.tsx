@@ -105,7 +105,7 @@ export default function EmotionPlanetCanvas() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={T("搜索情绪… (如 焦虑 / calm)", "Search emotions… (e.g. anxiety / calm)")}
-              className="w-full rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+              className="w-full rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-hidden"
             />
             {matches.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">

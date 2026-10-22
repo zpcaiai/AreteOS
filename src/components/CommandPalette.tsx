@@ -75,7 +75,7 @@ export default function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-[1500] flex items-start justify-center bg-slate-950/70 p-4 pt-[12vh] backdrop-blur-sm"
+      className="fixed inset-0 z-[1500] flex items-start justify-center bg-slate-950/70 p-4 pt-[12vh] backdrop-blur-xs"
       onClick={() => setOpen(false)}>
       <div
         ref={dialogRef}
@@ -99,7 +99,7 @@ export default function CommandPalette() {
           aria-expanded="true"
           aria-controls="command-palette-results"
           aria-activedescendant={results[active] ? `command-option-${results[active].href.replaceAll("/", "-") || "root"}` : undefined}
-          className="w-full border-b border-slate-800 bg-transparent px-4 py-3.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
+          className="w-full border-b border-slate-800 bg-transparent px-4 py-3.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-hidden"
         />
         <ul id="command-palette-results" className="max-h-[50vh] overflow-y-auto p-2" role="listbox">
           {results.length ? (

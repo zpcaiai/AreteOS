@@ -1,17 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+@theme {
+  --default-ring-width: 3px;
+  --default-ring-color: var(--color-blue-500);
+}
+
+/* Preserve v3 defaults while utilities remain free to override base styles. */
+@layer base {
+  *, ::before, ::after, ::backdrop, ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  input::placeholder, textarea::placeholder { color: var(--color-gray-400); }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
 
 :root {
   color-scheme: dark;
   /* System-first stacks keep production builds deterministic and avoid a
      network dependency on Google Fonts during CI or disaster recovery. */
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-serif: "EB Garamond", Georgia, Cambria, "Songti SC", serif;
+  --app-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --app-font-serif: "EB Garamond", Georgia, Cambria, "Songti SC", serif;
 }
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
-  font-family: var(--font-sans), ui-sans-serif, system-ui, "PingFang SC",
+  font-family: var(--app-font-sans), ui-sans-serif, system-ui, "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
 }
 
@@ -19,6 +31,7 @@ body {
 :focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
+}
 }
 
 /* Skip link for keyboard / screen-reader users. */
