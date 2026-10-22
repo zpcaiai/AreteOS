@@ -1,5 +1,4 @@
-// Provider-agnostic LLM access. Zero-dependency (uses fetch) so it runs on the
-// edge or node. Switch via AI_PROVIDER = openai | anthropic | ollama | mock.
+// LLM access on Node.js. Switch via AI_PROVIDER = gateway | openai | anthropic | ollama | mock.
 import { generateText } from "ai";
 
 export interface CompleteParams {
@@ -154,17 +153,27 @@ export const MOCK_SENTINEL = "__MOCK__";
 let cached: LLMProvider | null = null;
 export function getProvider(): LLMProvider {
   if (cached) return cached;
-  const provider = (process.env.AI_PROVIDER ?? "mock").toLowerCase();
-  if (provider === "openai" && process.env.OPENAI_API_KEY) {
-    cached = new OpenAIProvider(process.env.OPENAI_API_KEY, process.env.OPENAI_MODEL ?? "gpt-4o");
-  } else if (provider === "anthropic" && process.env.ANTHROPIC_API_KEY) {
-    cached = new AnthropicProvider(process.env.ANTHROPIC_API_KEY, process.env.ANTHROPIC_MODEL ?? "claude-3-5-sonnet-latest");
-  } else if (provider === "gateway" && (process.env.VERCEL_OIDC_TOKEN || process.env.AI_GATEWAY_API_KEY || process.env.VERCEL === "1")) {
+  const production = process.env.NODE_ENV === "production";
+  const provider = (process.env.AI_PROVIDER ?? (production ? "" : "mock")).trim().toLowerCase();
+  if (provider === "openai") {
+    const key = process.env.OPENAI_API_KEY?.trim();
+    if (!key) throw new Error("OpenAI credentials require OPENAI_API_KEY");
+    cached = new OpenAIProvider(key, process.env.OPENAI_MODEL ?? "gpt-4o");
+  } else if (provider === "anthropic") {
+    const key = process.env.ANTHROPIC_API_KEY?.trim();
+    if (!key) throw new Error("Anthropic credentials require ANTHROPIC_API_KEY");
+    cached = new AnthropicProvider(key, process.env.ANTHROPIC_MODEL ?? "claude-3-5-sonnet-latest");
+  } else if (provider === "gateway") {
+    if (!process.env.VERCEL_OIDC_TOKEN?.trim() && !process.env.AI_GATEWAY_API_KEY?.trim() && process.env.VERCEL !== "1") {
+      throw new Error("AI Gateway authentication requires Vercel OIDC or AI_GATEWAY_API_KEY");
+    }
     cached = new VercelGatewayProvider(process.env.AI_GATEWAY_MODEL ?? "openai/gpt-5.4");
   } else if (provider === "ollama") {
     cached = new OllamaProvider(process.env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434", process.env.OLLAMA_MODEL ?? "llama3.1");
-  } else {
+  } else if (provider === "mock" && !production) {
     cached = new MockProvider();
+  } else {
+    throw new Error("A supported real AI_PROVIDER is required in production; mock is only available outside production");
   }
   return cached;
 }

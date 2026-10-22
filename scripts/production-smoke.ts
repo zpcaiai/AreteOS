@@ -1,10 +1,6 @@
-export {};
+import { productionSmokeConfig } from "../src/lib/release/smoke-config";
 
-const base = (process.env.PRODUCTION_URL || process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "");
-if (!base.startsWith("https://")) throw new Error("PRODUCTION_URL must be an https URL");
-const healthSloMs = Number(process.env.HEALTH_SLO_MS ?? "5000");
-const pageSloMs = Number(process.env.PAGE_SLO_MS ?? "5000");
-const timeoutMs = Number(process.env.SMOKE_TIMEOUT_MS ?? "10000");
+const { base, healthSloMs, pageSloMs, timeoutMs } = productionSmokeConfig();
 
 async function get(path: string) {
   const started = Date.now();
