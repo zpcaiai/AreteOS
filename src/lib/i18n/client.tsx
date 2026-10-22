@@ -74,7 +74,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
           onClick={() => setLocale(l)}
           aria-pressed={locale === l}
           className={`rounded-full px-2.5 py-1 text-xs font-medium leading-none transition-colors ${
-            locale === l ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-white"
+            locale === l ? "bg-indigo-600 text-white shadow-xs" : "text-slate-400 hover:text-white"
           }`}>
           {LOCALE_LABELS[l]}
         </button>

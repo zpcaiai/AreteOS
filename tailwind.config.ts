@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "PingFang SC", "Microsoft YaHei", "sans-serif"],
-        serif: ["var(--font-serif)", "Georgia", "Cambria", "serif"],
+        sans: ["var(--app-font-sans)", "ui-sans-serif", "system-ui", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+        serif: ["var(--app-font-serif)", "Georgia", "Cambria", "serif"],
       },
       colors: {
         stage: {

@@ -28,7 +28,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run check:clinical
-      - run: npm audit --omit=dev --audit-level=moderate --registry=https://registry.npmjs.org
+      - run: npm audit --registry=https://registry.npmjs.org
       - name: Generate CycloneDX SBOM
         run: npm sbom --sbom-format cyclonedx > sbom.cdx.json
       - uses: actions/upload-artifact@v7
@@ -203,7 +203,9 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Validate Vercel release credentials
-        run: test -n "$VERCEL_TOKEN" && test -n "$VERCEL_ORG_ID" && test -n "$VERCEL_PROJECT_ID" && test -n "$PRODUCTION_URL"
+        run: |
+          test -n "$PRODUCTION_URL"
+          npx tsx scripts/verify-vercel-access.ts
       - name: Load production project settings
         run: npx vercel@56.3.1 pull --yes --environment=production --token "$VERCEL_TOKEN"
       - name: Create unaliased production candidate

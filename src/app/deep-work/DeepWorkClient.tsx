@@ -93,7 +93,7 @@ export default function DeepWorkPage() {
           <Card title={T("28 天热力图", "28-day heatmap")}>
             <div className="flex flex-wrap gap-1">
               {d.heatmap.map((h) => (
-                <div key={h.date} title={`${h.date}: ${h.minutes}m · ${h.sessions} ${T("次", "sessions")}`} style={{ backgroundColor: heatColor(h.minutes) }} className="h-5 w-5 rounded-sm" />
+                <div key={h.date} title={`${h.date}: ${h.minutes}m · ${h.sessions} ${T("次", "sessions")}`} style={{ backgroundColor: heatColor(h.minutes) }} className="h-5 w-5 rounded-xs" />
               ))}
             </div>
             {(() => {

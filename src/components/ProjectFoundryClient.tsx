@@ -190,7 +190,7 @@ export default function ProjectFoundryClient() {
       <Card title={T("选择一个可用工作区", "Choose a ready workspace")} accent="#a78bfa">
         <p className="text-sm leading-6 text-slate-300">{T("这些不是空白表单或仅选模块的推荐包。每个模板都预置了首批用户、真实问题、MVP 边界和对应的 Arete 能力；载入后任何内容都可以修改。", "These are not empty forms or module-only recommendations. Each template includes a first audience, concrete problem, MVP boundary, and matching Arete capabilities; every part remains editable.")}</p>
         <div className="relative mt-4">
-          <input value={templateQuery} onChange={(event) => setTemplateQuery(event.target.value)} placeholder={T("搜索行业、场景、企业规模或关键词…", "Search industry, scenario, company size, or keyword…")} aria-label={T("搜索工作区模板", "Search workspace templates")} className="w-full rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-2.5 pr-20 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none" />
+          <input value={templateQuery} onChange={(event) => setTemplateQuery(event.target.value)} placeholder={T("搜索行业、场景、企业规模或关键词…", "Search industry, scenario, company size, or keyword…")} aria-label={T("搜索工作区模板", "Search workspace templates")} className="w-full rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-2.5 pr-20 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-hidden" />
           {templateQuery && <button type="button" onClick={() => setTemplateQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-200">{T("清除", "Clear")}</button>}
         </div>
         <div className="mt-4 flex flex-wrap gap-2" aria-label={T("模板业务类型", "Template business type")}>

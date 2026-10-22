@@ -5,7 +5,7 @@
 A customer release is allowed only when all items are green:
 
 1. A fresh PostgreSQL 16 + pgvector database completes `npm run db:migrate:deploy`, `npm run db:seed`, and `npm run build`.
-2. `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run check:clinical`, and `npm audit --omit=dev --audit-level=high` pass in CI.
+2. `npm run typecheck`, `npm test`, `npm run test:e2e`, `npm run check:clinical`, and the full `npm audit --registry=https://registry.npmjs.org` (including development dependencies) pass in CI.
 3. `/api/health` returns HTTP 200 in the production environment.
 4. Real-provider scenario evaluation passes all blocking scenarios. Mock-provider output is never release evidence.
 5. Every clinical module listed in `docs/clinical-review.md` has named expert approval. The automated gate checks structure; it does not replace human review.
@@ -22,6 +22,48 @@ A customer release is allowed only when all items are green:
 4. CI verifies the canonical URL and exact commit after promotion. Manually verify login, email verification, password reset, a personal workspace, a team workspace, and any enabled signed payment flow.
 5. Review error rate, p95 latency, database connections, email delivery and payment reconciliation for at least 30 minutes.
 6. Roll back application traffic on regression. Database migrations in this repository are forward-only; restore the snapshot only through the database incident procedure.
+
+### Deployment token recovery
+
+`VERCEL_TOKEN` is a Vercel deployment access token, separate from AI Gateway
+credits or an AI Gateway API key. CI checks read access to the configured project
+and team before pulling settings. It refuses redirects, mismatched targets and
+invalid credentials, and never prints the token or upstream response bodies.
+
+If preflight reports `VERCEL_AUTH_INVALID`, the repository secret owner must create
+a new token in [Vercel account settings](https://vercel.com/account/tokens), scoped
+to the release project (or its owning team if project scope is unavailable), and
+replace `VERCEL_TOKEN` in GitHub Actions secrets. Check the `Production`
+environment for an overriding secret as well as the repository secret. Never put
+the token in an issue, source file, command argument or chat. Do not copy a broad
+personal CLI login credential into shared CI. An invalid-token response alone
+does not distinguish expiration from revocation.
+
+`VERCEL_TARGET_ACCESS_DENIED` instead requires checking team membership, token
+scope and the configured `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID`. A successful
+read-only preflight is not proof that a deployment or promotion succeeded.
+
+### AI Gateway funding and attestation recovery
+
+In the Vercel dashboard select the team owning `VERCEL_PROJECT_ID`, open **AI
+Gateway**, and review the credits balance. The billing owner can buy a one-time
+amount of Gateway credits; selecting a different team or merely adding a payment
+method does not fund this project's model requests. Review the current
+[pricing and paid-tier terms](https://vercel.com/docs/ai-gateway/pricing), including
+the effect of a first purchase on monthly free credits. Automatic top-up is not
+required. Keep the configured model and the spending boundary unchanged unless
+the owner explicitly authorizes a change.
+
+After access is restored, bind fresh evidence to the intended Git revision and
+actual production provider/model configuration. Execute a real model request,
+`npm run eval:agents -- --judge --require-real`, and `npm run eval:scenarios` with
+that real provider; all required checks must pass. Retain reports, raw outputs,
+revision/model, timing, cost and SHA256 digests outside the source repository.
+Only then set `AI_RUNTIME_VERIFIED_AT` to the actual successful completion time
+and, when all its evidence requirements are met, `AI_EVAL_ATTESTED_AT`. Preserve
+the seven-day runtime expiry and all other release controls. Follow the candidate
+verification, promotion and expected-commit canonical smoke steps above; a failed
+or skipped step remains unfinished.
 
 ## Backup and restore
 
