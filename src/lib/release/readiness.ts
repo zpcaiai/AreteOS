@@ -69,6 +69,7 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
   const clinicalEnabled = truthy(env.CLINICAL_FEATURE_ENABLED);
   const registrationMode = env.REGISTRATION_MODE || "closed";
   const observability = env.OBSERVABILITY_PROVIDER || "vercel";
+  const aiProvider = env.AI_PROVIDER?.trim().toLowerCase();
 
   const checks: ReleaseCheck[] = [
     required("runtime-core", "runtime", ["DATABASE_URL", "AUTH_SECRET", "NEXT_PUBLIC_SITE_URL", "ADMIN_EMAILS", "CRON_SECRET"], env, "Core runtime configuration is complete"),
@@ -78,20 +79,20 @@ export function releaseReadiness(env: NodeJS.ProcessEnv = process.env, requested
     ["closed", "invite", "open"].includes(registrationMode)
       ? { id: "registration-mode", category: "security", status: "pass", message: `Registration mode is explicit (${registrationMode})` }
       : { id: "registration-mode", category: "security", status: "fail", message: "Registration mode is invalid", remediation: "Set REGISTRATION_MODE to closed, invite, or open" },
-    env.AI_PROVIDER && env.AI_PROVIDER !== "mock"
-      ? { id: "real-ai-provider", category: "ai", status: "pass", message: `A real AI provider is selected (${env.AI_PROVIDER})` }
+    aiProvider && ["gateway", "openai", "anthropic", "ollama"].includes(aiProvider)
+      ? { id: "real-ai-provider", category: "ai", status: "pass", message: `A real AI provider is selected (${aiProvider})` }
       : { id: "real-ai-provider", category: "ai", status: "fail", message: "A real AI provider is required", remediation: "Configure AI_PROVIDER and its provider credentials" },
   ];
-  if (env.AI_PROVIDER === "gateway") {
+  if (aiProvider === "gateway") {
     checks.push(env.VERCEL === "1" || present("VERCEL_OIDC_TOKEN", env) || present("AI_GATEWAY_API_KEY", env)
       ? { id: "ai-credentials", category: "ai", status: "pass", message: "Vercel AI Gateway authentication is available" }
       : { id: "ai-credentials", category: "ai", status: "fail", message: "AI Gateway authentication is unavailable", remediation: "Deploy on Vercel with OIDC or set AI_GATEWAY_API_KEY" });
   } else {
-    const aiCredential = env.AI_PROVIDER === "openai"
+    const aiCredential = aiProvider === "openai"
       ? ["OPENAI_API_KEY"]
-      : env.AI_PROVIDER === "anthropic"
+      : aiProvider === "anthropic"
         ? ["ANTHROPIC_API_KEY"]
-        : env.AI_PROVIDER === "ollama"
+        : aiProvider === "ollama"
           ? ["OLLAMA_BASE_URL"]
           : ["AI_PROVIDER"];
     checks.push(required("ai-credentials", "ai", aiCredential, env, "AI provider credentials are configured"));

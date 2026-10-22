@@ -16,8 +16,15 @@ export const notFound = (message = "Not found") => NextResponse.json({ error: me
 export function requireSameOrigin(req: Request) {
   const origin = req.headers.get("origin");
   if (!origin && process.env.NODE_ENV !== "production") return;
-  const expected = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
-  if (!origin || new URL(origin).origin !== new URL(expected).origin) {
+  const expected = new URL(process.env.NEXT_PUBLIC_SITE_URL || req.url).origin;
+  let allowed = false;
+  if (origin) {
+    try {
+      const parsed = new URL(origin);
+      allowed = parsed.origin === origin && parsed.origin === expected;
+    } catch { /* Malformed client origins are rejected below. */ }
+  }
+  if (!allowed) {
     throw new HttpError(403, "Cross-site request rejected");
   }
 }
@@ -45,9 +52,13 @@ export async function parseBody<S extends z.ZodTypeAny>(req: Request, schema: S)
 
 export function pagination(req: Request, defaults = { limit: 30, max: 100 }) {
   const url = new URL(req.url);
-  const page = Math.max(1, Number(url.searchParams.get("page") ?? "1") || 1);
-  const limit = Math.min(defaults.max, Math.max(1, Number(url.searchParams.get("limit") ?? defaults.limit) || defaults.limit));
-  return { page, limit, skip: (page - 1) * limit };
+  const requestedPage = Number(url.searchParams.get("page") ?? "1");
+  const requestedLimit = Number(url.searchParams.get("limit") ?? defaults.limit);
+  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const limit = Number.isSafeInteger(requestedLimit) && requestedLimit > 0 ? Math.min(defaults.max, requestedLimit) : defaults.limit;
+  const skip = (page - 1) * limit;
+  if (!Number.isSafeInteger(skip) || skip > 2_147_483_647) throw new HttpError(400, "Pagination offset is too large");
+  return { page, limit, skip };
 }
 
 /** Wrap a route handler so thrown Responses/Errors become clean JSON. */

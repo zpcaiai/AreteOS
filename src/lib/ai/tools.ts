@@ -9,6 +9,8 @@
 import { prisma } from "../db";
 import { recall } from "../memory";
 import { reportError } from "../logger";
+import { generateText, jsonSchema, stepCountIs, tool } from "ai";
+import { getProvider } from "./provider";
 
 export interface ToolDef {
   name: string;
@@ -201,6 +203,31 @@ interface LoopParams {
   onEvent?: ChatEventHandler;
 }
 
+async function gatewayLoop({ system, messages, userId, temperature = 0.5, onEvent }: LoopParams): Promise<ChatResult> {
+  const toolCalls: ToolCallRecord[] = [];
+  onEvent?.({ type: "thinking" });
+  const result = await generateText({
+    model: process.env.AI_GATEWAY_MODEL ?? "openai/gpt-5.4",
+    system,
+    messages,
+    temperature,
+    maxRetries: 0,
+    abortSignal: AbortSignal.timeout(120_000),
+    stopWhen: stepCountIs(MAX_TOOL_TURNS + 1),
+    prepareStep: ({ stepNumber }) => stepNumber === MAX_TOOL_TURNS ? { toolChoice: "none" } : undefined,
+    tools: Object.fromEntries(COACH_TOOLS.map((definition) => [definition.name, tool({
+      description: definition.description,
+      inputSchema: jsonSchema<Record<string, unknown>>(definition.parameters),
+      execute: async (args) => {
+        toolCalls.push({ tool: definition.name, args });
+        onEvent?.({ type: "tool", tool: definition.name });
+        return executeTool(definition.name, args, { userId });
+      },
+    })])),
+  });
+  return { text: result.text, toolCalls };
+}
+
 async function openaiLoop({ system, messages, userId, temperature = 0.5, onEvent }: LoopParams, baseUrl: string, apiKey: string | undefined, model: string): Promise<ChatResult> {
   const toolCalls: ToolCallRecord[] = [];
   const convo: Record<string, unknown>[] = [
@@ -312,19 +339,23 @@ async function mockLoop({ messages, userId, onEvent }: LoopParams): Promise<Chat
 
 /**
  * Run a multi-turn chat with read-only tool access to the user's data.
- * Provider chosen via AI_PROVIDER (openai | anthropic | ollama | mock).
+ * Provider chosen via AI_PROVIDER (gateway | openai | anthropic | ollama | mock).
  */
 export async function chatWithTools(params: LoopParams): Promise<ChatResult> {
-  const provider = (process.env.AI_PROVIDER ?? "mock").toLowerCase();
-  if (provider === "openai" && process.env.OPENAI_API_KEY) {
-    return openaiLoop(params, "https://api.openai.com/v1", process.env.OPENAI_API_KEY, process.env.OPENAI_MODEL ?? "gpt-4o");
+  const provider = (process.env.AI_PROVIDER ?? (process.env.NODE_ENV === "production" ? "" : "mock")).trim().toLowerCase();
+  // Explicit offline fixtures are supported; real-provider failures never enter this loop.
+  if (provider === "mock") return mockLoop(params);
+  getProvider(); // Apply the same real-provider credential validation as the agent path.
+  if (provider === "gateway") return gatewayLoop(params);
+  if (provider === "openai") {
+    return openaiLoop(params, "https://api.openai.com/v1", process.env.OPENAI_API_KEY!.trim(), process.env.OPENAI_MODEL ?? "gpt-4o");
   }
   if (provider === "anthropic" && process.env.ANTHROPIC_API_KEY) {
-    return anthropicLoop(params, process.env.ANTHROPIC_API_KEY, process.env.ANTHROPIC_MODEL ?? "claude-3-5-sonnet-latest");
+    return anthropicLoop(params, process.env.ANTHROPIC_API_KEY!.trim(), process.env.ANTHROPIC_MODEL ?? "claude-3-5-sonnet-latest");
   }
   if (provider === "ollama") {
     // Ollama exposes an OpenAI-compatible endpoint with tool support.
     return openaiLoop(params, `${(process.env.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434").replace(/\/$/, "")}/v1`, undefined, process.env.OLLAMA_MODEL ?? "llama3.1");
   }
-  return mockLoop(params);
+  throw new Error("Unsupported coach AI_PROVIDER");
 }

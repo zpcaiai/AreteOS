@@ -4,14 +4,14 @@
 //                                    input and must produce schema-valid output.
 //   npm run eval:agents -- --judge — additionally grade each output against the
 //                                    golden example with an LLM judge (requires a
-//                                    real AI_PROVIDER; skipped under mock).
+//                                    real AI_PROVIDER; fails under mock).
 //
 // Writes eval-report.json so runs can be diffed across prompt changes.
 
 import { writeFileSync } from "node:fs";
-import { AGENTS } from "../src/lib/agents/registry";
 import { getProvider } from "../src/lib/ai/provider";
 import { gradeOutput, isSafetySensitive } from "../src/lib/eval/rubric";
+import { parseJudgeVerdict } from "../src/lib/eval/judge";
 
 interface Row {
   agent: string;
@@ -38,16 +38,16 @@ async function judge(agentName: string, input: unknown, golden: unknown, candida
     json: true,
     temperature: 0,
   });
-  try {
-    const parsed = JSON.parse(raw) as { score?: number; reason?: string };
-    return { score: Number(parsed.score) || 0, reason: String(parsed.reason ?? "") };
-  } catch {
-    return { score: 0, reason: `Judge returned non-JSON: ${raw.slice(0, 120)}` };
-  }
+  return parseJudgeVerdict(raw);
 }
 
 async function main() {
   const useJudge = process.argv.includes("--judge");
+  const provider = getProvider();
+  if (provider.name === "mock" && (useJudge || process.argv.includes("--require-real"))) {
+    throw new Error("A real AI_PROVIDER is required for --judge or --require-real; mock evidence is only an offline smoke check");
+  }
+  const { AGENTS } = await import("../src/lib/agents/registry");
   const rows: Row[] = [];
 
   for (const agent of Object.values(AGENTS)) {
@@ -62,7 +62,7 @@ async function main() {
         if (verdict) {
           row.judgeScore = verdict.score;
           row.judgeReason = verdict.reason;
-          if (verdict.score > 0 && verdict.score < 3) row.ok = false;
+          if (verdict.score < 3) row.ok = false;
         }
       }
       rows.push(row);
@@ -78,6 +78,8 @@ async function main() {
   const report = {
     ranAt: new Date().toISOString(),
     provider: getProvider().name,
+    mock: provider.name === "mock",
+    evidenceKind: provider.name === "mock" ? "OFFLINE_SMOKE" : "REAL_PROVIDER",
     judged: judged.length,
     avgRubricScore: rows.filter((r) => typeof r.rubricScore === "number").length
       ? rows.reduce((sum, r) => sum + (r.rubricScore ?? 0), 0) / rows.filter((r) => typeof r.rubricScore === "number").length
