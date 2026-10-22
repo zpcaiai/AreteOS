@@ -21,12 +21,17 @@ test("login retains typography, form spacing and light/dark surfaces", async ({ 
   expect(first.width).toBeGreaterThan(200);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
-  await page.getByRole("button", { name: "Switch to light theme" }).first().click();
+  // Login intentionally has no sidebar controls; render each persisted theme.
+  // The authenticated coach suite separately exercises the real toggle button.
+  const origin = new URL(page.url()).origin;
+  await page.context().addCookies([{ name: "theme", value: "light", url: origin }]);
+  await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page.locator("body")).toHaveCSS("background-color", "rgb(244, 246, 251)");
   await expect(email).toHaveCSS("background-color", "rgb(238, 242, 247)");
   await expect(email).toHaveCSS("color", "rgb(15, 23, 42)");
-  await page.getByRole("button", { name: "Switch to dark theme" }).first().click();
+  await page.context().addCookies([{ name: "theme", value: "dark", url: origin }]);
+  await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(email).not.toHaveCSS("background-color", "rgb(238, 242, 247)");
 });
